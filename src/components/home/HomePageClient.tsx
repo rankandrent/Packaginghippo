@@ -22,7 +22,7 @@ type HomepageData = {
     printing: any
     steps: any
     why_choose_us: any
-    why_choose_us: any
+
     faq: any
     ordering_process: any
 }

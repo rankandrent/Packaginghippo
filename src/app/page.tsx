@@ -55,5 +55,5 @@ export async function generateMetadata() {
 
 export default async function Home() {
   const data = await getHomepageData()
-  return <HomePageClient data={data} />
+  return <HomePageClient data={data as any} />
 }
