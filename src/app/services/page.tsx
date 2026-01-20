@@ -58,7 +58,7 @@ export default function ServicesPage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Header */}
-            <div className="bg-black text-white py-20">
+            <div className="bg-black text-white pt-32 pb-20">
                 <div className="container mx-auto px-4 text-center">
                     <h1 className="text-5xl font-black mb-4 text-yellow-500">Our Services</h1>
                     <p className="text-xl text-gray-400 max-w-2xl mx-auto">

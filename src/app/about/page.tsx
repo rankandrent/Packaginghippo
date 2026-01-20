@@ -6,7 +6,7 @@ export default function AboutPage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Header */}
-            <div className="bg-zinc-950 text-white py-24 relative overflow-hidden">
+            <div className="bg-zinc-950 text-white pt-32 pb-24 relative overflow-hidden">
                 <div className="absolute inset-0 bg-yellow-500/10"></div>
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <h1 className="text-5xl font-black mb-6">About Packaging Hippo</h1>

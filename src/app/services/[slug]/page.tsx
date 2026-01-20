@@ -58,7 +58,7 @@ export default async function ServicePage({ params }: Props) {
     return (
         <div className="min-h-screen bg-white">
             {/* HEADER */}
-            <div className="bg-gray-900 text-white py-20">
+            <div className="bg-gray-900 text-white pt-32 pb-20">
                 <div className="container mx-auto px-4 text-center">
                     <h1 className="text-4xl md:text-6xl font-black mb-6 capitalize text-yellow-500">
                         {category.name}

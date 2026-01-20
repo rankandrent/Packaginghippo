@@ -51,7 +51,7 @@ export function AdminSidebar() {
     const pathname = usePathname()
 
     return (
-        <div className="flex h-full w-64 flex-col border-r bg-muted/40 transition-all">
+        <div className="fixed top-0 left-0 h-screen w-64 flex-col border-r bg-white z-40 shadow-sm flex">
             <div className="flex h-14 items-center border-b px-6">
                 <Link href="/" className="flex items-center gap-2 font-semibold">
                     <span className="text-xl font-bold">Pakiging Hippo</span>

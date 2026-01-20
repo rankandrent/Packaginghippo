@@ -9,7 +9,7 @@ const categories = Object.values(STATIC_PRODUCT_CATEGORIES)
 export default function ProductsPage() {
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="bg-black text-white py-20">
+            <div className="bg-black text-white pt-32 pb-20">
                 <div className="container mx-auto px-4 text-center">
                     <h1 className="text-5xl font-black mb-4 text-yellow-500">Our Products</h1>
                     <p className="text-xl text-gray-400">Explore our wide range of custom packaging solutions.</p>

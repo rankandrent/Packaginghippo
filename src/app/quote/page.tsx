@@ -38,7 +38,7 @@ export default function QuotePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 md:py-12">
+        <div className="min-h-screen bg-gray-50 pt-24 pb-8 md:py-12 md:pt-28">
             <div className="container mx-auto px-4">
 
                 {/* Compact Form Container */}

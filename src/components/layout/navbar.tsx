@@ -8,7 +8,7 @@ export function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
 
     return (
-        <header className="fixed w-full z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800">
+        <header className="site-navbar fixed w-full z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800">
             <div className="container mx-auto px-4 h-20 flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">

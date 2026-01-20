@@ -6,11 +6,23 @@ export default function AdminLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-            <main className="flex-1 ml-64 p-8 overflow-y-auto h-screen">
-                {children}
-            </main>
-        </div>
+        <>
+            {/* Hide navbar and footer for admin pages */}
+            <style>{`
+                body > header, 
+                body > footer,
+                body > nav,
+                .site-navbar,
+                .site-footer {
+                    display: none !important;
+                }
+            `}</style>
+            <div className="min-h-screen bg-gray-50">
+                <AdminSidebar />
+                <main className="ml-64 p-8 min-h-screen">
+                    {children}
+                </main>
+            </div>
+        </>
     )
 }
