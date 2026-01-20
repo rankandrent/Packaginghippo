@@ -4,7 +4,7 @@ import Link from "next/link"
 import prisma from "@/lib/db"
 
 // Revalidate every minute
-export const revalidate = 60
+export const revalidate = 0
 
 async function getCategories() {
     try {
@@ -34,7 +34,7 @@ export default async function ProductsPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     {categories.length > 0 ? (
                         categories.map((cat) => (
-                            <Link href={`/products/${cat.slug}`} key={cat.id} className="group">
+                            <Link href={`/services/${cat.slug}`} key={cat.id} className="group">
                                 <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
                                     <div className="aspect-square bg-white relative flex items-center justify-center p-8 group-hover:bg-yellow-50 transition-colors">
                                         <Package className="w-20 h-20 text-gray-200 group-hover:text-yellow-500 transition-colors" />

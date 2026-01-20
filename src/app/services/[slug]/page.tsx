@@ -3,13 +3,13 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import prisma from "@/lib/prisma"
+import prisma from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Check, Star, User, Package } from "lucide-react"
 
 // Revalidate every 60 seconds
-export const revalidate = 60
+export const revalidate = 0
 
 type Props = {
     params: Promise<{ slug: string }>
@@ -39,8 +39,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     return {
-        title: `${category.name} | Custom Packaging`,
-        description: category.description,
+        title: category.seoTitle || `${category.name} | Custom Packaging`,
+        description: category.seoDesc || category.description,
         alternates: {
             canonical: `/services/${slug}`,
         },
@@ -52,7 +52,7 @@ export default async function ServicePage({ params }: Props) {
     const category = await getCategory(slug)
 
     if (!category) {
-        notFound() // Or render a fallback for hardcoded legacy services if needed
+        notFound()
     }
 
     return (
@@ -99,7 +99,7 @@ export default async function ServicePage({ params }: Props) {
                             <h3 className="text-2xl font-bold">Available Products</h3>
                             <div className="grid sm:grid-cols-2 gap-6">
                                 {category.products.map((product: any) => (
-                                    <Link href={`/quote?product=${product.slug}`} key={product.id}>
+                                    <Link href={`/products/${product.slug}`} key={product.id}>
                                         <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                                             <CardContent className="p-4">
                                                 <div className="aspect-square relative bg-gray-100 mb-4 rounded-md overflow-hidden">
@@ -125,9 +125,6 @@ export default async function ServicePage({ params }: Props) {
                             </div>
                         </div>
                     )}
-
-                    {/* Long Form Content Placeholder - Could come from DB if added to schema */}
-                    {/* ... keeping existing static content structure if needed, or removing ... */}
 
                     {/* FAQ Section */}
                     <div className="space-y-6">

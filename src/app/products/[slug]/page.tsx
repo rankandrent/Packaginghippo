@@ -1,4 +1,3 @@
-
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
@@ -6,22 +5,24 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Check, Star, Package, ArrowRight } from "lucide-react"
-import { STATIC_PRODUCT_CATEGORIES } from "@/lib/data/products-data"
+import prisma from "@/lib/db"
 
 // Revalidate every 60 seconds
-export const revalidate = 60
+export const revalidate = 0
 
 type Props = {
     params: Promise<{ slug: string }>
 }
 
 async function getProductData(slug: string) {
-    // 1. Try to find in static data first (fastest, and covers our new manual pages)
-    const staticData = STATIC_PRODUCT_CATEGORIES[slug]
-    if (staticData) return staticData
-
-    // 2. If not found, we could check DB (cms_categories) here in future
-    return null
+    try {
+        const product = await prisma.product.findUnique({
+            where: { slug }
+        })
+        return product
+    } catch (e) {
+        return null
+    }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -35,8 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     return {
-        title: `${product.name} | Custom Packaging`,
-        description: product.description,
+        title: product.seoTitle || `${product.name} | Custom Packaging`,
+        description: product.seoDesc || product.shortDesc || product.description,
         alternates: {
             canonical: `/products/${slug}`,
         },
@@ -51,6 +52,20 @@ export default async function ProductPage({ params }: Props) {
         notFound()
     }
 
+    // Default features/benefits if not in DB (schema might not have array fields for them yet, 
+    // or we use materials/finishings as proxy)
+    const benefits = [
+        "No Die & Plate Charges",
+        "Free Graphic Design Support",
+        "Fast Turnaround Time",
+        "Starting from 100 Units"
+    ]
+
+    const features = [
+        ...(product.materials || []),
+        ...(product.finishings || [])
+    ]
+
     return (
         <div className="min-h-screen bg-white">
             {/* HEADER */}
@@ -61,7 +76,7 @@ export default async function ProductPage({ params }: Props) {
                         {product.name}
                     </h1>
                     <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                        {product.description}
+                        {product.shortDesc || product.description}
                     </p>
                     <div className="mt-8">
                         <Button variant="default" size="lg" className="text-lg px-8 py-6 rounded-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold" asChild>
@@ -75,15 +90,24 @@ export default async function ProductPage({ params }: Props) {
                 {/* MAIN CONTENT */}
                 <div className="md:col-span-2 space-y-12">
 
+                    {/* Product Images if available */}
+                    {product.images && product.images.length > 0 && (
+                        <div className="grid grid-cols-2 gap-4">
+                            {product.images.map((img, i) => (
+                                <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 border">
+                                    <Image src={img} alt={product.name} fill className="object-cover" />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Intro Block */}
                     <div className="prose prose-lg max-w-none text-gray-700">
-                        <p className="lead text-xl font-medium text-gray-900">
-                            {product.longDescription}
-                        </p>
+                        <div dangerouslySetInnerHTML={{ __html: product.description || '' }} />
 
                         <h3 className="text-2xl font-bold mt-8 mb-4">Key Benefits</h3>
                         <div className="grid sm:grid-cols-2 gap-4">
-                            {product.benefits.map((benefit, i) => (
+                            {benefits.map((benefit, i) => (
                                 <div key={i} className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg">
                                     <div className="bg-yellow-100 p-2 rounded-full text-yellow-700">
                                         <Check className="w-5 h-5" />
@@ -93,24 +117,28 @@ export default async function ProductPage({ params }: Props) {
                             ))}
                         </div>
 
-                        <h3 className="text-2xl font-bold mt-8 mb-4">Standard Features</h3>
-                        <ul className="space-y-2">
-                            {product.features.map((feature, i) => (
-                                <li key={i} className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                                    {feature}
-                                </li>
-                            ))}
-                        </ul>
+                        {features.length > 0 && (
+                            <>
+                                <h3 className="text-2xl font-bold mt-8 mb-4">Specifications & Options</h3>
+                                <ul className="space-y-2">
+                                    {features.map((feature, i) => (
+                                        <li key={i} className="flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
                     </div>
 
                     {/* FAQ Section */}
                     <div className="space-y-6 pt-8 border-t">
                         <h3 className="text-2xl font-bold">Frequently Asked Questions</h3>
                         {[
-                            { q: "What is the minimum order quantity?", a: "Our standard MOQ starts at 100 units, but we can accommodate smaller runs for specific prototypes." },
-                            { q: "Can I print on the inside of the box?", a: "Yes! We offer full inside and outside printing to give your customers a premium unboxing experience." },
-                            { q: "How long does production take?", a: "Standard turnaround is 8-10 business days after design approval. Rush options are available." }
+                            { q: "What is the minimum order quantity?", a: `Our standard MOQ starts at ${product.minOrder || 100} units.` },
+                            { q: "Can I print on the inside?", a: "Yes! We offer full inside and outside printing." },
+                            { q: "How long does production take?", a: "Standard turnaround is 8-10 business days." }
                         ].map((faq, i) => (
                             <div key={i} className="border-b pb-4 last:border-0">
                                 <h4 className="font-bold text-lg mb-2">{faq.q}</h4>
