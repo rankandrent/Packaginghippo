@@ -2,59 +2,26 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Box, Leaf, ShoppingBag, Truck } from "lucide-react"
 import Link from "next/link"
+import prisma from "@/lib/db"
 
-const allServices = [
-    {
-        title: "Mailer Boxes",
-        desc: "Durable and stylish corrugated boxes perfect for e-commerce shipping.",
-        icon: Truck,
-        slug: "mailer-boxes"
-    },
-    {
-        title: "Rigid Boxes",
-        desc: "Premium rigid setup boxes for luxury products and gifts.",
-        icon: Box,
-        slug: "rigid-boxes"
-    },
-    {
-        title: "Folding Cartons",
-        desc: "Lightweight cardstock boxes for retail shelving and cosmetics.",
-        icon: ShoppingBag,
-        slug: "folding-cartons"
-    },
-    {
-        title: "Eco-Friendly",
-        desc: "Sustainable kraft options made from 100% recycled materials.",
-        icon: Leaf,
-        slug: "eco-friendly"
-    },
-    {
-        title: "Display Boxes",
-        desc: "Counter top displays designed to grab attention at checkout.",
-        icon: Box,
-        slug: "display-boxes"
-    },
-    {
-        title: "Food Packaging",
-        desc: "Food-grade safe materials for takeout, bakery, and produce.",
-        icon: ShoppingBag,
-        slug: "food-packaging"
-    },
-    {
-        title: "Apparel Boxes",
-        desc: "Two-piece boxes perfect for clothing and accessories.",
-        icon: Box,
-        slug: "apparel-boxes"
-    },
-    {
-        title: "CBD Packaging",
-        desc: "Child-resistant options compliant with industry regulations.",
-        icon: Leaf,
-        slug: "cbd-packaging"
+export const revalidate = 60
+
+async function getServices() {
+    try {
+        // In this schema, Product Categories serve as services
+        const categories = await prisma.productCategory.findMany({
+            where: { isActive: true },
+            orderBy: { order: 'asc' }
+        })
+        return categories
+    } catch (e) {
+        return []
     }
-]
+}
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+    const services = await getServices()
+
     return (
         <div className="min-h-screen bg-white">
             {/* Header */}
@@ -70,15 +37,15 @@ export default function ServicesPage() {
             {/* Services Grid */}
             <div className="container mx-auto px-4 py-16">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {allServices.map((service, i) => (
+                    {services.map((service, i) => (
                         <Link href={`/services/${service.slug}`} key={i} className="group">
                             <Card className="h-full border border-gray-100 shadow-sm hover:shadow-xl hover:border-yellow-400 transition-all duration-300">
                                 <CardContent className="p-8 space-y-4">
                                     <div className="w-14 h-14 bg-yellow-50 rounded-xl flex items-center justify-center text-yellow-600 group-hover:bg-yellow-500 group-hover:text-black transition-colors">
-                                        <service.icon className="w-7 h-7" />
+                                        <Box className="w-7 h-7" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-gray-900">{service.title}</h3>
-                                    <p className="text-gray-500 leading-relaxed">{service.desc}</p>
+                                    <h3 className="text-2xl font-bold text-gray-900">{service.name}</h3>
+                                    <p className="text-gray-500 leading-relaxed">{service.description}</p>
                                     <div className="pt-4 flex items-center text-sm font-bold text-yellow-600 group-hover:gap-2 transition-all">
                                         Learn More <ArrowRight className="ml-1 w-4 h-4" />
                                     </div>
@@ -96,7 +63,7 @@ export default function ServicesPage() {
                     <p className="text-gray-600 max-w-xl mx-auto">
                         We specialize in completely custom projects. If you have unique requirements, our engineering team is ready to help.
                     </p>
-                    <Button variant="yellow" size="lg" asChild>
+                    <Button variant="default" size="lg" className="bg-yellow-500 text-black hover:bg-yellow-400 font-bold" asChild>
                         <Link href="/contact">Contact Custom Team</Link>
                     </Button>
                 </div>

@@ -3,7 +3,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { supabase } from "@/lib/supabase"
+import prisma from "@/lib/prisma"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Check, Star, User, Package } from "lucide-react"
@@ -16,16 +16,16 @@ type Props = {
 }
 
 async function getCategory(slug: string) {
-    const { data, error } = await supabase
-        .from("cms_categories")
-        .select("*, products:cms_products(*)")
-        .eq("slug", slug)
-        .single()
-
-    if (error || !data) {
+    try {
+        const category = await prisma.productCategory.findUnique({
+            where: { slug },
+            include: { products: true }
+        })
+        return category
+    } catch (error) {
+        console.error("Error fetching category:", error)
         return null
     }
-    return data
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

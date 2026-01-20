@@ -1,12 +1,26 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Package } from "lucide-react"
 import Link from "next/link"
+import prisma from "@/lib/db"
 
-import { STATIC_PRODUCT_CATEGORIES } from "@/lib/data/products-data"
+// Revalidate every minute
+export const revalidate = 60
 
-const categories = Object.values(STATIC_PRODUCT_CATEGORIES)
+async function getCategories() {
+    try {
+        const categories = await prisma.productCategory.findMany({
+            where: { isActive: true },
+            orderBy: { order: 'asc' }
+        })
+        return categories
+    } catch (e) {
+        return []
+    }
+}
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+    const categories = await getCategories()
+
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="bg-black text-white pt-32 pb-20">
@@ -18,21 +32,27 @@ export default function ProductsPage() {
 
             <div className="container mx-auto px-4 py-16">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    {categories.map((cat, i) => (
-                        <Link href={`/products/${cat.slug}`} key={i} className="group">
-                            <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                <div className="aspect-square bg-white relative flex items-center justify-center p-8 group-hover:bg-yellow-50 transition-colors">
-                                    <Package className="w-20 h-20 text-gray-200 group-hover:text-yellow-500 transition-colors" />
-                                </div>
-                                <CardContent className="p-6 bg-white border-t group-hover:bg-gray-900 group-hover:text-white transition-colors">
-                                    <h3 className="font-bold text-lg mb-2">{cat.name}</h3>
-                                    <p className="text-xs opacity-60 flex items-center gap-2">
-                                        View Details <ArrowRight className="w-3 h-3" />
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </Link>
-                    ))}
+                    {categories.length > 0 ? (
+                        categories.map((cat) => (
+                            <Link href={`/products/${cat.slug}`} key={cat.id} className="group">
+                                <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
+                                    <div className="aspect-square bg-white relative flex items-center justify-center p-8 group-hover:bg-yellow-50 transition-colors">
+                                        <Package className="w-20 h-20 text-gray-200 group-hover:text-yellow-500 transition-colors" />
+                                    </div>
+                                    <CardContent className="p-6 bg-white border-t group-hover:bg-gray-900 group-hover:text-white transition-colors">
+                                        <h3 className="font-bold text-lg mb-2">{cat.name}</h3>
+                                        <p className="text-sm opacity-60 flex items-center gap-2">
+                                            View Details <ArrowRight className="w-3 h-3" />
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        ))
+                    ) : (
+                        <div className="col-span-full text-center py-20 text-gray-500">
+                            No products found. Please add products from the dashboard.
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

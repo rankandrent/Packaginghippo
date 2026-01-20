@@ -1,7 +1,6 @@
-
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+import prisma from "@/lib/db"
 import { RichTextEditor } from "@/components/admin/RichTextEditor" // We might need a read-only viewer, or just render HTML
 
 // Allow caching for 60 seconds
@@ -12,17 +11,19 @@ type Props = {
 }
 
 async function getPage(slug: string) {
-    const { data, error } = await supabase
-        .from("cms_pages")
-        .select("*")
-        .eq("slug", slug)
-        .eq("is_published", true)
-        .single()
+    try {
+        const page = await prisma.page.findUnique({
+            where: { slug }
+        })
 
-    if (error || !data) {
+        if (!page || !page.isPublished) {
+            return null
+        }
+        return page
+    } catch (error) {
+        console.error("Error fetching page:", error)
         return null
     }
-    return data
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -36,8 +37,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     return {
-        title: page.seo_title || page.title,
-        description: page.meta_description,
+        title: page.seoTitle || page.title,
+        description: page.seoDesc,
         alternates: {
             canonical: `/${slug}`,
         },
@@ -52,22 +53,25 @@ export default async function DynamicPage({ params }: Props) {
         notFound()
     }
 
+    // specific handling for Json content if needed, trusting it's string-compat or handle Tiptap
+    const htmlContent = typeof page.content === 'string' ? page.content : JSON.stringify(page.content)
+
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
             <h1 className="text-4xl font-bold mb-8">{page.title}</h1>
 
-            {/* Search Engine Schema */}
-            {page.schema_json && (
+            {/* Search Engine Schema - Removed as schema_json is not in Prisma model yet */}
+            {/* {page.schema_json && (
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(page.schema_json) }}
                 />
-            )}
+            )} */}
 
             {/* Content Rendering */}
             <div
                 className="prose prose-lg max-w-none"
-                dangerouslySetInnerHTML={{ __html: typeof page.content === 'string' ? page.content : '' }} // Handle JSON if needed
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
         </div>
     )
