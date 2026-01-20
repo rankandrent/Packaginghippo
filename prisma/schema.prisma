@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  id          String   @id @default(uuid())
+  siteName    String   @default("Packaging Hippo")
+  contactPhone String?
+  contactEmail String?
+  address     String?
+  logoUrl     String?
+  socialLinks String?  // JSON string
+  metaDefault String?  // JSON string for default SEO
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Page {
+  id        String   @id @default(uuid())
+  slug      String   @unique // e.g., "home", "about", "custom-quote"
+  title     String
+  content   String?  // JSON for flexible sections
+  seoTitle  String?
+  seoDesc   String?
+  isPublished Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductCategory {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          String          @id @default(uuid())
+  name        String
+  slug        String          @unique
+  description String?         // Rich text or JSON
+  shortDesc   String?
+  images      String[]        // Array of URLs
+  minOrder    Int?            @default(100)
+  priceRequest Boolean        @default(true)
+  categoryId  String
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  
+  // Specs
+  dimensions  String?
+  materials   String?
+  finishings  String?
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Inquiry {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  
+  // Quote Details
+  boxType   String?
+  quantity  String?
+  dimensions String? // LxWxD
+  color     String?
+  message   String?
+  
+  status    String   @default("PENDING") // PENDING, REPLIED, CLOSED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
