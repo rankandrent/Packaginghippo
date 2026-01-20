@@ -1,17 +1,9 @@
-
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import { supabase } from "@/lib/supabase"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
     Table,
     TableBody,
@@ -20,19 +12,18 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Plus, Pencil, Trash2, Loader2, Package } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Plus, Pencil, Trash2, Loader2 } from "lucide-react"
 
 type Product = {
     id: string
     name: string
     slug: string
-    price: number
-    category: { name: string } | null
-    created_at: string
+    price: number | null
+    isActive: boolean
+    category: { name: string; slug: string }
 }
 
-export default function ProductsDashboard() {
+export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
     const router = useRouter()
@@ -44,21 +35,9 @@ export default function ProductsDashboard() {
     async function fetchProducts() {
         try {
             setLoading(true)
-            const { data, error } = await supabase
-                .from("cms_products")
-                .select(`
-          id, 
-          name, 
-          slug, 
-          price, 
-          created_at,
-          category:category_id (name)
-        `)
-                .order("created_at", { ascending: false })
-
-            if (error) throw error
-            // @ts-ignore - Supabase type inference might be tricky with joins without generated types
-            setProducts(data || [])
+            const res = await fetch('/api/cms/products')
+            const data = await res.json()
+            setProducts(data.products || [])
         } catch (error) {
             console.error("Error fetching products:", error)
         } finally {
@@ -75,18 +54,29 @@ export default function ProductsDashboard() {
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/(^-|-$)+/g, "")
 
-        try {
-            const { data, error } = await supabase
-                .from("cms_products")
-                .insert([{ name, slug, price: 0 }])
-                .select()
-                .single()
+        // Get first category for default
+        const catRes = await fetch('/api/cms/categories')
+        const catData = await catRes.json()
+        const firstCategory = catData.categories?.[0]
 
-            if (error) throw error
-            router.push(`/dashboard/products/${data.id}`)
+        if (!firstCategory) {
+            alert("Please create a category first")
+            return
+        }
+
+        try {
+            const res = await fetch('/api/cms/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, slug, categoryId: firstCategory.id }),
+            })
+
+            if (!res.ok) throw new Error('Failed to create')
+            const data = await res.json()
+            router.push(`/dashboard/products/${data.product.id}`)
         } catch (error) {
             console.error("Error creating product:", error)
-            alert("Error creating product.")
+            alert("Error creating product")
         }
     }
 
@@ -94,22 +84,32 @@ export default function ProductsDashboard() {
         if (!confirm("Are you sure you want to delete this product?")) return
 
         try {
-            const { error } = await supabase.from("cms_products").delete().eq("id", id)
-            if (error) throw error
-            fetchProducts()
+            const res = await fetch(`/api/cms/products?id=${id}`, {
+                method: 'DELETE',
+            })
+
+            if (!res.ok) throw new Error('Failed to delete')
+            setProducts(products.filter(p => p.id !== id))
         } catch (error) {
             console.error("Error deleting product:", error)
+            alert("Error deleting product")
         }
+    }
+
+    if (loading) {
+        return (
+            <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        )
     }
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Products</h2>
-                    <p className="text-muted-foreground">
-                        Manage your product catalog.
-                    </p>
+                    <p className="text-muted-foreground">Manage your product catalog</p>
                 </div>
                 <Button onClick={createProduct}>
                     <Plus className="mr-2 h-4 w-4" /> Add Product
@@ -117,68 +117,57 @@ export default function ProductsDashboard() {
             </div>
 
             <Card>
-                <CardHeader>
-                    <CardTitle>All Products</CardTitle>
-                    <CardDescription>
-                        A list of all products in your inventory.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {loading ? (
-                        <div className="flex justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                        </div>
-                    ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Category</TableHead>
-                                    <TableHead>Price</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Slug</TableHead>
+                                <TableHead>Category</TableHead>
+                                <TableHead>Price</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {products.map((product) => (
+                                <TableRow key={product.id}>
+                                    <TableCell className="font-medium">{product.name}</TableCell>
+                                    <TableCell className="text-muted-foreground">{product.slug}</TableCell>
+                                    <TableCell>{product.category?.name || '-'}</TableCell>
+                                    <TableCell>{product.price ? `$${product.price}` : 'Quote'}</TableCell>
+                                    <TableCell>
+                                        <span className={`px-2 py-1 rounded-full text-xs ${product.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100'}`}>
+                                            {product.isActive ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => router.push(`/dashboard/products/${product.id}`)}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => deleteProduct(product.id)}
+                                        >
+                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {products.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                                            No products found. Add one to get started.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    products.map((product) => (
-                                        <TableRow key={product.id}>
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center gap-2">
-                                                    <Package className="h-4 w-4 text-muted-foreground" />
-                                                    {product.name}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>{product.category?.name || "Uncategorized"}</TableCell>
-                                            <TableCell>${product.price?.toFixed(2)}</TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <Link href={`/dashboard/products/${product.id}`}>
-                                                        <Button variant="ghost" size="icon">
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Button>
-                                                    </Link>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                                        onClick={() => deleteProduct(product.id)}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    )}
+                            ))}
+                            {products.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                        No products found. Click "Add Product" to create one.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
         </div>

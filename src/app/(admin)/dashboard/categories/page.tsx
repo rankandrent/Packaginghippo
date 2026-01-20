@@ -1,16 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
     Table,
     TableBody,
@@ -19,18 +12,21 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Plus, Trash2, Loader2, Folder, Edit, ExternalLink } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2 } from "lucide-react"
 
 type Category = {
     id: string
     name: string
     slug: string
-    created_at: string
+    description: string | null
+    isActive: boolean
+    _count?: { products: number }
 }
 
-export default function CategoriesDashboard() {
+export default function CategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
+    const router = useRouter()
 
     useEffect(() => {
         fetchCategories()
@@ -39,13 +35,9 @@ export default function CategoriesDashboard() {
     async function fetchCategories() {
         try {
             setLoading(true)
-            const { data, error } = await supabase
-                .from("cms_categories")
-                .select("*")
-                .order("created_at", { ascending: false })
-
-            if (error) throw error
-            setCategories(data || [])
+            const res = await fetch('/api/cms/categories')
+            const data = await res.json()
+            setCategories(data.categories || [])
         } catch (error) {
             console.error("Error fetching categories:", error)
         } finally {
@@ -63,40 +55,50 @@ export default function CategoriesDashboard() {
             .replace(/(^-|-$)+/g, "")
 
         try {
-            const { data, error } = await supabase
-                .from("cms_categories")
-                .insert([{ name, slug }])
-                .select()
-                .single()
+            const res = await fetch('/api/cms/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, slug }),
+            })
 
-            if (error) throw error
-            setCategories([data, ...categories])
+            if (!res.ok) throw new Error('Failed to create')
+            fetchCategories()
         } catch (error) {
             console.error("Error creating category:", error)
-            alert("Error creating category. Slug might already exist.")
+            alert("Error creating category")
         }
     }
 
     async function deleteCategory(id: string) {
-        if (!confirm("Are you sure? This might affect products in this category.")) return
+        if (!confirm("Are you sure? Products in this category will be orphaned.")) return
 
         try {
-            const { error } = await supabase.from("cms_categories").delete().eq("id", id)
-            if (error) throw error
-            setCategories(categories.filter((c) => c.id !== id))
+            const res = await fetch(`/api/cms/categories?id=${id}`, {
+                method: 'DELETE',
+            })
+
+            if (!res.ok) throw new Error('Failed to delete')
+            setCategories(categories.filter(c => c.id !== id))
         } catch (error) {
             console.error("Error deleting category:", error)
+            alert("Error deleting category")
         }
+    }
+
+    if (loading) {
+        return (
+            <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        )
     }
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
-                    <p className="text-muted-foreground">
-                        Organize your products into categories.
-                    </p>
+                    <p className="text-muted-foreground">Manage product categories</p>
                 </div>
                 <Button onClick={createCategory}>
                     <Plus className="mr-2 h-4 w-4" /> Add Category
@@ -104,75 +106,55 @@ export default function CategoriesDashboard() {
             </div>
 
             <Card>
-                <CardHeader>
-                    <CardTitle>All Categories</CardTitle>
-                    <CardDescription>
-                        Manage your product categories here.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {loading ? (
-                        <div className="flex justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                        </div>
-                    ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Slug</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Slug</TableHead>
+                                <TableHead>Products</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {categories.map((cat) => (
+                                <TableRow key={cat.id}>
+                                    <TableCell className="font-medium">{cat.name}</TableCell>
+                                    <TableCell className="text-muted-foreground">{cat.slug}</TableCell>
+                                    <TableCell>{cat._count?.products || 0}</TableCell>
+                                    <TableCell>
+                                        <span className={`px-2 py-1 rounded-full text-xs ${cat.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100'}`}>
+                                            {cat.isActive ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => router.push(`/dashboard/categories/${cat.id}`)}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => deleteCategory(cat.id)}
+                                        >
+                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {categories.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                                            No categories found. Add one to get started.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    categories.map((category) => (
-                                        <TableRow key={category.id}>
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center gap-2">
-                                                    <Folder className="h-4 w-4 text-muted-foreground" />
-                                                    {category.name}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    /{category.slug}
-                                                    <Link href={`/products/${category.slug}`} target="_blank" className="text-muted-foreground hover:text-primary">
-                                                        <ExternalLink className="w-3 h-3" />
-                                                    </Link>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <Link href={`/dashboard/categories/${category.id}`}>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="mr-2"
-                                                    >
-                                                        <Edit className="h-4 w-4" />
-                                                    </Button>
-                                                </Link>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                                    onClick={() => deleteCategory(category.id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    )}
+                            ))}
+                            {categories.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                        No categories found
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
         </div>
