@@ -155,7 +155,6 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                                     value={category.imageUrl ? [category.imageUrl] : []}
                                     onChange={(urls) => setCategory({ ...category, imageUrl: urls[0] || null })}
                                     maxFiles={1}
-                                    folder="categories"
                                 />
                             </div>
                         </div>
