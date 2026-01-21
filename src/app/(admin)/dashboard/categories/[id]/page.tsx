@@ -3,21 +3,34 @@
 import { useEffect, useState, use } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
+import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
 import { Loader2, ArrowLeft, Save } from "lucide-react"
-import { CmsCategory } from "@/types/cms"
+import { Switch } from "@/components/ui/switch"
+
+type Category = {
+    id: string
+    name: string
+    slug: string
+    description: string | null
+    imageUrl: string | null
+    seoTitle: string | null
+    seoDesc: string | null
+    isActive: boolean
+    sections: any
+}
 
 export default function CategoryEditor({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
-    const [category, setCategory] = useState<CmsCategory | null>(null)
+    const [category, setCategory] = useState<Category | null>(null)
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
+    const [sections, setSections] = useState<Section[]>([])
     const router = useRouter()
 
     useEffect(() => {
@@ -27,17 +40,16 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
     async function fetchCategory() {
         try {
             setLoading(true)
-            const { data, error } = await supabase
-                .from("cms_categories")
-                .select("*")
-                .eq("id", id)
-                .single()
+            const res = await fetch(`/api/cms/categories?id=${id}`)
+            const data = await res.json()
+            if (data.error) throw new Error(data.error)
 
-            if (error) throw error
-            setCategory(data)
+            setCategory(data.category)
+            if (data.category.sections && Array.isArray(data.category.sections)) {
+                setSections(data.category.sections)
+            }
         } catch (error) {
             console.error("Error fetching category:", error)
-            alert("Category not found")
             router.push('/dashboard/categories')
         } finally {
             setLoading(false)
@@ -50,22 +62,20 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
 
         try {
             setSaving(true)
-            const { error } = await supabase
-                .from("cms_categories")
-                .update({
-                    name: category.name,
-                    slug: category.slug,
-                    description: category.description,
-                    image_url: category.image_url,
-                    seo_title: category.seo_title,
-                    seo_description: category.seo_description,
-                    content: category.content
-                    // updated_at is usually handled by DB trigger or standard Supabase behavior if column exists
-                })
-                .eq("id", category.id)
+            const res = await fetch('/api/cms/categories', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...category,
+                    sections: sections
+                }),
+            })
 
-            if (error) throw error
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error)
+
             alert("Category saved successfully!")
+            router.refresh()
         } catch (error) {
             console.error("Error saving category:", error)
             alert("Error saving category")
@@ -82,20 +92,20 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
         )
     }
 
-    if (!category) return null
+    if (!category) return <div>Category not found</div>
 
     return (
-        <form onSubmit={saveCategory} className="max-w-4xl mx-auto space-y-8">
+        <form onSubmit={saveCategory} className="max-w-4xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <Link href="/dashboard/categories">
-                        <Button variant="ghost" size="icon" type="button">
+                        <Button variant="outline" size="icon" type="button">
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                     </Link>
                     <div>
                         <h2 className="text-3xl font-bold tracking-tight">Edit Category</h2>
-                        <p className="text-muted-foreground text-sm">ID: {category.id}</p>
+                        <p className="text-muted-foreground">Manage category details and content</p>
                     </div>
                 </div>
                 <Button type="submit" disabled={saving}>
@@ -104,9 +114,9 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                 </Button>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-3">
                 <div className="md:col-span-2 space-y-6">
-                    <div className="rounded-lg border bg-card p-6 space-y-4">
+                    <div className="rounded-lg border bg-card p-6 space-y-4 shadow-sm">
                         <h3 className="font-semibold text-lg">General Information</h3>
 
                         <div className="grid gap-4 md:grid-cols-2">
@@ -140,27 +150,55 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
 
                         <div className="space-y-2">
                             <Label>Category Image</Label>
-                            <div className="border rounded-md p-4 bg-gray-50/50">
+                            <div className="border rounded-md p-4 bg-muted/20">
                                 <ImageUploader
-                                    value={category.image_url ? [category.image_url] : []}
-                                    onChange={(urls) => setCategory({ ...category, image_url: urls[0] || null })}
+                                    value={category.imageUrl ? [category.imageUrl] : []}
+                                    onChange={(urls) => setCategory({ ...category, imageUrl: urls[0] || null })}
                                     maxFiles={1}
+                                    folder="categories"
                                 />
                             </div>
                         </div>
                     </div>
+
+                    {/* DYNAMIC SECTIONS */}
+                    <div className="space-y-4 rounded-lg border bg-card p-6 shadow-sm">
+                        <div className="mb-4">
+                            <h3 className="font-semibold text-lg">Page Sections</h3>
+                            <p className="text-sm text-muted-foreground">Add custom sections to the category page.</p>
+                        </div>
+                        <SectionBuilder sections={sections} onChange={setSections} />
+                    </div>
                 </div>
 
                 <div className="space-y-6">
-                    <div className="rounded-lg border bg-card p-6 space-y-4">
+                    <div className="rounded-lg border bg-card p-6 space-y-4 shadow-sm">
+                        <h3 className="font-semibold text-lg">Visibility</h3>
+                        <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/20">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="isActive" className="text-base">Active Status</Label>
+                                <p className="text-xs text-muted-foreground">
+                                    {category.isActive ? 'Category is visible in store' : 'Category is hidden'}
+                                </p>
+                            </div>
+                            <Switch
+                                id="isActive"
+                                checked={category.isActive}
+                                onCheckedChange={(checked) => setCategory({ ...category, isActive: checked })}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="rounded-lg border bg-card p-6 space-y-4 shadow-sm">
                         <h3 className="font-semibold text-lg">SEO Settings</h3>
                         <div className="space-y-3">
                             <div className="space-y-2">
                                 <Label htmlFor="seo_title">Meta Title</Label>
                                 <Input
                                     id="seo_title"
-                                    value={category.seo_title || ""}
-                                    onChange={(e) => setCategory({ ...category, seo_title: e.target.value })}
+                                    value={category.seoTitle || ""}
+                                    onChange={(e) => setCategory({ ...category, seoTitle: e.target.value })}
+                                    placeholder="SEO Title"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -168,8 +206,9 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                                 <Textarea
                                     id="seo_desc"
                                     rows={4}
-                                    value={category.seo_description || ""}
-                                    onChange={(e) => setCategory({ ...category, seo_description: e.target.value })}
+                                    value={category.seoDesc || ""}
+                                    onChange={(e) => setCategory({ ...category, seoDesc: e.target.value })}
+                                    placeholder="SEO Description"
                                 />
                             </div>
                         </div>

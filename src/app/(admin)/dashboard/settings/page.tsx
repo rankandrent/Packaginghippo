@@ -24,6 +24,22 @@ type SeoSettings = {
     ogImage: string
 }
 
+type FooterSettings = {
+    description?: string
+    social?: {
+        facebook?: string
+        instagram?: string
+        linkedin?: string
+        twitter?: string
+    }
+    columns?: {
+        productsTitle?: string
+        companyTitle?: string
+        contactTitle?: string
+    }
+    copyrightText?: string
+}
+
 export default function SettingsPage() {
     const [general, setGeneral] = useState<GeneralSettings>({
         siteName: '',
@@ -39,6 +55,7 @@ export default function SettingsPage() {
         defaultKeywords: '',
         ogImage: '',
     })
+    const [footer, setFooter] = useState<FooterSettings>({})
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState<string | null>(null)
 
@@ -55,6 +72,7 @@ export default function SettingsPage() {
             data.settings?.forEach((s: any) => {
                 if (s.key === 'general') setGeneral(s.value)
                 if (s.key === 'seo') setSeo(s.value)
+                if (s.key === 'footer') setFooter(s.value)
             })
         } catch (error) {
             console.error("Error fetching settings:", error)
@@ -160,6 +178,7 @@ export default function SettingsPage() {
                 </CardContent>
             </Card>
 
+
             {/* SEO Settings */}
             <Card>
                 <CardHeader>
@@ -202,6 +221,104 @@ export default function SettingsPage() {
                     >
                         {saving === 'seo' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <Save className="mr-2 h-4 w-4" /> Save SEO Settings
+                    </Button>
+                </CardContent>
+            </Card>
+
+            {/* Footer & Social Settings */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Footer & Social Data</CardTitle>
+                    <CardDescription>Manage footer content and social media links</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label>Footer Description</Label>
+                        <Textarea
+                            value={footer.description ?? ''}
+                            onChange={(e) => setFooter({ ...footer, description: e.target.value })}
+                            placeholder="Defaults to tagline if empty"
+                            rows={2}
+                        />
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label>Facebook URL</Label>
+                            <Input
+                                value={footer.social?.facebook ?? ''}
+                                onChange={(e) => setFooter({ ...footer, social: { ...footer.social, facebook: e.target.value } })}
+                                placeholder="https://facebook.com/..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Instagram URL</Label>
+                            <Input
+                                value={footer.social?.instagram ?? ''}
+                                onChange={(e) => setFooter({ ...footer, social: { ...footer.social, instagram: e.target.value } })}
+                                placeholder="https://instagram.com/..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>LinkedIn URL</Label>
+                            <Input
+                                value={footer.social?.linkedin ?? ''}
+                                onChange={(e) => setFooter({ ...footer, social: { ...footer.social, linkedin: e.target.value } })}
+                                placeholder="https://linkedin.com/..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Twitter/X URL</Label>
+                            <Input
+                                value={footer.social?.twitter ?? ''}
+                                onChange={(e) => setFooter({ ...footer, social: { ...footer.social, twitter: e.target.value } })}
+                                placeholder="https://twitter.com/..."
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label>Products Title</Label>
+                            <Input
+                                value={footer.columns?.productsTitle ?? ''}
+                                onChange={(e) => setFooter({ ...footer, columns: { ...footer.columns, productsTitle: e.target.value } })}
+                                placeholder="Products"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Company Title</Label>
+                            <Input
+                                value={footer.columns?.companyTitle ?? ''}
+                                onChange={(e) => setFooter({ ...footer, columns: { ...footer.columns, companyTitle: e.target.value } })}
+                                placeholder="Company"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Contact Title</Label>
+                            <Input
+                                value={footer.columns?.contactTitle ?? ''}
+                                onChange={(e) => setFooter({ ...footer, columns: { ...footer.columns, contactTitle: e.target.value } })}
+                                placeholder="Get in Touch"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Copyright Text</Label>
+                        <Input
+                            value={footer.copyrightText ?? ''}
+                            onChange={(e) => setFooter({ ...footer, copyrightText: e.target.value })}
+                            placeholder="© 2024 PackagingHippo. All rights reserved."
+                        />
+                    </div>
+
+                    <Button
+                        onClick={() => saveSettings('footer', footer)}
+                        disabled={saving === 'footer'}
+                    >
+                        {saving === 'footer' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Save className="mr-2 h-4 w-4" /> Save Footer Settings
                     </Button>
                 </CardContent>
             </Card>

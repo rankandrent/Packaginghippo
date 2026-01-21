@@ -76,6 +76,7 @@ model ProductCategory {
   imageUrl    String?
   seoTitle    String?
   seoDesc     String?
+  sections    Json?    // List of dynamic sections
   order       Int       @default(0)
   isActive    Boolean   @default(true)
   products    Product[]
@@ -99,6 +100,9 @@ model Product {
   dimensions  String?
   materials   String?
   finishings  String?
+  
+  content     Json?    // Generic content
+  sections    Json?    // List of dynamic sections
   
   // SEO
   seoTitle    String?

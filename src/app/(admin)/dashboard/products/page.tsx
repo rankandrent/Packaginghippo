@@ -13,6 +13,10 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Plus, Pencil, Trash2, Loader2 } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type Product = {
     id: string
@@ -45,30 +49,28 @@ export default function ProductsPage() {
         }
     }
 
-    async function createProduct() {
-        const name = prompt("Enter product name:")
-        if (!name) return
+    // State for creation dialog
+    const [createDialogOpen, setCreateDialogOpen] = useState(false)
+    const [newName, setNewName] = useState("")
+    const [newCategoryId, setNewCategoryId] = useState("")
+    const [categories, setCategories] = useState<{ id: string, name: string }[]>([])
 
-        const slug = name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)+/g, "")
+    // Fetch categories when component mounts (or when dialog opens)
+    useEffect(() => {
+        fetch("/api/cms/categories").then(res => res.json()).then(data => setCategories(data.categories || []))
+    }, [])
 
-        // Get first category for default
-        const catRes = await fetch('/api/cms/categories')
-        const catData = await catRes.json()
-        const firstCategory = catData.categories?.[0]
+    async function createProduct(e: React.FormEvent) {
+        e.preventDefault()
+        if (!newName || !newCategoryId) return
 
-        if (!firstCategory) {
-            alert("Please create a category first")
-            return
-        }
+        const slug = newName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
 
         try {
             const res = await fetch('/api/cms/products', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, slug, categoryId: firstCategory.id }),
+                body: JSON.stringify({ name: newName, slug, categoryId: newCategoryId }),
             })
 
             if (!res.ok) throw new Error('Failed to create')
@@ -111,9 +113,39 @@ export default function ProductsPage() {
                     <h2 className="text-3xl font-bold tracking-tight">Products</h2>
                     <p className="text-muted-foreground">Manage your product catalog</p>
                 </div>
-                <Button onClick={createProduct}>
-                    <Plus className="mr-2 h-4 w-4" /> Add Product
-                </Button>
+
+                <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <Plus className="mr-2 h-4 w-4" /> Add Product
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Create New Product</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={createProduct} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label>Product Name</Label>
+                                <Input value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. Custom Mailer Box" required />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Category</Label>
+                                <Select value={newCategoryId} onValueChange={setNewCategoryId}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map(cat => (
+                                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button type="submit" className="w-full">Create Product</Button>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <Card>

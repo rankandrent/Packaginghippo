@@ -12,7 +12,9 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Loader2, Save, Eye, EyeOff, RefreshCw } from "lucide-react"
+import { Loader2, Save, Eye, EyeOff, RefreshCw, Plus, Trash2 } from "lucide-react"
+import { ImageUploader } from "@/components/admin/ImageUploader"
+import { RichTextEditor } from "@/components/admin/RichTextEditor"
 
 type HomepageSection = {
     id: string
@@ -93,6 +95,68 @@ export default function HomepageEditor() {
         setSections(sections.map(s => s.id === id ? { ...s, isActive: !s.isActive } : s))
     }
 
+
+    async function createSection(key: string) {
+        try {
+            setLoading(true)
+
+            // Default content based on section type
+            let title = 'New Section'
+            let content: any = {}
+
+            switch (key) {
+                case 'seo_content':
+                    title = 'New SEO Content'
+                    content = {
+                        heading: 'Detailed Information',
+                        content: '<p>Content goes here...</p>',
+                        collapsedHeight: 300
+                    }
+                    break
+                case 'customer_reviews':
+                    title = 'Customer Reviews'
+                    content = {
+                        heading: 'What Our Customers Say',
+                        subheading: 'Trusted by thousands of businesses worldwide',
+                        items: [
+                            { name: 'John Doe', role: 'Business Owner', rating: 5, text: 'Excellent quality packaging!' }
+                        ]
+                    }
+                    break
+                case 'features_bar':
+                    title = 'Features Bar'
+                    content = {
+                        heading: 'ONE PLACE - Where you get all your custom packaging needs',
+                        items: [
+                            { icon: 'dollar', title: 'NO DIE &', subtitle: 'PLATE CHARGES' },
+                            { icon: 'clock', title: 'QUICK', subtitle: 'TURNAROUND TIME' },
+                            { icon: 'truck', title: 'FREE', subtitle: 'SHIPPING' },
+                            { icon: 'package', title: 'STARTING FROM', subtitle: '50 BOXES' },
+                            { icon: 'palette', title: 'CUSTOMIZE SIZE', subtitle: '& STYLE' },
+                            { icon: 'pen', title: 'FREE GRAPHIC', subtitle: 'DESIGNING' },
+                        ]
+                    }
+                    break
+                default:
+                    title = `New ${key.replace(/_/g, ' ')}`
+                    content = { heading: 'New Section' }
+            }
+
+            const res = await fetch('/api/cms/homepage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sectionKey: key, title, content }),
+            })
+            if (!res.ok) throw new Error("Failed to create")
+            await fetchSections()
+        } catch (e) {
+            console.error(e)
+            alert("Failed to create section")
+        } finally {
+            setLoading(false)
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex justify-center py-8">
@@ -110,8 +174,19 @@ export default function HomepageEditor() {
                         Edit homepage sections. All changes are saved to MongoDB.
                     </p>
                 </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
                 <Button variant="outline" onClick={fetchSections}>
                     <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+                </Button>
+                <Button onClick={() => createSection('seo_content')}>
+                    <Plus className="w-4 h-4 mr-2" /> Add SEO Content
+                </Button>
+                <Button onClick={() => createSection('customer_reviews')}>
+                    <Plus className="w-4 h-4 mr-2" /> Add Customer Reviews
+                </Button>
+                <Button onClick={() => createSection('features_bar')}>
+                    <Plus className="w-4 h-4 mr-2" /> Add Features Bar
                 </Button>
             </div>
 
@@ -176,38 +251,511 @@ export default function HomepageEditor() {
                 ))}
             </Accordion>
 
-            {sections.length === 0 && (
-                <Card>
-                    <CardContent className="text-center py-10 text-muted-foreground">
-                        No sections found. Run the seed script to populate data.
-                    </CardContent>
-                </Card>
-            )}
-        </div>
+            {
+                sections.length === 0 && (
+                    <Card>
+                        <CardContent className="text-center py-10 text-muted-foreground">
+                            No sections found. Run the seed script to populate data.
+                        </CardContent>
+                    </Card>
+                )
+            }
+        </div >
     )
 }
 
 // Component to render visual editor based on section type
 function SectionEditor({ section, onUpdate }: { section: HomepageSection, onUpdate: (key: string, value: any) => void }) {
     const content = section.content || {}
+    const isLogoLoop = section.sectionKey === 'logo_loop'
 
+    // Custom editor for Logo Loop
+    if (isLogoLoop) {
+        const items = Array.isArray(content.items) ? content.items : []
+
+        const addLogo = (url: string) => {
+            onUpdate('items', [...items, url])
+        }
+
+        const removeLogo = (index: number) => {
+            const newItems = [...items]
+            newItems.splice(index, 1)
+            onUpdate('items', newItems)
+        }
+
+        return (
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    <Label>Section Heading (Optional)</Label>
+                    <Input
+                        value={content.heading || ''}
+                        onChange={(e) => onUpdate('heading', e.target.value)}
+                        placeholder="e.g. TRUSTED BY 100+ BRANDS"
+                    />
+                </div>
+
+                <div className="space-y-4 border p-4 rounded-md">
+                    <Label>Client Logos</Label>
+
+                    {/* List of existing logos */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        {items.map((item: string, idx: number) => (
+                            <div key={idx} className="relative group border rounded-md p-2 flex items-center justify-center bg-gray-50 h-24">
+                                {item.startsWith('http') ? (
+                                    <img src={item} alt={`Logo ${idx}`} className="max-h-full max-w-full object-contain" />
+                                ) : (
+                                    <span className="text-xs font-bold text-gray-500">{item}</span>
+                                )}
+                                <button
+                                    onClick={() => removeLogo(idx)}
+                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <Trash2 className="w-3 h-3" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Uploader for new logo */}
+                    <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Add New Logo</Label>
+                        <ImageUploader
+                            value={[]}
+                            bucket="products" // Reusing products bucket for now
+                            onChange={(urls) => {
+                                if (urls.length > 0) addLogo(urls[0])
+                            }}
+                            maxFiles={1}
+                        />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Hero Section Editor
+    if (section.sectionKey === 'hero') {
+        return (
+            <div className="space-y-4">
+                <div className="bg-yellow-50 p-4 rounded text-sm text-yellow-800">
+                    The Hero section is the first thing visitors see. Make it impactful!
+                </div>
+                <div className="space-y-2">
+                    <Label>Heading</Label>
+                    <Textarea
+                        value={content.heading || ''}
+                        onChange={e => onUpdate('heading', e.target.value)}
+                        placeholder="e.g. Custom Boxes & Packaging"
+                        rows={2}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Subheading</Label>
+                    <Textarea
+                        value={content.subheading || ''}
+                        onChange={e => onUpdate('subheading', e.target.value)}
+                        placeholder="e.g. Elevate your brand with premium custom boxes."
+                        rows={2}
+                    />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label>CTA Text</Label>
+                        <Input
+                            value={content.cta_text || ''}
+                            onChange={e => onUpdate('cta_text', e.target.value)}
+                            placeholder="e.g. Get Custom Quote"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>CTA Link</Label>
+                        <Input
+                            value={content.cta_link || ''}
+                            onChange={e => onUpdate('cta_link', e.target.value)}
+                            placeholder="e.g. /quote"
+                        />
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label>Hero Image URL (Right Side)</Label>
+                    <Input
+                        value={content.hero_image || ''}
+                        onChange={e => onUpdate('hero_image', e.target.value)}
+                        placeholder="https://example.com/image.jpg"
+                    />
+                    {content.hero_image && (
+                        <div className="border rounded-md p-2 bg-muted/20">
+                            <img src={content.hero_image} alt="Hero Preview" className="max-h-32 object-contain mx-auto" />
+                        </div>
+                    )}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label>Badge Text</Label>
+                        <Input
+                            value={content.badge_text || ''}
+                            onChange={e => onUpdate('badge_text', e.target.value)}
+                            placeholder="e.g. 500+ Happy Clients"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Badge Subtext</Label>
+                        <Input
+                            value={content.badge_subtext || ''}
+                            onChange={e => onUpdate('badge_subtext', e.target.value)}
+                            placeholder="e.g. Best packaging service we've used!"
+                        />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Benefits Section Editor
+    if (section.sectionKey === 'benefits') {
+        const items = Array.isArray(content.items) ? content.items : []
+        return (
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    <Label>Heading</Label>
+                    <Input
+                        value={content.heading || ''}
+                        onChange={e => onUpdate('heading', e.target.value)}
+                        placeholder="e.g. How Custom Packaging Can Boost Your Brand"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Introduction</Label>
+                    <Textarea
+                        value={content.intro || ''}
+                        onChange={e => onUpdate('intro', e.target.value)}
+                        rows={3}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Section Image URL</Label>
+                    <Input
+                        value={content.image || ''}
+                        onChange={e => onUpdate('image', e.target.value)}
+                        placeholder="https://example.com/benefits-image.jpg"
+                    />
+                    {content.image && (
+                        <div className="border rounded-md p-2 bg-muted/20">
+                            <img src={content.image} alt="Benefits Preview" className="max-h-32 object-contain mx-auto" />
+                        </div>
+                    )}
+                </div>
+                <div className="space-y-3">
+                    <Label>Benefit Items</Label>
+                    {items.map((item: any, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-start p-3 border rounded-lg bg-muted/20">
+                            <div className="flex-1 space-y-2">
+                                <Input
+                                    value={item.title || ''}
+                                    placeholder="Benefit Title"
+                                    onChange={(e) => {
+                                        const newItems = [...items]
+                                        newItems[idx] = { ...newItems[idx], title: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                                <Textarea
+                                    value={item.desc || ''}
+                                    placeholder="Description"
+                                    rows={2}
+                                    onChange={(e) => {
+                                        const newItems = [...items]
+                                        newItems[idx] = { ...newItems[idx], desc: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive"
+                                type="button"
+                                onClick={() => {
+                                    const newItems = items.filter((_: any, i: number) => i !== idx)
+                                    onUpdate('items', newItems)
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdate('items', [...items, { title: '', desc: '' }])}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Add Benefit
+                    </Button>
+                </div>
+            </div>
+        )
+    }
+
+    if (section.sectionKey === 'seo_content') {
+        return (
+            <div className="space-y-4">
+                <div className="bg-blue-50 p-4 rounded text-sm text-blue-800">
+                    This section is for long-form SEO content. It will be collapsed by default with a "Read More" button.
+                </div>
+                <div className="space-y-2">
+                    <Label>Heading (Optional)</Label>
+                    <Input
+                        value={content.heading || ''}
+                        onChange={e => onUpdate('heading', e.target.value)}
+                        placeholder="e.g. Detailed Information"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Content</Label>
+                    <RichTextEditor
+                        content={content.content || ''}
+                        onChange={html => onUpdate('content', html)}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Collapsed Height (px) - Default: 300</Label>
+                    <Input
+                        type="number"
+                        value={content.collapsedHeight || 300}
+                        onChange={e => onUpdate('collapsedHeight', parseInt(e.target.value))}
+                    />
+                </div>
+            </div>
+        )
+    }
+
+    // Customer Reviews Editor
+    if (section.sectionKey === 'customer_reviews') {
+        const reviews = Array.isArray(content.items) ? content.items : []
+        return (
+            <div className="space-y-4">
+                <div className="bg-green-50 p-4 rounded text-sm text-green-800">
+                    Customer reviews with star ratings. Great for building trust!
+                </div>
+                <div className="space-y-2">
+                    <Label>Section Heading</Label>
+                    <Input
+                        value={content.heading || ''}
+                        onChange={e => onUpdate('heading', e.target.value)}
+                        placeholder="e.g. What Our Customers Say"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Subheading</Label>
+                    <Input
+                        value={content.subheading || ''}
+                        onChange={e => onUpdate('subheading', e.target.value)}
+                        placeholder="e.g. Trusted by thousands of businesses"
+                    />
+                </div>
+                <div className="space-y-3">
+                    <Label>Reviews</Label>
+                    {reviews.map((review: any, idx: number) => (
+                        <div key={idx} className="p-4 border rounded-lg bg-muted/20 space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <Label className="text-xs">Name</Label>
+                                    <Input
+                                        value={review.name || ''}
+                                        placeholder="Customer name"
+                                        onChange={(e) => {
+                                            const newItems = [...reviews]
+                                            newItems[idx] = { ...newItems[idx], name: e.target.value }
+                                            onUpdate('items', newItems)
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <Label className="text-xs">Role/Company</Label>
+                                    <Input
+                                        value={review.role || ''}
+                                        placeholder="e.g. Business Owner"
+                                        onChange={(e) => {
+                                            const newItems = [...reviews]
+                                            newItems[idx] = { ...newItems[idx], role: e.target.value }
+                                            onUpdate('items', newItems)
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <Label className="text-xs">Rating (1-5)</Label>
+                                    <Input
+                                        type="number"
+                                        min={1}
+                                        max={5}
+                                        value={review.rating || 5}
+                                        onChange={(e) => {
+                                            const newItems = [...reviews]
+                                            newItems[idx] = { ...newItems[idx], rating: parseInt(e.target.value) }
+                                            onUpdate('items', newItems)
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <Label className="text-xs">Image URL (optional)</Label>
+                                    <Input
+                                        value={review.image || ''}
+                                        placeholder="https://..."
+                                        onChange={(e) => {
+                                            const newItems = [...reviews]
+                                            newItems[idx] = { ...newItems[idx], image: e.target.value }
+                                            onUpdate('items', newItems)
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <Label className="text-xs">Review Text</Label>
+                                <Textarea
+                                    value={review.text || ''}
+                                    placeholder="Customer's review..."
+                                    rows={3}
+                                    onChange={(e) => {
+                                        const newItems = [...reviews]
+                                        newItems[idx] = { ...newItems[idx], text: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive"
+                                type="button"
+                                onClick={() => {
+                                    const newItems = reviews.filter((_: any, i: number) => i !== idx)
+                                    onUpdate('items', newItems)
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4 mr-2" /> Remove Review
+                            </Button>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdate('items', [...reviews, { name: '', role: '', rating: 5, text: '' }])}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Add Review
+                    </Button>
+                </div>
+            </div>
+        )
+    }
+
+    // Features Bar Editor
+    if (section.sectionKey === 'features_bar') {
+        const features = Array.isArray(content.items) ? content.items : []
+        const iconOptions = ['dollar', 'clock', 'truck', 'package', 'palette', 'pen', 'sparkles', 'shield', 'zap', 'check']
+        return (
+            <div className="space-y-4">
+                <div className="bg-purple-50 p-4 rounded text-sm text-purple-800">
+                    Horizontal bar showing key features/USPs with icons.
+                </div>
+                <div className="space-y-2">
+                    <Label>Section Heading</Label>
+                    <Input
+                        value={content.heading || ''}
+                        onChange={e => onUpdate('heading', e.target.value)}
+                        placeholder="e.g. ONE PLACE - Where you get all your custom packaging needs"
+                    />
+                </div>
+                <div className="space-y-3">
+                    <Label>Features</Label>
+                    {features.map((feature: any, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-start p-3 border rounded-lg bg-muted/20">
+                            <div className="flex-1 grid grid-cols-3 gap-2">
+                                <div>
+                                    <Label className="text-xs">Icon</Label>
+                                    <select
+                                        className="w-full h-10 border rounded-md px-2 text-sm"
+                                        value={feature.icon || 'check'}
+                                        onChange={(e) => {
+                                            const newItems = [...features]
+                                            newItems[idx] = { ...newItems[idx], icon: e.target.value }
+                                            onUpdate('items', newItems)
+                                        }}
+                                    >
+                                        {iconOptions.map(icon => (
+                                            <option key={icon} value={icon}>{icon}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <Label className="text-xs">Title</Label>
+                                    <Input
+                                        value={feature.title || ''}
+                                        placeholder="FREE"
+                                        onChange={(e) => {
+                                            const newItems = [...features]
+                                            newItems[idx] = { ...newItems[idx], title: e.target.value }
+                                            onUpdate('items', newItems)
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <Label className="text-xs">Subtitle</Label>
+                                    <Input
+                                        value={feature.subtitle || ''}
+                                        placeholder="SHIPPING"
+                                        onChange={(e) => {
+                                            const newItems = [...features]
+                                            newItems[idx] = { ...newItems[idx], subtitle: e.target.value }
+                                            onUpdate('items', newItems)
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive"
+                                type="button"
+                                onClick={() => {
+                                    const newItems = features.filter((_: any, i: number) => i !== idx)
+                                    onUpdate('items', newItems)
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdate('items', [...features, { icon: 'check', title: '', subtitle: '' }])}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Add Feature
+                    </Button>
+                </div>
+            </div>
+        )
+    }
     // Common fields most sections have
-    const hasHeading = 'heading' in content
+    const hasHeading = 'heading' in content || !Object.keys(content).length
     const hasText = 'text' in content
     const hasItems = 'items' in content
 
     return (
         <div className="space-y-4">
-            {hasHeading && (
-                <div className="space-y-2">
-                    <Label>Heading</Label>
-                    <Input
-                        value={content.heading || ''}
-                        onChange={(e) => onUpdate('heading', e.target.value)}
-                        placeholder="Section heading"
-                    />
-                </div>
-            )}
+            <div className="space-y-2">
+                <Label>Heading</Label>
+                <Input
+                    value={content.heading || ''}
+                    onChange={(e) => onUpdate('heading', e.target.value)}
+                    placeholder="Section heading"
+                />
+            </div>
 
             {'subheading' in content && (
                 <div className="space-y-2">
@@ -282,25 +830,274 @@ function SectionEditor({ section, onUpdate }: { section: HomepageSection, onUpda
                 </div>
             )}
 
-            {/* Items display - simplified for now, shows count */}
-            {hasItems && Array.isArray(content.items) && (
-                <div className="bg-muted p-4 rounded-lg">
-                    <Label className="text-sm text-muted-foreground">
-                        List Items: {content.items.length} items
-                    </Label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Use the JSON editor below for detailed item editing
-                    </p>
+            {/* FAQ Section Editor */}
+            {section.sectionKey === 'faq' && Array.isArray(content.items) && (
+                <div className="space-y-3">
+                    <Label>FAQ Items</Label>
+                    {content.items.map((item: any, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-start p-3 border rounded-lg bg-muted/20">
+                            <div className="flex-1 space-y-2">
+                                <Input
+                                    value={item.q || item.question || ''}
+                                    placeholder="Question"
+                                    onChange={(e) => {
+                                        const newItems = [...content.items]
+                                        newItems[idx] = { ...newItems[idx], q: e.target.value, question: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                                <Textarea
+                                    value={item.a || item.answer || ''}
+                                    placeholder="Answer"
+                                    rows={3}
+                                    onChange={(e) => {
+                                        const newItems = [...content.items]
+                                        newItems[idx] = { ...newItems[idx], a: e.target.value, answer: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive"
+                                type="button"
+                                onClick={() => {
+                                    const newItems = content.items.filter((_: any, i: number) => i !== idx)
+                                    onUpdate('items', newItems)
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdate('items', [...(content.items || []), { q: '', a: '' }])}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Add FAQ
+                    </Button>
                 </div>
             )}
 
-            {'points' in content && Array.isArray(content.points) && (
-                <div className="bg-muted p-4 rounded-lg">
-                    <Label className="text-sm text-muted-foreground">
-                        Points: {content.points.length} items
-                    </Label>
+            {/* Benefits Section Editor */}
+            {section.sectionKey === 'benefits' && Array.isArray(content.items) && (
+                <div className="space-y-3">
+                    <Label>Benefit Items</Label>
+                    {content.items.map((item: any, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-start p-3 border rounded-lg bg-muted/20">
+                            <div className="flex-1 space-y-2">
+                                <Input
+                                    value={item.title || ''}
+                                    placeholder="Benefit Title"
+                                    onChange={(e) => {
+                                        const newItems = [...content.items]
+                                        newItems[idx] = { ...newItems[idx], title: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                                <Textarea
+                                    value={item.desc || item.description || ''}
+                                    placeholder="Description"
+                                    rows={2}
+                                    onChange={(e) => {
+                                        const newItems = [...content.items]
+                                        newItems[idx] = { ...newItems[idx], desc: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive"
+                                type="button"
+                                onClick={() => {
+                                    const newItems = content.items.filter((_: any, i: number) => i !== idx)
+                                    onUpdate('items', newItems)
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdate('items', [...(content.items || []), { title: '', desc: '' }])}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Add Benefit
+                    </Button>
                 </div>
             )}
+
+            {/* Industries Section Editor */}
+            {section.sectionKey === 'industries' && Array.isArray(content.items) && (
+                <div className="space-y-3">
+                    <Label>Industry Items</Label>
+                    {content.items.map((item: any, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-start p-3 border rounded-lg bg-muted/20">
+                            <div className="flex-1 space-y-2">
+                                <Input
+                                    value={item.name || item.title || ''}
+                                    placeholder="Industry Name"
+                                    onChange={(e) => {
+                                        const newItems = [...content.items]
+                                        newItems[idx] = { ...newItems[idx], name: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                                <Input
+                                    value={item.image || ''}
+                                    placeholder="Image URL (optional)"
+                                    onChange={(e) => {
+                                        const newItems = [...content.items]
+                                        newItems[idx] = { ...newItems[idx], image: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive"
+                                type="button"
+                                onClick={() => {
+                                    const newItems = content.items.filter((_: any, i: number) => i !== idx)
+                                    onUpdate('items', newItems)
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdate('items', [...(content.items || []), { name: '', image: '' }])}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Add Industry
+                    </Button>
+                </div>
+            )}
+
+            {/* Popular Products Section Editor */}
+            {section.sectionKey === 'popular_products' && Array.isArray(content.items) && (
+                <div className="space-y-3">
+                    <Label>Product Items</Label>
+                    {content.items.map((item: any, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-start p-3 border rounded-lg bg-muted/20">
+                            <div className="flex-1 space-y-2">
+                                <Input
+                                    value={item.name || item.title || ''}
+                                    placeholder="Product Name"
+                                    onChange={(e) => {
+                                        const newItems = [...content.items]
+                                        newItems[idx] = { ...newItems[idx], name: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                                <Input
+                                    value={item.slug || ''}
+                                    placeholder="Slug (e.g. mailer-boxes)"
+                                    onChange={(e) => {
+                                        const newItems = [...content.items]
+                                        newItems[idx] = { ...newItems[idx], slug: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                                <Input
+                                    value={item.image || ''}
+                                    placeholder="Image URL"
+                                    onChange={(e) => {
+                                        const newItems = [...content.items]
+                                        newItems[idx] = { ...newItems[idx], image: e.target.value }
+                                        onUpdate('items', newItems)
+                                    }}
+                                />
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive"
+                                type="button"
+                                onClick={() => {
+                                    const newItems = content.items.filter((_: any, i: number) => i !== idx)
+                                    onUpdate('items', newItems)
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdate('items', [...(content.items || []), { name: '', slug: '', image: '' }])}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Add Product
+                    </Button>
+                </div>
+            )}
+
+            {/* Why Choose Us Section Editor - Points */}
+            {'points' in content && Array.isArray(content.points) && (
+                <div className="space-y-3">
+                    <Label>Points</Label>
+                    {content.points.map((point: any, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-center p-2 border rounded-lg bg-muted/20">
+                            <Input
+                                className="flex-1"
+                                value={typeof point === 'string' ? point : point.text || point.title || ''}
+                                placeholder="Point text"
+                                onChange={(e) => {
+                                    const newPoints = [...content.points]
+                                    newPoints[idx] = typeof point === 'string' ? e.target.value : { ...point, text: e.target.value }
+                                    onUpdate('points', newPoints)
+                                }}
+                            />
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive"
+                                type="button"
+                                onClick={() => {
+                                    const newPoints = content.points.filter((_: any, i: number) => i !== idx)
+                                    onUpdate('points', newPoints)
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onUpdate('points', [...(content.points || []), ''])}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Add Point
+                    </Button>
+                </div>
+            )}
+
+            {/* Generic fallback for unknown items */}
+            {hasItems && Array.isArray(content.items) &&
+                !['faq', 'benefits', 'industries', 'popular_products'].includes(section.sectionKey) && (
+                    <div className="bg-muted p-4 rounded-lg">
+                        <Label className="text-sm text-muted-foreground">
+                            List Items: {content.items.length} items
+                        </Label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            Use the JSON editor below for detailed item editing
+                        </p>
+                    </div>
+                )}
         </div>
     )
 }

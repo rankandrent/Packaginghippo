@@ -1,9 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
+import { revalidatePath } from 'next/cache'
 
-// GET all categories
-export async function GET() {
+// GET all categories or single by ID
+export async function GET(request: NextRequest) {
     try {
+        const { searchParams } = new URL(request.url)
+        const id = searchParams.get('id')
+
+        if (id) {
+            const category = await prisma.productCategory.findUnique({
+                where: { id },
+                include: {
+                    _count: {
+                        select: { products: true }
+                    }
+                }
+            })
+            if (!category) {
+                return NextResponse.json({ error: 'Category not found' }, { status: 404 })
+            }
+            return NextResponse.json({ category })
+        }
+
         const categories = await prisma.productCategory.findMany({
             orderBy: { order: 'asc' },
             include: {
@@ -44,7 +63,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json()
-        const { id, name, slug, description, imageUrl, seoTitle, seoDesc, order, isActive } = body
+        const { id, name, slug, description, imageUrl, seoTitle, seoDesc, order, isActive, sections } = body
 
         const updated = await prisma.productCategory.update({
             where: { id },
@@ -57,9 +76,14 @@ export async function PUT(request: NextRequest) {
                 seoDesc,
                 order,
                 isActive,
+                sections,
                 updatedAt: new Date(),
             },
         })
+
+        revalidatePath(`/services/${slug}`)
+        revalidatePath('/products') // Categories list
+        revalidatePath('/services') // Services list
 
         return NextResponse.json({ category: updated })
     } catch (error) {

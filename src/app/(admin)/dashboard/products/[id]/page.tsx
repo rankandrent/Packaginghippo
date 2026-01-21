@@ -3,56 +3,93 @@
 import { useEffect, useState, use } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
-import { Loader2, ArrowLeft, Plus, Trash2, Save } from "lucide-react"
-import { CmsProduct } from "@/types/cms"
+import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
+import { Loader2, ArrowLeft, Save, Plus, Trash2 } from "lucide-react"
 
 type Category = {
     id: string
     name: string
 }
 
+type Product = {
+    id: string
+    name: string
+    slug: string
+    description: string | null
+    shortDesc: string | null
+    price: number | null
+    categoryId: string
+    images: string[]
+    specifications: string | null // currently string in schema? No, checked schema: dimensions, materials, finishings are strings. 
+    // Wait, the schema has: dimensions, materials, finishings.
+    // The previous file had "specifications" JSON? No, previously supabase used JSON. Prisma has specific fields. 
+    // I need to map "specifications" UI to dimensions/materials/finishings OR add a specs JSON field?
+    // User asked for "jitne bhi sections hon... edit kar sakoon". SectionBuilder handles generic content.
+    // For specific specs, I will map the named fields. 
+    dimensions: string | null
+    materials: string | null
+    finishings: string | null
+
+    seoTitle: string | null
+    seoDesc: string | null
+    isActive: boolean
+    sections: any // Json
+
+    // Legacy fields from Supabase version if needed or just use sections?
+    // User wants "sections". SectionBuilder is enough for generic "benefits/features".
+    // I will stick to schema fields.
+}
+
 export default function ProductEditor({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
-    const [product, setProduct] = useState<CmsProduct | null>(null)
+    const [product, setProduct] = useState<Product | null>(null)
     const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const router = useRouter()
 
+    // Helper for SectionBuilder type
+    const [sections, setSections] = useState<Section[]>([])
+
     useEffect(() => {
-        fetchProduct()
-        fetchCategories()
+        const init = async () => {
+            await Promise.all([fetchProduct(), fetchCategories()])
+            setLoading(false)
+        }
+        init()
     }, [])
 
     async function fetchProduct() {
         try {
-            setLoading(true)
-            const { data, error } = await supabase
-                .from("cms_products")
-                .select("*")
-                .eq("id", id)
-                .single()
+            const res = await fetch(`/api/cms/products?id=${id}`)
+            const data = await res.json()
+            if (data.error) throw new Error(data.error)
 
-            if (error) throw error
-            setProduct(data)
+            setProduct(data.product)
+            // Parse sections if existing
+            if (data.product.sections && Array.isArray(data.product.sections)) {
+                setSections(data.product.sections)
+            }
         } catch (error) {
             console.error("Error fetching product:", error)
-            router.push('/dashboard/products')
-        } finally {
-            setLoading(false)
+            // router.push('/dashboard/products')
         }
     }
 
     async function fetchCategories() {
-        const { data } = await supabase.from("cms_categories").select("id, name")
-        setCategories(data || [])
+        try {
+            const res = await fetch("/api/cms/categories")
+            const data = await res.json()
+            setCategories(data.categories || [])
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     async function saveProduct(e?: React.FormEvent) {
@@ -61,103 +98,26 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
 
         try {
             setSaving(true)
-            const { error } = await supabase
-                .from("cms_products")
-                .update({
-                    name: product.name,
-                    slug: product.slug,
-                    price: product.price,
-                    description: product.description, // Rich text short desc
-                    short_description: product.short_description, // Plain text really short
-                    specifications: product.specifications,
-                    benefits: product.benefits,
-                    features: product.features,
-                    faq: product.faq,
-                    category_id: product.category_id,
-                    images: product.images,
-                    seo_title: product.seo_title,
-                    meta_description: product.meta_description,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq("id", product.id)
+            const res = await fetch('/api/cms/products', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...product,
+                    sections: sections // Save the sections from state
+                }),
+            })
 
-            if (error) throw error
-            alert("Product saved!")
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error)
+
+            alert("Product saved successfully!")
+            router.refresh()
         } catch (error) {
             console.error("Error saving product:", error)
             alert("Error saving product")
         } finally {
             setSaving(false)
         }
-    }
-
-    // --- Helper Functions for Arrays ---
-
-    const updateSpec = (key: string, value: string) => {
-        if (!product) return
-        const currentSpecs = (product.specifications || {})
-        setProduct({
-            ...product,
-            specifications: { ...currentSpecs, [key]: value },
-        })
-    }
-
-    const removeSpec = (key: string) => {
-        if (!product) return
-        const currentSpecs = { ...(product.specifications || {}) }
-        delete currentSpecs[key]
-        setProduct({ ...product, specifications: currentSpecs })
-    }
-
-    const addBenefit = () => {
-        if (!product) return
-        setProduct({ ...product, benefits: [...(product.benefits || []), "New Benefit"] })
-    }
-
-    const updateBenefit = (index: number, value: string) => {
-        if (!product) return
-        const newBenefits = [...(product.benefits || [])]
-        newBenefits[index] = value
-        setProduct({ ...product, benefits: newBenefits })
-    }
-
-    const removeBenefit = (index: number) => {
-        if (!product) return
-        setProduct({ ...product, benefits: (product.benefits || []).filter((_, i) => i !== index) })
-    }
-
-    const addFeature = () => {
-        if (!product) return
-        setProduct({ ...product, features: [...(product.features || []), "New Feature"] })
-    }
-
-    const updateFeature = (index: number, value: string) => {
-        if (!product) return
-        const newFeatures = [...(product.features || [])]
-        newFeatures[index] = value
-        setProduct({ ...product, features: newFeatures })
-    }
-
-    const removeFeature = (index: number) => {
-        if (!product) return
-        setProduct({ ...product, features: (product.features || []).filter((_, i) => i !== index) })
-    }
-
-    const addFaq = () => {
-        if (!product) return
-        setProduct({ ...product, faq: [...(product.faq || []), { q: "Question?", a: "Answer" }] })
-    }
-
-    const updateFaq = (index: number, field: 'q' | 'a', value: string) => {
-        if (!product) return
-        const newFaq = [...(product.faq || [])]
-        newFaq[index] = { ...newFaq[index], [field]: value }
-        setProduct({ ...product, faq: newFaq })
-    }
-
-    const removeFaq = (index: number) => {
-        if (!product) return
-        setProduct({ ...product, faq: (product.faq || []).filter((_, i) => i !== index) })
     }
 
     if (loading) {
@@ -168,9 +128,7 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
         )
     }
 
-    if (!product) {
-        return <div>Product not found</div>
-    }
+    if (!product) return <div>Product not found</div>
 
     return (
         <form onSubmit={saveProduct} className="max-w-6xl mx-auto space-y-8 pb-20">
@@ -210,7 +168,7 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                         </div>
                         <div className="space-y-2">
                             <Label>Short Description (Plain)</Label>
-                            <Textarea value={product.short_description || ""} onChange={(e) => setProduct({ ...product, short_description: e.target.value })} rows={2} />
+                            <Textarea value={product.shortDesc || ""} onChange={(e) => setProduct({ ...product, shortDesc: e.target.value })} rows={2} />
                         </div>
                         <div className="space-y-2">
                             <Label>Full Description (Rich Text)</Label>
@@ -218,81 +176,32 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                         </div>
                     </div>
 
-                    {/* Specifications */}
+                    {/* Specifications (Fixed Fields) */}
                     <div className="space-y-4 rounded-lg border bg-card p-6">
-                        <div className="flex items-center justify-between">
-                            <Label className="text-lg font-semibold">Specifications</Label>
-                            <Button type="button" variant="outline" size="sm" onClick={() => {
-                                const key = prompt("Enter spec name:")
-                                if (key) updateSpec(key, "")
-                            }}>+ Add Spec</Button>
-                        </div>
-                        <div className="space-y-2">
-                            {Object.entries((product.specifications || {})).map(([key, value]) => (
-                                <div key={key} className="flex gap-2 items-center">
-                                    <Label className="w-1/3 truncate">{key}</Label>
-                                    <Input value={value} onChange={(e) => updateSpec(key, e.target.value)} className="h-8" />
-                                    <Button type="button" variant="ghost" size="sm" onClick={() => removeSpec(key)} className="text-destructive h-8 w-8 p-0">
-                                        <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Details Lists (Benefits, Features, FAQ) */}
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {/* Benefits */}
-                        <div className="space-y-4 rounded-lg border bg-card p-6">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-lg font-semibold">Key Benefits</Label>
-                                <Button type="button" variant="outline" size="sm" onClick={addBenefit}><Plus className="w-4 h-4" /></Button>
+                        <h3 className="font-semibold text-lg">Specifications</h3>
+                        <div className="grid gap-4 md:grid-cols-3">
+                            <div className="space-y-2">
+                                <Label>Dimensions</Label>
+                                <Input value={product.dimensions || ''} onChange={(e) => setProduct({ ...product, dimensions: e.target.value })} placeholder="e.g. 10x10x5" />
                             </div>
                             <div className="space-y-2">
-                                {product.benefits?.map((benefit, i) => (
-                                    <div key={i} className="flex gap-2">
-                                        <Input value={benefit} onChange={(e) => updateBenefit(i, e.target.value)} />
-                                        <Button type="button" variant="ghost" size="icon" onClick={() => removeBenefit(i)} className="text-destructive"><Trash2 className="w-4 h-4" /></Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Features */}
-                        <div className="space-y-4 rounded-lg border bg-card p-6">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-lg font-semibold">Features</Label>
-                                <Button type="button" variant="outline" size="sm" onClick={addFeature}><Plus className="w-4 h-4" /></Button>
+                                <Label>Materials</Label>
+                                <Input value={product.materials || ''} onChange={(e) => setProduct({ ...product, materials: e.target.value })} placeholder="e.g. Cardboard" />
                             </div>
                             <div className="space-y-2">
-                                {product.features?.map((feature, i) => (
-                                    <div key={i} className="flex gap-2">
-                                        <Input value={feature} onChange={(e) => updateFeature(i, e.target.value)} />
-                                        <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(i)} className="text-destructive"><Trash2 className="w-4 h-4" /></Button>
-                                    </div>
-                                ))}
+                                <Label>Finishings</Label>
+                                <Input value={product.finishings || ''} onChange={(e) => setProduct({ ...product, finishings: e.target.value })} placeholder="e.g. Matte, Gloss" />
                             </div>
                         </div>
                     </div>
 
-                    {/* FAQ */}
+                    {/* DYNAMIC SECTIONS */}
                     <div className="space-y-4 rounded-lg border bg-card p-6">
-                        <div className="flex items-center justify-between">
-                            <Label className="text-lg font-semibold">FAQ</Label>
-                            <Button type="button" variant="outline" size="sm" onClick={addFaq}>+ Add FAQ</Button>
+                        <div className="mb-4">
+                            <h3 className="font-semibold text-lg">Page Sections</h3>
+                            <p className="text-sm text-muted-foreground">Add custom sections to the product page (Benefits, Features, FAQ, etc.)</p>
                         </div>
-                        <div className="space-y-4">
-                            {product.faq?.map((item, i) => (
-                                <div key={i} className="space-y-2 p-3 bg-muted/30 rounded-md border">
-                                    <div className="flex justify-between">
-                                        <Label className="uppercase text-xs text-muted-foreground">Question {i + 1}</Label>
-                                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeFaq(i)}><Trash2 className="w-3 h-3" /></Button>
-                                    </div>
-                                    <Input placeholder="Question" value={item.q} onChange={(e) => updateFaq(i, 'q', e.target.value)} className="font-bold" />
-                                    <Textarea placeholder="Answer" value={item.a} onChange={(e) => updateFaq(i, 'a', e.target.value)} rows={2} />
-                                </div>
-                            ))}
-                        </div>
+                        <SectionBuilder sections={sections} onChange={setSections} />
                     </div>
                 </div>
 
@@ -323,8 +232,8 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                             <select
                                 id="category"
                                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={product.category_id || ""}
-                                onChange={(e) => setProduct({ ...product, category_id: e.target.value || null })}
+                                value={product.categoryId || ""}
+                                onChange={(e) => setProduct({ ...product, categoryId: e.target.value })}
                             >
                                 <option value="">Select Category...</option>
                                 {categories.map((cat) => (
@@ -333,6 +242,16 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                                     </option>
                                 ))}
                             </select>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="isActive"
+                                checked={product.isActive}
+                                onChange={(e) => setProduct({ ...product, isActive: e.target.checked })}
+                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                            />
+                            <Label htmlFor="isActive">Active</Label>
                         </div>
                     </div>
 
@@ -343,17 +262,19 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                             <Label htmlFor="seo_title">Meta Title</Label>
                             <Input
                                 id="seo_title"
-                                value={product.seo_title || ""}
-                                onChange={(e) => setProduct({ ...product, seo_title: e.target.value })}
+                                value={product.seoTitle || ""}
+                                onChange={(e) => setProduct({ ...product, seoTitle: e.target.value })}
+                                placeholder="SEO Title"
                             />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="meta_description">Meta Description</Label>
                             <Textarea
                                 id="meta_description"
-                                value={product.meta_description || ""}
-                                onChange={(e) => setProduct({ ...product, meta_description: e.target.value })}
+                                value={product.seoDesc || ""}
+                                onChange={(e) => setProduct({ ...product, seoDesc: e.target.value })}
                                 rows={4}
+                                placeholder="SEO Description for search engines"
                             />
                         </div>
                     </div>

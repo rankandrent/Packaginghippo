@@ -2,25 +2,37 @@ import Link from "next/link"
 import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react"
 import prisma from "@/lib/db"
 
+
 async function getSettings() {
     try {
-        const settings = await prisma.siteSettings.findUnique({
-            where: { key: 'general' }
+        const settings = await prisma.siteSettings.findMany({
+            where: {
+                key: { in: ['general', 'footer'] }
+            }
         })
-        return settings?.value as any || {}
+
+        const general = settings.find(s => s.key === 'general')?.value as any || {}
+        const footer = settings.find(s => s.key === 'footer')?.value as any || {}
+
+        return { general, footer }
     } catch (e) {
-        return {}
+        return { general: {}, footer: {} }
     }
 }
 
 export async function Footer() {
-    const settings = await getSettings()
+    const { general, footer } = await getSettings()
 
-    const siteName = settings.siteName || "PackagingHippo"
-    const phone = settings.phone || "(510) 500-9533"
-    const email = settings.email || "sales@packaginghippo.com"
-    const address = settings.address || "123 Packaging Street, Industrial District, NY 10001"
-    const tagline = settings.tagline || "Your trusted partner for premium custom packaging solutions."
+    const siteName = general.siteName || "PackagingHippo"
+    const phone = general.phone || "(510) 500-9533"
+    const email = general.email || "sales@packaginghippo.com"
+    const address = general.address || "123 Packaging Street, Industrial District, NY 10001"
+    const tagline = footer.description || general.tagline || "Your trusted partner for premium custom packaging solutions."
+
+    // Column Titles
+    const productsTitle = footer.columns?.productsTitle || "Products"
+    const companyTitle = footer.columns?.companyTitle || "Company"
+    const contactTitle = footer.columns?.contactTitle || "Get in Touch"
 
     return (
         <footer className="site-footer bg-neutral-900 border-t border-neutral-800 text-white pt-16 pb-8">
@@ -33,21 +45,32 @@ export async function Footer() {
                             {tagline}
                         </p>
                         <div className="flex gap-4">
-                            <Link href="#" className="p-2 bg-gray-800 rounded-full hover:bg-yellow-500 hover:text-black transition">
-                                <Facebook className="w-4 h-4" />
-                            </Link>
-                            <Link href="#" className="p-2 bg-gray-800 rounded-full hover:bg-yellow-500 hover:text-black transition">
-                                <Instagram className="w-4 h-4" />
-                            </Link>
-                            <Link href="#" className="p-2 bg-gray-800 rounded-full hover:bg-yellow-500 hover:text-black transition">
-                                <Linkedin className="w-4 h-4" />
-                            </Link>
+                            {footer.social?.facebook && (
+                                <Link href={footer.social.facebook} target="_blank" className="p-2 bg-gray-800 rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                    <Facebook className="w-4 h-4" />
+                                </Link>
+                            )}
+                            {footer.social?.instagram && (
+                                <Link href={footer.social.instagram} target="_blank" className="p-2 bg-gray-800 rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                    <Instagram className="w-4 h-4" />
+                                </Link>
+                            )}
+                            {footer.social?.linkedin && (
+                                <Link href={footer.social.linkedin} target="_blank" className="p-2 bg-gray-800 rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                    <Linkedin className="w-4 h-4" />
+                                </Link>
+                            )}
+                            {footer.social?.twitter && (
+                                <Link href={footer.social.twitter} target="_blank" className="p-2 bg-gray-800 rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                    <Twitter className="w-4 h-4" />
+                                </Link>
+                            )}
                         </div>
                     </div>
 
                     {/* Products */}
                     <div>
-                        <h4 className="font-bold text-lg mb-6 text-yellow-500">Products</h4>
+                        <h4 className="font-bold text-lg mb-6 text-yellow-500">{productsTitle}</h4>
                         <ul className="space-y-3 text-sm text-gray-400">
                             <li><Link href="/products/mailer-boxes" className="hover:text-white">Mailer Boxes</Link></li>
                             <li><Link href="/products/rigid-boxes" className="hover:text-white">Rigid Boxes</Link></li>
@@ -59,7 +82,7 @@ export async function Footer() {
 
                     {/* Company */}
                     <div>
-                        <h4 className="font-bold text-lg mb-6 text-yellow-500">Company</h4>
+                        <h4 className="font-bold text-lg mb-6 text-yellow-500">{companyTitle}</h4>
                         <ul className="space-y-3 text-sm text-gray-400">
                             <li><Link href="/about" className="hover:text-white">About Us</Link></li>
                             <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
@@ -71,7 +94,7 @@ export async function Footer() {
 
                     {/* Contact */}
                     <div>
-                        <h4 className="font-bold text-lg mb-6 text-yellow-500">Get in Touch</h4>
+                        <h4 className="font-bold text-lg mb-6 text-yellow-500">{contactTitle}</h4>
                         <ul className="space-y-4 text-sm text-gray-400">
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-5 h-5 text-yellow-500 shrink-0" />
@@ -90,7 +113,7 @@ export async function Footer() {
                 </div>
 
                 <div className="border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
-                    © {new Date().getFullYear()} {siteName}. All rights reserved.
+                    {footer.copyrightText || `© ${new Date().getFullYear()} ${siteName}. All rights reserved.`}
                 </div>
             </div>
         </footer>

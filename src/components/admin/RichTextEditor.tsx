@@ -45,6 +45,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
         onUpdate: ({ editor }) => {
             onChange(editor.getHTML())
         },
+        immediatelyRender: false,
     })
 
     if (!editor) {
@@ -179,7 +180,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
                     </Button>
                 </div>
             </div>
-            <EditorContent editor={editor} className="min-h-[300px] p-4" />
+            <EditorContent editor={editor} className="min-h-[300px] p-4 rich-text" />
         </div>
     )
 }

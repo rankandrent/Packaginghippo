@@ -11,15 +11,14 @@ async function getHomepageData() {
       orderBy: { order: 'asc' },
     })
 
-    const formattedData: Record<string, any> = {}
-    sections.forEach((section) => {
-      formattedData[section.sectionKey] = section.content
-    })
-
-    return formattedData
+    // Return array directly to preserve order
+    return sections.map(s => ({
+      key: s.sectionKey,
+      content: s.content
+    }))
   } catch (error) {
     console.error("Error fetching homepage data:", error)
-    return {}
+    return []
   }
 }
 
@@ -54,6 +53,12 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
-  const data = await getHomepageData()
-  return <HomePageClient data={data as any} />
+  const sections = await getHomepageData()
+  const settings = await getSiteSettings()
+
+  return (
+    <main>
+      <HomePageClient sections={sections as any} settings={settings} />
+    </main>
+  )
 }

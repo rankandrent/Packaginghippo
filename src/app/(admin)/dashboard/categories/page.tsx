@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
     Table,
     TableBody,
@@ -12,7 +14,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog"
+import { Plus, Pencil, Trash2, Loader2, Search, Filter } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 type Category = {
     id: string
@@ -26,6 +30,9 @@ type Category = {
 export default function CategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
+    const [createDialogOpen, setCreateDialogOpen] = useState(false)
+    const [newName, setNewName] = useState("")
+    const [searchQuery, setSearchQuery] = useState("")
     const router = useRouter()
 
     useEffect(() => {
@@ -45,11 +52,11 @@ export default function CategoriesPage() {
         }
     }
 
-    async function createCategory() {
-        const name = prompt("Enter category name:")
-        if (!name) return
+    async function createCategory(e: React.FormEvent) {
+        e.preventDefault()
+        if (!newName) return
 
-        const slug = name
+        const slug = newName
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/(^-|-$)+/g, "")
@@ -58,11 +65,14 @@ export default function CategoriesPage() {
             const res = await fetch('/api/cms/categories', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, slug }),
+                body: JSON.stringify({ name: newName, slug }),
             })
 
             if (!res.ok) throw new Error('Failed to create')
-            fetchCategories()
+            const data = await res.json()
+
+            // Redirect to the editor immediately so user can set SEO, etc.
+            router.push(`/dashboard/categories/${data.category.id}`)
         } catch (error) {
             console.error("Error creating category:", error)
             alert("Error creating category")
@@ -85,9 +95,14 @@ export default function CategoriesPage() {
         }
     }
 
+    const filteredCategories = categories.filter(category =>
+        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        category.slug.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
     if (loading) {
         return (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center items-center h-[calc(100vh-200px)]">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
         )
@@ -95,17 +110,61 @@ export default function CategoriesPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
-                    <p className="text-muted-foreground">Manage product categories</p>
+                    <p className="text-muted-foreground">Manage your product categories and structure.</p>
                 </div>
-                <Button onClick={createCategory}>
-                    <Plus className="mr-2 h-4 w-4" /> Add Category
-                </Button>
+
+                <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <Plus className="mr-2 h-4 w-4" /> Add Category
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Create New Category</DialogTitle>
+                            <DialogDescription>
+                                Start by naming your category. You can add more details later.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={createCategory} className="space-y-4 pt-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Category Name</Label>
+                                <Input
+                                    id="name"
+                                    value={newName}
+                                    onChange={(e) => setNewName(e.target.value)}
+                                    placeholder="e.g. Mailer Boxes"
+                                    required
+                                    autoFocus
+                                />
+                            </div>
+                            <DialogFooter>
+                                <Button type="submit" className="w-full sm:w-auto">Create & Edit</Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <Card>
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <CardTitle>All Categories</CardTitle>
+                        <div className="relative w-full max-w-sm">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                type="search"
+                                placeholder="Search categories..."
+                                className="pl-8"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                </CardHeader>
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
@@ -118,38 +177,55 @@ export default function CategoriesPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {categories.map((cat) => (
-                                <TableRow key={cat.id}>
-                                    <TableCell className="font-medium">{cat.name}</TableCell>
-                                    <TableCell className="text-muted-foreground">{cat.slug}</TableCell>
-                                    <TableCell>{cat._count?.products || 0}</TableCell>
-                                    <TableCell>
-                                        <span className={`px-2 py-1 rounded-full text-xs ${cat.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100'}`}>
-                                            {cat.isActive ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => router.push(`/dashboard/categories/${cat.id}`)}
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => deleteCategory(cat.id)}
-                                        >
-                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {categories.length === 0 && (
+                            {filteredCategories.length > 0 ? (
+                                filteredCategories.map((cat) => (
+                                    <TableRow key={cat.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => router.push(`/dashboard/categories/${cat.id}`)}>
+                                        <TableCell className="font-medium">
+                                            <div className="flex flex-col">
+                                                <span>{cat.name}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground font-mono text-sm">{cat.slug}</TableCell>
+                                        <TableCell>
+                                            <Badge variant="secondary" className="font-normal">
+                                                {cat._count?.products || 0} products
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={cat.isActive ? 'default' : 'secondary'} className={cat.isActive ? 'bg-green-600 hover:bg-green-700' : ''}>
+                                                {cat.isActive ? 'Active' : 'Inactive'}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => router.push(`/dashboard/categories/${cat.id}`)}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                    <span className="sr-only">Edit</span>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                                    onClick={() => deleteCategory(cat.id)}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                    <span className="sr-only">Delete</span>
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                        No categories found
+                                    <TableCell colSpan={5} className="h-24 text-center">
+                                        <div className="flex flex-col items-center justify-center text-muted-foreground">
+                                            <p>No categories found</p>
+                                            {searchQuery && <p className="text-sm">Try adjusting your search query</p>}
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )}

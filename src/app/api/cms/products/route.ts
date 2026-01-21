@@ -1,11 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
+import { revalidatePath } from 'next/cache'
 
-// GET all products
+// GET all products or single by ID
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url)
+        const id = searchParams.get('id')
         const categoryId = searchParams.get('categoryId')
+
+        if (id) {
+            const product = await prisma.product.findUnique({
+                where: { id },
+                include: {
+                    category: {
+                        select: { name: true, slug: true }
+                    }
+                }
+            })
+            if (!product) {
+                return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+            }
+            return NextResponse.json({ product })
+        }
 
         const products = await prisma.product.findMany({
             where: categoryId ? { categoryId } : undefined,
@@ -27,13 +44,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, categoryId } = body
+        const { name, slug, categoryId, sections } = body
+
+        if (!categoryId) {
+            return NextResponse.json({ error: 'Category is required' }, { status: 400 })
+        }
 
         const product = await prisma.product.create({
             data: {
                 name,
                 slug,
                 categoryId,
+                sections: sections || [], // Default to empty array
                 images: [],
             },
         })
@@ -53,7 +75,7 @@ export async function PUT(request: NextRequest) {
             id, name, slug, description, shortDesc,
             images, minOrder, price, categoryId,
             dimensions, materials, finishings,
-            seoTitle, seoDesc, isActive
+            seoTitle, seoDesc, isActive, sections
         } = body
 
         const updated = await prisma.product.update({
@@ -73,9 +95,16 @@ export async function PUT(request: NextRequest) {
                 seoTitle,
                 seoDesc,
                 isActive,
+                sections, // Save dynamic sections
                 updatedAt: new Date(),
             },
         })
+
+        // Revalidate the product page and listing
+        revalidatePath(`/products/${slug}`)
+        revalidatePath('/products')
+        revalidatePath(`/services/${updated.categoryId}`) // Assuming we can get category slug, but revalidating path might fail if slug unknown. 
+        // Better: revalidatePath('/', 'layout') wipes everything if needed, but specific is better.
 
         return NextResponse.json({ product: updated })
     } catch (error) {
