@@ -19,6 +19,7 @@ import { LogoLoop } from "./sections/LogoLoop"
 import { SeoContent } from "./sections/SeoContent"
 import { CustomerReviews } from "./sections/CustomerReviews"
 import { FeaturesBar } from "./sections/FeaturesBar"
+import { QuoteSection } from "./sections/QuoteSection"
 
 type HomepageData = Record<string, any>
 
@@ -46,6 +47,7 @@ const SECTION_COMPONENTS: Record<string, React.FC<{ data: any }>> = {
     seo_content: SeoContent,
     customer_reviews: CustomerReviews,
     features_bar: FeaturesBar,
+    quote_form: QuoteSection,
 }
 
 export default function HomePageClient({ sections, settings }: { sections: Section[], settings?: any }) {

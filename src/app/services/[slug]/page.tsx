@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
 import prisma from "@/lib/db"
 import { Metadata } from "next"
-import { SectionRenderer } from "@/components/public/SectionRenderer"
-import { Section } from "@/components/admin/SectionBuilder"
+import { SectionRenderer, Section } from "@/components/public/SectionRenderer"
+import { QuoteForm } from "@/components/forms/QuoteForm"
 
 export const revalidate = 60 // ISR
 
@@ -91,6 +91,17 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     return (
         <main className="min-h-screen">
             <SectionRenderer sections={sections} />
+
+            <section className="py-20 bg-gray-50">
+                <div className="container mx-auto px-4">
+                    <QuoteForm
+                        theme="dark"
+                        title={`Get a Quote for ${category.name}`}
+                        subtitle="Professional packaging solutions tailored for your business."
+                        pageSource={`Category: ${category.name}`}
+                    />
+                </div>
+            </section>
         </main>
     )
 }

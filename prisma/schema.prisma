@@ -145,6 +145,9 @@ model Inquiry {
   type       String?  @default("quote")
   details    Json?
   
+  sourceUrl  String?
+  sourcePage String?
+  
   status     String   @default("PENDING") // PENDING, REPLIED, CLOSED
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

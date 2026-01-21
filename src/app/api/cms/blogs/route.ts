@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(posts)
     } catch (error) {
+        console.error("GET /api/cms/blogs error:", error)
         return NextResponse.json({ error: 'Failed to fetch blogs' }, { status: 500 })
     }
 }

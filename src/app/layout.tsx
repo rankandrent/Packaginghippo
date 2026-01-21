@@ -43,8 +43,8 @@ export default async function RootLayout({
   const menuSettings = settings.menu || null;
 
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
         <Navbar settings={generalSettings} menuData={menuSettings} />
         <main>{children}</main>
         <Footer />

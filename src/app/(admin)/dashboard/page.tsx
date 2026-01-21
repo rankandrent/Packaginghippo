@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, Package, FolderOpen, Home, Loader2 } from "lucide-react"
+import { FileText, Package, FolderOpen, Home, Loader2, MessageSquare } from "lucide-react"
 import Link from "next/link"
 
 export default function DashboardPage() {
@@ -13,6 +13,7 @@ export default function DashboardPage() {
         products: 0,
         categories: 0,
         sections: 0,
+        inquiries: 0,
     })
     const [loading, setLoading] = useState(true)
 
@@ -23,18 +24,20 @@ export default function DashboardPage() {
     async function fetchStats() {
         try {
             setLoading(true)
-            const [pagesRes, productsRes, categoriesRes, sectionsRes] = await Promise.all([
+            const [pagesRes, productsRes, categoriesRes, sectionsRes, inquiriesRes] = await Promise.all([
                 fetch('/api/cms/pages'),
                 fetch('/api/cms/products'),
                 fetch('/api/cms/categories'),
                 fetch('/api/cms/homepage'),
+                fetch('/api/cms/inquiries'),
             ])
 
-            const [pages, products, categories, sections] = await Promise.all([
+            const [pages, products, categories, sections, inquiries] = await Promise.all([
                 pagesRes.json(),
                 productsRes.json(),
                 categoriesRes.json(),
                 sectionsRes.json(),
+                inquiriesRes.json(),
             ])
 
             setStats({
@@ -42,6 +45,7 @@ export default function DashboardPage() {
                 products: products.products?.length || 0,
                 categories: categories.categories?.length || 0,
                 sections: sections.sections?.length || 0,
+                inquiries: inquiries?.length || 0,
             })
         } catch (error) {
             console.error("Error fetching stats:", error)
@@ -55,6 +59,7 @@ export default function DashboardPage() {
         { title: "Products", value: stats.products, icon: Package, href: "/dashboard/products", color: "text-green-500" },
         { title: "Categories", value: stats.categories, icon: FolderOpen, href: "/dashboard/categories", color: "text-purple-500" },
         { title: "Homepage Sections", value: stats.sections, icon: Home, href: "/dashboard/homepage", color: "text-yellow-500" },
+        { title: "Leads/Inquiries", value: stats.inquiries, icon: MessageSquare, href: "/dashboard/inquiries", color: "text-red-500" },
     ]
 
     return (

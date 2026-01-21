@@ -14,7 +14,8 @@ import {
     LogOut,
     Loader2,
     Menu,
-    BookOpen
+    BookOpen,
+    MessageSquare
 } from "lucide-react"
 
 const sidebarItems = [
@@ -57,6 +58,11 @@ const sidebarItems = [
         title: "Blog",
         href: "/dashboard/blog",
         icon: BookOpen,
+    },
+    {
+        title: "Inquiries",
+        href: "/dashboard/inquiries",
+        icon: MessageSquare,
     },
 ]
 

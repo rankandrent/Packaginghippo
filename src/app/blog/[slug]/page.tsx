@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { Calendar, User, Share2, Facebook, Twitter, Linkedin, ChevronRight } from "lucide-react"
+import { Calendar, User, Share2, Facebook, Twitter, Linkedin, ChevronRight, Clock } from "lucide-react"
 import { notFound } from "next/navigation"
+import { DynamicTOC } from "@/components/blog/DynamicTOC"
 
 async function getBlogPost(slug: string) {
     const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/cms/blogs?slug=${slug}`, { cache: 'no-store' })
@@ -8,10 +9,48 @@ async function getBlogPost(slug: string) {
     return res.json()
 }
 
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+    const post = await getBlogPost(params.slug)
+    if (!post) return { title: 'Post Not Found' }
+
+    return {
+        title: post.seoTitle || post.title,
+        description: post.seoDesc || post.excerpt,
+        openGraph: {
+            title: post.seoTitle || post.title,
+            description: post.seoDesc || post.excerpt,
+            images: post.mainImage ? [{ url: post.mainImage }] : [],
+            type: 'article',
+            publishedTime: post.publishedAt || post.createdAt,
+            authors: [post.author?.name || 'Admin'],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: post.seoTitle || post.title,
+            description: post.seoDesc || post.excerpt,
+            images: post.mainImage ? [post.mainImage] : [],
+        }
+    }
+}
+
+async function getRelatedPosts(categoryId: string, currentId: string) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/cms/blogs?publishedOnly=true`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const all = await res.json()
+    return Array.isArray(all)
+        ? all.filter((p: any) => p.categoryId === categoryId && p.id !== currentId).slice(0, 3)
+        : []
+}
+
 export default async function SingleBlogPage({ params }: { params: { slug: string } }) {
     const post = await getBlogPost(params.slug)
-
     if (!post) notFound()
+
+    const relatedPosts = await getRelatedPosts(post.categoryId, post.id)
+
+    // Simple reading time calc
+    const wordCount = post.content.split(/\s+/).length
+    const readingTime = Math.ceil(wordCount / 200)
 
     return (
         <div className="min-h-screen bg-white">
@@ -66,7 +105,11 @@ export default async function SingleBlogPage({ params }: { params: { slug: strin
                                     <p className="text-xs text-gray-500">{post.author?.role || 'Packaging Expert'}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <div className="flex items-center gap-2 text-sm text-gray-500 border-l pl-6">
+                                <Clock className="w-4 h-4" />
+                                {readingTime} min read
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-500 border-l pl-6">
                                 <Calendar className="w-4 h-4" />
                                 {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
                             </div>
@@ -80,24 +123,36 @@ export default async function SingleBlogPage({ params }: { params: { slug: strin
 
                     {/* Left Sidebar - Table of Contents */}
                     <div className="hidden lg:block">
-                        <div className="sticky top-32 space-y-6">
-                            <h3 className="font-bold text-blue-900 uppercase tracking-wider text-sm border-b pb-2">Table of Contents</h3>
-                            <nav className="space-y-4">
-                                {/* This would normally be dynamically generated from HTML content */}
-                                <ul className="space-y-3 text-sm text-gray-500 font-medium">
-                                    <li className="hover:text-blue-900 transition-colors cursor-pointer">Quick Overview</li>
-                                    <li className="hover:text-blue-900 transition-colors cursor-pointer">Key Benefits</li>
-                                    <li className="hover:text-blue-900 transition-colors cursor-pointer">Design Strategies</li>
-                                    <li className="hover:text-blue-900 transition-colors cursor-pointer">Conclusion</li>
-                                </ul>
-                            </nav>
+                        <div className="sticky top-32 space-y-8">
+                            <DynamicTOC />
 
-                            <div className="pt-8 space-y-4">
-                                <h3 className="font-bold text-blue-900 uppercase tracking-wider text-sm border-b pb-2">Share This Post</h3>
-                                <div className="flex gap-3">
-                                    <button className="p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all"><Facebook className="w-4 h-4" /></button>
-                                    <button className="p-2 bg-blue-50 text-blue-400 rounded-full hover:bg-blue-400 hover:text-white transition-all"><Twitter className="w-4 h-4" /></button>
-                                    <button className="p-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-700 hover:text-white transition-all"><Linkedin className="w-4 h-4" /></button>
+                            <div className="pt-8 space-y-4 border-t">
+                                <h3 className="font-bold text-blue-900 uppercase tracking-wider text-xs border-b pb-2 text-center md:text-left">Share This Post</h3>
+                                <div className="flex gap-3 justify-center md:justify-start">
+                                    <a
+                                        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all"
+                                    >
+                                        <Facebook className="w-4 h-4" />
+                                    </a>
+                                    <a
+                                        href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-blue-50 text-blue-400 rounded-full hover:bg-blue-400 hover:text-white transition-all"
+                                    >
+                                        <Twitter className="w-4 h-4" />
+                                    </a>
+                                    <a
+                                        href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-700 hover:text-white transition-all"
+                                    >
+                                        <Linkedin className="w-4 h-4" />
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -134,23 +189,72 @@ export default async function SingleBlogPage({ params }: { params: { slug: strin
                             </div>
                         </div>
 
-                        {/* Social Share Mobile */}
                         <div className="lg:hidden mt-8 flex flex-col items-center gap-4">
                             <p className="font-bold text-sm text-gray-400 uppercase tracking-widest">Share This Article</p>
                             <div className="flex gap-4">
-                                <button className="p-3 bg-gray-100 rounded-full"><Facebook className="w-5 h-5 text-blue-600" /></button>
-                                <button className="p-3 bg-gray-100 rounded-full"><Twitter className="w-5 h-5 text-blue-400" /></button>
-                                <button className="p-3 bg-gray-100 rounded-full"><Linkedin className="w-5 h-5 text-blue-700" /></button>
-                                <button className="p-3 bg-gray-100 rounded-full"><Share2 className="w-5 h-5 text-gray-600" /></button>
+                                <a
+                                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-3 bg-gray-100 rounded-full hover:bg-blue-600 hover:text-white transition-all text-blue-600"
+                                >
+                                    <Facebook className="w-5 h-5" />
+                                </a>
+                                <a
+                                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-3 bg-gray-100 rounded-full hover:bg-blue-400 hover:text-white transition-all text-blue-400"
+                                >
+                                    <Twitter className="w-5 h-5" />
+                                </a>
+                                <a
+                                    href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-3 bg-gray-100 rounded-full hover:bg-blue-700 hover:text-white transition-all text-blue-700"
+                                >
+                                    <Linkedin className="w-5 h-5" />
+                                </a>
+                                <button
+                                    onClick={() => navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}
+                                    className="p-3 bg-gray-100 rounded-full hover:bg-gray-600 hover:text-white transition-all text-gray-600"
+                                >
+                                    <Share2 className="w-5 h-5" />
+                                </button>
                             </div>
                         </div>
                     </div>
 
                 </div>
+
+                {/* Related Posts Section */}
+                {relatedPosts.length > 0 && (
+                    <div className="mt-24 pt-16 border-t max-w-6xl mx-auto">
+                        <div className="flex items-center justify-between mb-12">
+                            <h2 className="text-3xl font-black text-blue-900 uppercase">Related Articles</h2>
+                            <Link href="/blog" className="text-sm font-bold text-blue-900 hover:underline flex items-center gap-2">View All Posts <ChevronRight className="w-4 h-4" /></Link>
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {relatedPosts.map((rp: any) => (
+                                <Link key={rp.id} href={`/blog/${rp.slug}`} className="group space-y-4">
+                                    <div className="aspect-video rounded-xl overflow-hidden bg-gray-100 border relative">
+                                        {rp.mainImage && <img src={rp.mainImage} alt={rp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h4 className="font-bold text-gray-900 leading-snug group-hover:text-blue-900 transition-colors uppercase line-clamp-2">{rp.title}</h4>
+                                        <p className="text-xs text-gray-500">{new Date(rp.publishedAt || rp.createdAt).toLocaleDateString()}</p>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* CTA Section */}
-            <div className="bg-blue-900 py-16 text-white text-center">
+            <div className="bg-blue-900 py-20 text-white text-center">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl md:text-4xl font-black uppercase mb-6">Need Custom Packaging Solutions?</h2>
                     <p className="text-blue-100 mb-10 max-w-2xl mx-auto">Get a personalized quote for your business today. Our experts are ready to help.</p>

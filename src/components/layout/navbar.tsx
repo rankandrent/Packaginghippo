@@ -1,4 +1,5 @@
 "use client"
+// Navigation component for Packaging Hippo
 
 import Link from "next/link"
 import { useState } from "react"

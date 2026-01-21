@@ -26,6 +26,7 @@ type BlogPost = {
     updatedAt: string
     author?: { name: string }
     category?: { name: string }
+    createdAt: string
 }
 
 export default function BlogListPage() {
@@ -42,7 +43,7 @@ export default function BlogListPage() {
             setLoading(true)
             const res = await fetch('/api/cms/blogs')
             const data = await res.json()
-            setPosts(data || [])
+            setPosts(Array.isArray(data) ? data : [])
         } catch (error) {
             console.error("Error fetching blogs:", error)
         } finally {
@@ -127,7 +128,9 @@ export default function BlogListPage() {
                                     <TableCell className="text-muted-foreground text-sm">
                                         {post.publishedAt
                                             ? new Date(post.publishedAt).toLocaleDateString()
-                                            : new Date(post.createdAt).toLocaleDateString()
+                                            : post.createdAt
+                                                ? new Date(post.createdAt).toLocaleDateString()
+                                                : 'N/A'
                                         }
                                     </TableCell>
                                     <TableCell className="text-right">

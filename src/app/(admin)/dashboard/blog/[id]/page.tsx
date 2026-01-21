@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Save, ArrowLeft, Image as ImageIcon } from "lucide-react"
+import { Loader2, Save, ArrowLeft, Image as ImageIcon, Sparkles } from "lucide-react"
 import Link from "next/link"
+import { RichTextEditor } from "@/components/admin/RichTextEditor"
+import { ImageUploader } from "@/components/admin/ImageUploader"
+import { Badge } from "@/components/ui/badge"
 
 export default function BlogEditorPage() {
     const params = useParams()
@@ -43,8 +46,12 @@ export default function BlogEditorPage() {
             fetch('/api/cms/authors'),
             fetch('/api/cms/blog-categories')
         ])
-        setAuthors(await authRes.json())
-        setCategories(await catRes.json())
+        const [authorsData, categoriesData] = await Promise.all([
+            authRes.json(),
+            catRes.json()
+        ])
+        setAuthors(Array.isArray(authorsData) ? authorsData : [])
+        setCategories(Array.isArray(categoriesData) ? categoriesData : [])
     }
 
     async function fetchPost() {
@@ -126,9 +133,14 @@ export default function BlogEditorPage() {
                                 <Textarea value={post.excerpt} onChange={(e) => setPost({ ...post, excerpt: e.target.value })} placeholder="Short summary for listing cards" rows={3} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Content (HTML/Rich Text)</label>
-                                <Textarea value={post.content} onChange={(e) => setPost({ ...post, content: e.target.value })} placeholder="Write your blog content here..." className="min-h-[400px] font-mono text-sm" required />
-                                <p className="text-xs text-muted-foreground">HTML is supported. Use standard tags like h2, h3, p, etc.</p>
+                                <label className="text-sm font-bold text-blue-900 uppercase tracking-tight flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4 text-yellow-500" /> Blog Content
+                                </label>
+                                <RichTextEditor
+                                    content={post.content}
+                                    onChange={(html) => setPost({ ...post, content: html })}
+                                />
+                                <p className="text-xs text-muted-foreground italic">Use the toolbar above to style your content, add links, and structure your article.</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -200,16 +212,13 @@ export default function BlogEditorPage() {
                     <Card>
                         <CardHeader><CardTitle>Featured Image</CardTitle></CardHeader>
                         <CardContent className="space-y-4">
-                            {post.mainImage && (
-                                <img src={post.mainImage} alt="Preview" className="w-full h-40 object-cover rounded-md border" />
-                            )}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Image URL</label>
-                                <Input value={post.mainImage} onChange={(e) => setPost({ ...post, mainImage: e.target.value })} placeholder="https://..." />
-                            </div>
-                            <Button variant="outline" className="w-full" type="button">
-                                <ImageIcon className="mr-2 h-4 w-4" /> Change Image
-                            </Button>
+                            <ImageUploader
+                                value={post.mainImage ? [post.mainImage] : []}
+                                onChange={(urls) => setPost({ ...post, mainImage: urls[0] || "" })}
+                                bucket="blogs"
+                                maxFiles={1}
+                            />
+                            <p className="text-[10px] text-muted-foreground text-center">Recommended size: 1200x630px for best SEO results.</p>
                         </CardContent>
                     </Card>
                 </div>
