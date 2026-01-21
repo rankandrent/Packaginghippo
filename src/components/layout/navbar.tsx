@@ -12,12 +12,22 @@ type NavbarProps = {
         phone?: string
         email?: string
     }
+    menuData?: { id: string; label: string; href: string }[] | null
 }
 
-export function Navbar({ settings }: NavbarProps) {
+const DEFAULT_MENU = [
+    { label: "Home", href: "/" },
+    { label: "Custom Packaging", href: "/products", hasChildren: true },
+    { label: "Request A Quote", href: "/quote" },
+    { label: "Contact Us", href: "/contact" }
+]
+
+export function Navbar({ settings, menuData }: NavbarProps) {
     const [isOpen, setIsOpen] = useState(false)
     const siteName = settings?.siteName || "PackagingHippo"
     const phone = settings?.phone || "+1 845 379 9277"
+
+    const navItems = menuData || DEFAULT_MENU;
 
     return (
         <header className="site-navbar w-full z-50 bg-white">
@@ -97,34 +107,28 @@ export function Navbar({ settings }: NavbarProps) {
             <div className="bg-white border-b hidden lg:block shadow-sm">
                 <div className="container mx-auto px-4 h-14 flex items-center justify-between">
                     <nav className="flex items-center gap-8 h-full">
-                        <Link href="/" className="text-sm font-bold text-gray-700 hover:text-blue-900 uppercase tracking-wide h-full flex items-center">
-                            Home
-                        </Link>
-                        <div className="group relative h-full flex items-center">
-                            <Link href="/products" className="text-sm font-bold text-gray-700 group-hover:text-blue-900 uppercase tracking-wide flex items-center gap-1">
-                                Custom Packaging <ChevronDown className="w-3 h-3" />
-                            </Link>
-                            {/* Mega Menu Placeholder */}
-                            <div className="absolute top-full left-0 w-64 bg-white shadow-xl border-t-2 border-yellow-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-4 rounded-b-lg">
-                                <ul className="space-y-2">
-                                    <li><Link href="/products/mailer-boxes" className="block text-sm text-gray-600 hover:text-blue-900">Mailer Boxes</Link></li>
-                                    <li><Link href="/products/display-boxes" className="block text-sm text-gray-600 hover:text-blue-900">Display Boxes</Link></li>
-                                    <li><Link href="/products/retail-boxes" className="block text-sm text-gray-600 hover:text-blue-900">Retail Boxes</Link></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <Link href="/box-styles" className="text-sm font-bold text-gray-700 hover:text-blue-900 uppercase tracking-wide h-full flex items-center">
-                            Box By Style
-                        </Link>
-                        <Link href="/materials" className="text-sm font-bold text-gray-700 hover:text-blue-900 uppercase tracking-wide h-full flex items-center">
-                            Packaging Material
-                        </Link>
-                        <Link href="/printing" className="text-sm font-bold text-gray-700 hover:text-blue-900 uppercase tracking-wide h-full flex items-center">
-                            Custom Printing
-                        </Link>
-                        <Link href="/contact" className="text-sm font-bold text-gray-700 hover:text-blue-900 uppercase tracking-wide h-full flex items-center">
-                            Schedule A Meeting
-                        </Link>
+                        {navItems.map((item, idx) => (
+                            item.label === "Custom Packaging" || (item as any).hasChildren ? (
+                                <div key={idx} className="group relative h-full flex items-center">
+                                    <Link href={item.href} className="text-sm font-bold text-gray-700 group-hover:text-blue-900 uppercase tracking-wide flex items-center gap-1">
+                                        {item.label} <ChevronDown className="w-3 h-3" />
+                                    </Link>
+                                    {/* Mega Menu Placeholder */}
+                                    <div className="absolute top-full left-0 w-64 bg-white shadow-xl border-t-2 border-yellow-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-4 rounded-b-lg">
+                                        <ul className="space-y-2">
+                                            <li><Link href="/services/mailer-boxes" className="block text-sm text-gray-600 hover:text-blue-900">Mailer Boxes</Link></li>
+                                            <li><Link href="/services/rigid-boxes" className="block text-sm text-gray-600 hover:text-blue-900">Rigid Boxes</Link></li>
+                                            <li><Link href="/services/folding-cartons" className="block text-sm text-gray-600 hover:text-blue-900">Folding Cartons</Link></li>
+                                            <li><Link href="/services/display-boxes" className="block text-sm text-gray-600 hover:text-blue-900">Display Boxes</Link></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            ) : (
+                                <Link key={idx} href={item.href} className="text-sm font-bold text-gray-700 hover:text-blue-900 uppercase tracking-wide h-full flex items-center">
+                                    {item.label}
+                                </Link>
+                            )
+                        ))}
                     </nav>
 
                     <Button asChild className="bg-blue-900 hover:bg-blue-800 text-white font-bold uppercase tracking-wider rounded-md h-10 px-6">
@@ -139,10 +143,11 @@ export function Navbar({ settings }: NavbarProps) {
                     <Input type="text" placeholder="Search products..." className="w-full bg-gray-50 mb-4" />
 
                     <nav className="flex flex-col space-y-3">
-                        <Link href="/" className="text-sm font-bold text-gray-900 uppercase border-b pb-2" onClick={() => setIsOpen(false)}>Home</Link>
-                        <Link href="/products" className="text-sm font-bold text-gray-900 uppercase border-b pb-2" onClick={() => setIsOpen(false)}>Custom Packaging</Link>
-                        <Link href="/box-styles" className="text-sm font-bold text-gray-900 uppercase border-b pb-2" onClick={() => setIsOpen(false)}>Box By Style</Link>
-                        <Link href="/contact" className="text-sm font-bold text-gray-900 uppercase border-b pb-2" onClick={() => setIsOpen(false)}>Contact Us</Link>
+                        {navItems.map((item, idx) => (
+                            <Link key={idx} href={item.href} className="text-sm font-bold text-gray-900 uppercase border-b pb-2" onClick={() => setIsOpen(false)}>
+                                {item.label}
+                            </Link>
+                        ))}
                     </nav>
 
                     <div className="pt-2 flex flex-col gap-3">
@@ -159,3 +164,4 @@ export function Navbar({ settings }: NavbarProps) {
         </header>
     )
 }
+

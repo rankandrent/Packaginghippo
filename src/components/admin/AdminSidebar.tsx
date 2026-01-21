@@ -1,9 +1,9 @@
-
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { useState, useEffect } from "react"
 import {
     LayoutDashboard,
     FileText,
@@ -12,6 +12,9 @@ import {
     Home,
     Settings,
     LogOut,
+    Loader2,
+    Menu,
+    BookOpen
 } from "lucide-react"
 
 const sidebarItems = [
@@ -45,10 +48,47 @@ const sidebarItems = [
         href: "/dashboard/settings",
         icon: Settings,
     },
+    {
+        title: "Menu",
+        href: "/dashboard/settings/menu",
+        icon: Menu,
+    },
+    {
+        title: "Blog",
+        href: "/dashboard/blog",
+        icon: BookOpen,
+    },
 ]
 
 export function AdminSidebar() {
     const pathname = usePathname()
+    const router = useRouter()
+    const [loggingOut, setLoggingOut] = useState(false)
+    const [user, setUser] = useState<{ name?: string; email: string } | null>(null)
+
+    useEffect(() => {
+        // Fetch current user session
+        fetch('/api/auth/session')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated) {
+                    setUser(data.user)
+                }
+            })
+            .catch(() => { })
+    }, [])
+
+    async function handleLogout() {
+        setLoggingOut(true)
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' })
+            router.push('/dashboard/login')
+            router.refresh()
+        } catch (error) {
+            console.error('Logout failed:', error)
+            setLoggingOut(false)
+        }
+    }
 
     return (
         <div className="fixed top-0 left-0 h-screen w-64 flex-col border-r bg-white z-40 shadow-sm flex">
@@ -77,11 +117,26 @@ export function AdminSidebar() {
                 </nav>
             </div>
             <div className="border-t p-4">
-                <div className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-primary cursor-pointer">
-                    <LogOut className="h-4 w-4" />
+                {user && (
+                    <div className="px-3 py-2 mb-2 text-sm">
+                        <p className="font-medium text-gray-900">{user.name || 'Admin'}</p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                )}
+                <button
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                    className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-primary cursor-pointer disabled:opacity-50"
+                >
+                    {loggingOut ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <LogOut className="h-4 w-4" />
+                    )}
                     Logout
-                </div>
+                </button>
             </div>
         </div>
     )
 }
+

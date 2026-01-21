@@ -72,11 +72,11 @@ export async function Footer() {
                     <div>
                         <h4 className="font-bold text-lg mb-6 text-yellow-500">{productsTitle}</h4>
                         <ul className="space-y-3 text-sm text-gray-400">
-                            <li><Link href="/products/mailer-boxes" className="hover:text-white">Mailer Boxes</Link></li>
-                            <li><Link href="/products/rigid-boxes" className="hover:text-white">Rigid Boxes</Link></li>
-                            <li><Link href="/products/folding-cartons" className="hover:text-white">Folding Cartons</Link></li>
-                            <li><Link href="/products/display-boxes" className="hover:text-white">Display Boxes</Link></li>
-                            <li><Link href="/products/eco-friendly" className="hover:text-white">Eco-Friendly</Link></li>
+                            <li><Link href="/services/mailer-boxes" className="hover:text-white">Mailer Boxes</Link></li>
+                            <li><Link href="/services/rigid-boxes" className="hover:text-white">Rigid Boxes</Link></li>
+                            <li><Link href="/services/folding-cartons" className="hover:text-white">Folding Cartons</Link></li>
+                            <li><Link href="/services/display-boxes" className="hover:text-white">Display Boxes</Link></li>
+                            <li><Link href="/services/eco-friendly" className="hover:text-white">Eco-Friendly</Link></li>
                         </ul>
                     </div>
 
@@ -84,11 +84,10 @@ export async function Footer() {
                     <div>
                         <h4 className="font-bold text-lg mb-6 text-yellow-500">{companyTitle}</h4>
                         <ul className="space-y-3 text-sm text-gray-400">
-                            <li><Link href="/about" className="hover:text-white">About Us</Link></li>
-                            <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
+                            <li><Link href="/about-us" className="hover:text-white">About Us</Link></li>
                             <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
-                            <li><Link href="/terms" className="hover:text-white">Terms & Conditions</Link></li>
-                            <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
+                            <li><Link href="/terms-and-conditions" className="hover:text-white">Terms & Conditions</Link></li>
+                            <li><Link href="/privacy-policy" className="hover:text-white">Privacy Policy</Link></li>
                         </ul>
                     </div>
 

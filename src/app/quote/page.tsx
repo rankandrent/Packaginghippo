@@ -4,7 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import { Upload } from "lucide-react"
+import { Upload, Loader2, CheckCircle2 } from "lucide-react"
+import { useState } from "react"
 
 const formSchema = z.object({
     name: z.string().min(2, "Name is required"),
@@ -22,6 +23,9 @@ const formSchema = z.object({
 })
 
 export default function QuotePage() {
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isSuccess, setIsSuccess] = useState(false)
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -32,9 +36,52 @@ export default function QuotePage() {
         }
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
-        alert("Quote Request Sent! (Simulation)")
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        setIsSubmitting(true)
+        try {
+            const res = await fetch('/api/inquiry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: values.name,
+                    email: values.email,
+                    phone: values.phone,
+                    type: 'quote',
+                    message: values.message,
+                    details: {
+                        dimensions: `${values.width}x${values.length}x${values.depth} ${values.unit}`,
+                        material: values.material,
+                        color: values.color,
+                        turnaround: values.turnaround,
+                        quantity: values.quantity
+                    }
+                }),
+            })
+
+            if (!res.ok) throw new Error('Submission failed')
+            setIsSuccess(true)
+            form.reset()
+        } catch (error) {
+            console.error(error)
+            alert("Something went wrong. Please try again.")
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    if (isSuccess) {
+        return (
+            <div className="min-h-[70vh] flex items-center justify-center pt-24">
+                <div className="text-center space-y-4 p-8 bg-white rounded-2xl shadow-sm border max-w-md mx-auto">
+                    <div className="flex justify-center">
+                        <CheckCircle2 className="w-16 h-16 text-green-500" />
+                    </div>
+                    <h1 className="text-3xl font-black text-gray-900">Quote Requested!</h1>
+                    <p className="text-gray-500">Thank you for your interest. Our packaging experts will review your request and contact you soon.</p>
+                    <button onClick={() => setIsSuccess(false)} className="w-full py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg transition-colors">Request Another Quote</button>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -60,6 +107,7 @@ export default function QuotePage() {
                                 <div className="space-y-1">
                                     <label className="text-xs font-semibold flex gap-0.5">Email <span className="text-red-400">*</span></label>
                                     <input {...form.register("email")} className="w-full p-2 text-sm rounded border-none text-gray-900 bg-gray-100 outline-none focus:ring-1 focus:ring-yellow-400" placeholder="Enter your email" />
+                                    {form.formState.errors.email && <p className="text-red-300 text-[10px]">{form.formState.errors.email.message}</p>}
                                 </div>
                             </div>
 
@@ -67,6 +115,7 @@ export default function QuotePage() {
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold flex gap-0.5">Phone Number <span className="text-red-400">*</span></label>
                                 <input {...form.register("phone")} className="w-full p-2 text-sm rounded border-none text-gray-900 bg-gray-100 outline-none focus:ring-1 focus:ring-yellow-400" placeholder="Enter your phone number" />
+                                {form.formState.errors.phone && <p className="text-red-300 text-[10px]">{form.formState.errors.phone.message}</p>}
                             </div>
 
                             {/* Row 3: Dimensions */}
@@ -151,7 +200,8 @@ export default function QuotePage() {
 
                             {/* Submit */}
                             <div className="pt-2">
-                                <Button type="submit" variant="yellow" className="w-full py-2.5 text-sm font-bold uppercase tracking-wider shadow-md hover:bg-yellow-400 hover:scale-[1.01] transition-all">
+                                <Button type="submit" disabled={isSubmitting} variant="yellow" className="w-full py-2.5 text-sm font-bold uppercase tracking-wider shadow-md hover:bg-yellow-400 hover:scale-[1.01] transition-all">
+                                    {isSubmitting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
                                     Submit Quote
                                 </Button>
                             </div>

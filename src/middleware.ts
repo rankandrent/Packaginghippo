@@ -1,0 +1,46 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
+
+const JWT_SECRET = new TextEncoder().encode(
+    process.env.JWT_SECRET || 'your-secret-key-change-this-in-production'
+);
+
+async function verifyTokenEdge(token: string) {
+    try {
+        const { payload } = await jwtVerify(token, JWT_SECRET);
+        return payload;
+    } catch {
+        return null;
+    }
+}
+
+export async function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl;
+
+    // Public auth pages - redirect to dashboard if already logged in
+    const authPages = ['/dashboard/login', '/dashboard/signup', '/dashboard/forgot-password'];
+    const isAuthPage = authPages.some(page => pathname.startsWith(page));
+
+    // Protected dashboard pages
+    const isDashboardPage = pathname.startsWith('/dashboard') && !isAuthPage && !pathname.startsWith('/dashboard/reset-password');
+
+    const token = request.cookies.get('admin-token')?.value;
+    const user = token ? await verifyTokenEdge(token) : null;
+
+    // Redirect to login if accessing protected page without auth
+    if (isDashboardPage && !user) {
+        return NextResponse.redirect(new URL('/dashboard/login', request.url));
+    }
+
+    // Redirect to dashboard if accessing auth pages while logged in
+    if (isAuthPage && user) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
+    return NextResponse.next();
+}
+
+export const config = {
+    matcher: '/dashboard/:path*',
+};

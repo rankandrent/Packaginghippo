@@ -40,11 +40,12 @@ export default async function RootLayout({
 }>) {
   const settings = await getSettings();
   const generalSettings = settings.general || {};
+  const menuSettings = settings.menu || null;
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navbar settings={generalSettings} />
+        <Navbar settings={generalSettings} menuData={menuSettings} />
         <main>{children}</main>
         <Footer />
       </body>

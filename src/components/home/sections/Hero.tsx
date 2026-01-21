@@ -45,24 +45,24 @@ export function Hero({ data }: { data: any }) {
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="relative flex justify-center md:justify-end"
                     >
-                        <div className="relative z-10 w-full max-w-md aspect-square bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-3xl shadow-2xl shadow-yellow-500/20 transform rotate-[-5deg] flex items-center justify-center border-t border-white/20 overflow-hidden">
+                        <div className="relative z-10 w-full max-w-md aspect-square bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-3xl shadow-2xl shadow-yellow-500/20 transform rotate-[-5deg] flex items-center justify-center border-t border-white/20">
                             {data.hero_image ? (
                                 <img
                                     src={data.hero_image}
                                     alt="Hero"
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover rounded-3xl"
                                 />
                             ) : (
                                 <Box className="w-32 h-32 md:w-48 md:h-48 text-black opacity-50" />
                             )}
-                            <div className="absolute -bottom-6 -right-6 md:-bottom-10 md:-right-10 bg-white p-4 md:p-6 rounded-2xl shadow-xl transform rotate-[5deg] max-w-xs">
-                                <div className="flex items-center gap-3 mb-2">
+                            <div className="absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 bg-white p-4 md:p-6 rounded-2xl shadow-xl transform rotate-[5deg] max-w-[200px] md:max-w-xs z-20">
+                                <div className="flex items-center gap-2 md:gap-3 mb-2">
                                     <div className="flex -space-x-2">
                                         <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-200 border-2 border-white" />
                                         <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-300 border-2 border-white" />
                                         <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-400 border-2 border-white" />
                                     </div>
-                                    <div className="text-sm font-bold text-gray-900">{data.badge_text || "500+ Happy Clients"}</div>
+                                    <div className="text-xs md:text-sm font-bold text-gray-900">{data.badge_text || "500+ Happy Clients"}</div>
                                 </div>
                                 <p className="text-xs text-gray-500">{data.badge_subtext || "\"Best packaging service we've used!\""}</p>
                             </div>
