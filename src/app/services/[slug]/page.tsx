@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     return {
         title: category.seoTitle || category.name,
-        description: category.seoDesc || category.description,
+        description: (category.seoDesc || category.description) || undefined,
         openGraph: {
             title: category.seoTitle || category.name,
-            description: category.seoDesc || category.description,
+            description: (category.seoDesc || category.description) || undefined,
             images: category.imageUrl ? [category.imageUrl] : [],
         },
     }

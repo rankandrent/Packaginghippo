@@ -25,10 +25,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     return {
         title: product.seoTitle || product.name,
-        description: product.seoDesc || product.shortDesc,
+        description: (product.seoDesc || product.shortDesc) || undefined,
         openGraph: {
             title: product.seoTitle || product.name,
-            description: product.seoDesc || product.shortDesc,
+            description: (product.seoDesc || product.shortDesc) || undefined,
             images: product.images || [],
         },
     }

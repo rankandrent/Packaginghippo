@@ -194,6 +194,20 @@ function ProductGridSection({ content }: { content: any }) {
 
 
 
+// ... existing sub components ...
+
+function TextSection({ content }: { content: any }) {
+    if (!content.html) return null
+    return (
+        <section className="py-16 bg-white">
+            <div className="container mx-auto px-4 prose max-w-4xl text-gray-700 leading-relaxed">
+                {content.heading && <h2 className="text-3xl font-bold text-gray-900 mb-6">{content.heading}</h2>}
+                <div dangerouslySetInnerHTML={{ __html: content.html }} />
+            </div>
+        </section>
+    )
+}
+
 function SeoContentSection({ content }: { content: any }) {
     const [isExpanded, setIsExpanded] = useState(false)
     const collapsedHeight = content.collapsedHeight || 300
