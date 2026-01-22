@@ -25,11 +25,34 @@ async function getSettings() {
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const seo = settings.seo || {};
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://packaginghippo.com';
 
   return {
-    title: seo.defaultTitle || "Packaging Hippo | Custom Boxes & Packaging Solutions",
+    metadataBase: new URL(baseUrl),
+    title: {
+      default: seo.defaultTitle || "Packaging Hippo | Custom Boxes & Packaging Solutions",
+      template: `%s | ${seo.siteName || "Packaging Hippo"}`
+    },
     description: seo.defaultDescription || "Premium custom packaging boxes with your logo. Get a free quote today.",
     keywords: seo.defaultKeywords,
+    alternates: {
+      canonical: '/',
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'en_US',
+      url: baseUrl,
+      siteName: seo.siteName || "Packaging Hippo",
+      images: seo.ogImage ? [{ url: seo.ogImage }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: seo.ogImage ? [seo.ogImage] : [],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    }
   };
 }
 

@@ -13,6 +13,7 @@ export interface JWTPayload {
     userId: string;
     email: string;
     name?: string;
+    [key: string]: any;
 }
 
 // Password hashing

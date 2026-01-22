@@ -22,11 +22,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
         title: category.seoTitle || category.name,
         description: (category.seoDesc || category.description) || undefined,
+        alternates: {
+            canonical: `/services/${slug}`,
+        },
         openGraph: {
             title: category.seoTitle || category.name,
             description: (category.seoDesc || category.description) || undefined,
-            images: category.imageUrl ? [category.imageUrl] : [],
+            images: category.imageUrl ? [{ url: category.imageUrl }] : [],
+            type: 'website',
         },
+        twitter: {
+            card: 'summary_large_image',
+            title: category.seoTitle || category.name,
+            description: (category.seoDesc || category.description) || undefined,
+            images: category.imageUrl ? [category.imageUrl] : [],
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Metadata } from "next"
 import { Calendar, User, ArrowRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -18,6 +19,27 @@ async function getCategories() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/cms/blog-categories`, { cache: 'no-store' })
     if (!res.ok) return []
     return res.json()
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Packaging Insights Blog | Trends & Packaging Solutions",
+        description: "Explore the latest packaging trends, industry insights, and expert advice for custom branded boxes and shipping solutions.",
+        alternates: {
+            canonical: '/blog',
+        },
+        openGraph: {
+            title: "Packaging Insights Blog | Trends & Packaging Solutions",
+            description: "Expert packaging advice and industry trends.",
+            type: 'website',
+            url: '/blog',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: "Packaging Insights Blog",
+            description: "Expert packaging advice and industry trends.",
+        }
+    }
 }
 
 export default async function BlogListingPage({ searchParams }: { searchParams: { category?: string } }) {

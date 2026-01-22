@@ -44,11 +44,20 @@ export async function generateMetadata() {
     title: seo.defaultTitle || 'Packaging Hippo | Custom Boxes & Packaging Solutions',
     description: seo.defaultDescription || 'Premium custom packaging boxes with your logo.',
     keywords: seo.defaultKeywords,
+    alternates: {
+      canonical: '/',
+    },
     openGraph: {
       title: seo.defaultTitle,
       description: seo.defaultDescription,
-      images: seo.ogImage ? [seo.ogImage] : [],
+      images: seo.ogImage ? [{ url: seo.ogImage }] : [],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.defaultTitle,
+      description: seo.defaultDescription,
+      images: seo.ogImage ? [seo.ogImage] : [],
+    }
   }
 }
 

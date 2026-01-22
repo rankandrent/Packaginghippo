@@ -38,10 +38,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     return {
         title: page.seoTitle || page.title,
-        description: page.seoDesc,
+        description: page.seoDesc || undefined,
         alternates: {
             canonical: `/${slug}`,
         },
+        openGraph: {
+            title: page.seoTitle || page.title,
+            description: page.seoDesc || undefined,
+            type: 'website',
+            url: `/${slug}`,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: page.seoTitle || page.title,
+            description: page.seoDesc || undefined,
+        }
     }
 }
 

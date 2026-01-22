@@ -26,11 +26,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
         title: product.seoTitle || product.name,
         description: (product.seoDesc || product.shortDesc) || undefined,
+        alternates: {
+            canonical: `/products/${slug}`,
+        },
         openGraph: {
             title: product.seoTitle || product.name,
             description: (product.seoDesc || product.shortDesc) || undefined,
-            images: product.images || [],
+            images: product.images ? product.images.map(img => ({ url: img })) : [],
+            type: 'website',
         },
+        twitter: {
+            card: 'summary_large_image',
+            title: product.seoTitle || product.name,
+            description: (product.seoDesc || product.shortDesc) || undefined,
+            images: product.images || [],
+        }
     }
 }
 
