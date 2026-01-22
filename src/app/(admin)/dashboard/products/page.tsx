@@ -75,12 +75,15 @@ export default function ProductsPage() {
                 body: JSON.stringify({ name: newName, slug, categoryId: newCategoryId }),
             })
 
-            if (!res.ok) throw new Error('Failed to create')
+            if (!res.ok) {
+                const errorData = await res.json()
+                throw new Error(errorData.details || errorData.error || 'Failed to create')
+            }
             const data = await res.json()
             router.push(`/dashboard/products/${data.product.id}`)
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error creating product:", error)
-            alert("Error creating product")
+            alert(error.message || "Error creating product")
         }
     }
 

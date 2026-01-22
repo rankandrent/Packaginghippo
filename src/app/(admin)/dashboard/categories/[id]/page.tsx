@@ -21,6 +21,7 @@ type Category = {
     imageUrl: string | null
     seoTitle: string | null
     seoDesc: string | null
+    seoKeywords: string | null
     isActive: boolean
     sections: any
 }
@@ -208,6 +209,15 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                                     value={category.seoDesc || ""}
                                     onChange={(e) => setCategory({ ...category, seoDesc: e.target.value })}
                                     placeholder="SEO Description"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="seo_keywords">Meta Keywords</Label>
+                                <Input
+                                    id="seo_keywords"
+                                    value={category.seoKeywords || ""}
+                                    onChange={(e) => setCategory({ ...category, seoKeywords: e.target.value })}
+                                    placeholder="Keywords separated by commas"
                                 />
                             </div>
                         </div>

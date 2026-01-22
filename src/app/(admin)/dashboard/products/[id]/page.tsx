@@ -38,6 +38,7 @@ type Product = {
 
     seoTitle: string | null
     seoDesc: string | null
+    seoKeywords: string | null
     isActive: boolean
     sections: any // Json
 
@@ -275,6 +276,15 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                                 onChange={(e) => setProduct({ ...product, seoDesc: e.target.value })}
                                 rows={4}
                                 placeholder="SEO Description for search engines"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="seo_keywords">Meta Keywords</Label>
+                            <Input
+                                id="seo_keywords"
+                                value={product.seoKeywords || ""}
+                                onChange={(e) => setProduct({ ...product, seoKeywords: e.target.value })}
+                                placeholder="Keywords separated by commas"
                             />
                         </div>
                     </div>

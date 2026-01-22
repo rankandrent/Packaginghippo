@@ -61,9 +61,12 @@ export async function POST(request: NextRequest) {
         })
 
         return NextResponse.json({ product })
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error creating product:', error)
-        return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
+        return NextResponse.json({
+            error: 'Failed to create product',
+            details: error.message
+        }, { status: 500 })
     }
 }
 
@@ -75,7 +78,7 @@ export async function PUT(request: NextRequest) {
             id, name, slug, description, shortDesc,
             images, minOrder, price, categoryId,
             dimensions, materials, finishings,
-            seoTitle, seoDesc, isActive, sections
+            seoTitle, seoDesc, seoKeywords, isActive, sections
         } = body
 
         const updated = await prisma.product.update({
@@ -94,6 +97,7 @@ export async function PUT(request: NextRequest) {
                 finishings,
                 seoTitle,
                 seoDesc,
+                seoKeywords,
                 isActive,
                 sections, // Save dynamic sections
                 updatedAt: new Date(),

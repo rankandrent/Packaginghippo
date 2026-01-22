@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
         title: product.seoTitle || product.name,
         description: (product.seoDesc || product.shortDesc) || undefined,
+        keywords: product.seoKeywords || undefined,
         alternates: {
             canonical: `/products/${slug}`,
         },
