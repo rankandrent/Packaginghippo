@@ -63,20 +63,20 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     return (
         <main className="min-h-screen bg-white">
             {/* Standard Product Hero (Always present) */}
-            <section className="pt-24 pb-12 bg-gray-50">
+            <section className="pt-10 pb-6 bg-gray-50">
                 <div className="container mx-auto px-4">
                     <Breadcrumbs items={breadcrumbItems} />
                     <div className="grid md:grid-cols-2 gap-8 items-start">
                         {/* Images */}
                         <div className="space-y-4">
-                            <div className="relative aspect-square rounded-2xl overflow-hidden bg-white shadow-sm border">
+                            <div className="relative aspect-[3/2] max-h-[400px] rounded-2xl overflow-hidden bg-white shadow-sm border">
                                 {product.images?.[0] ? (
                                     <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
                                 )}
                             </div>
-                            <div className="grid grid-cols-4 gap-4">
+                            <div className="grid grid-cols-4 gap-2">
                                 {product.images?.slice(1, 5).map((img, i) => (
                                     <div key={i} className="relative aspect-square rounded-lg overflow-hidden border bg-white">
                                         <Image src={img} alt={`${product.name} ${i}`} fill className="object-cover" />
@@ -86,10 +86,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         </div>
 
                         {/* Info */}
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             <div>
                                 {product.category && <span className="text-yellow-600 font-bold tracking-wide text-xs uppercase">{product.category.name}</span>}
-                                <h1 className="text-3xl md:text-4xl font-black text-gray-900 mt-1 leading-tight">{product.name}</h1>
+                                <h1 className="text-2xl md:text-3xl font-black text-gray-900 mt-1 leading-tight">{product.name}</h1>
                             </div>
 
                             {product.price && (
@@ -107,9 +107,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                             </div>
 
                             {/* Specs */}
-                            <div className="bg-white p-4 rounded-xl border space-y-2">
-                                <h3 className="font-bold text-base">Specifications</h3>
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                            <div className="bg-white p-3 rounded-xl border space-y-2">
+                                <h3 className="font-bold text-sm">Specifications</h3>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
                                     {product.dimensions && (
                                         <div><span className="text-gray-500">Dimensions:</span> <br /> <span className="font-medium">{product.dimensions}</span></div>
                                     )}
