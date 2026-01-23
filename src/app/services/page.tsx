@@ -1,73 +1,131 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { ArrowRight, Box, Leaf, ShoppingBag, Truck } from "lucide-react"
+import { Metadata } from "next"
 import Link from "next/link"
+import { Card, CardContent } from "@/components/ui/card"
 import prisma from "@/lib/db"
+import { QuoteForm } from "@/components/forms/QuoteForm"
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
-async function getServices() {
-    try {
-        // In this schema, Product Categories serve as services
-        const categories = await prisma.productCategory.findMany({
-            where: { isActive: true },
-            orderBy: { order: 'asc' }
-        })
-        return categories
-    } catch (e) {
-        return []
+async function getServicesPage() {
+    return await prisma.page.findUnique({
+        where: { slug: "services" }
+    })
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+    const page = await getServicesPage()
+
+    return {
+        title: page?.seoTitle || "All Packaging Categories | Packaging Hippo",
+        description: page?.seoDesc || "Browse our complete range of custom packaging categories. From corrugated boxes to luxury rigid packaging.",
+        keywords: page?.seoKeywords || undefined,
     }
 }
 
+function PackageIcon({ className }: { className?: string }) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+            <line x1="12" y1="22.08" x2="12" y2="12" />
+        </svg>
+    )
+}
+
+function ArrowRight({ className }: { className?: string }) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+    )
+}
+
 export default async function ServicesPage() {
-    const services = await getServices()
+    const page = await getServicesPage()
+    const categories = await prisma.productCategory.findMany({
+        where: { isActive: true },
+        orderBy: { order: 'asc' },
+        include: {
+            _count: {
+                select: { products: true }
+            }
+        }
+    })
+
+    const htmlContent = page?.content ? (typeof page.content === 'string' ? page.content : (page.content as any).html || '') : null
 
     return (
-        <div className="min-h-screen bg-white">
-            {/* Header */}
-            <div className="bg-black text-white pt-32 pb-20">
-                <div className="container mx-auto px-4 text-center">
-                    <h1 className="text-5xl font-black mb-4 text-yellow-500">Our Services</h1>
+        <main className="min-h-screen bg-white">
+            {/* Header Section */}
+            <div className="bg-zinc-950 pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden relative">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/10 via-zinc-950 to-zinc-950"></div>
+                <div className="container mx-auto px-4 relative z-10 text-center">
+                    <h1 className="text-4xl md:text-6xl font-black text-white mb-6">
+                        {page?.title || "Explore All Categories"}
+                    </h1>
                     <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                        From structural design to final production, we offer end-to-end packaging solutions for every industry.
+                        {page?.seoDesc || "Discover our comprehensive range of custom packaging solutions designed for every industry and need."}
                     </p>
                 </div>
             </div>
 
-            {/* Services Grid */}
-            <div className="container mx-auto px-4 py-16">
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {services.map((service, i) => (
-                        <Link href={`/services/${service.slug}`} key={i} className="group">
-                            <Card className="h-full border border-gray-100 shadow-sm hover:shadow-xl hover:border-yellow-400 transition-all duration-300">
-                                <CardContent className="p-8 space-y-4">
-                                    <div className="w-14 h-14 bg-yellow-50 rounded-xl flex items-center justify-center text-yellow-600 group-hover:bg-yellow-500 group-hover:text-black transition-colors">
-                                        <Box className="w-7 h-7" />
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-gray-900">{service.name}</h3>
-                                    <p className="text-gray-500 leading-relaxed">{service.description}</p>
-                                    <div className="pt-4 flex items-center text-sm font-bold text-yellow-600 group-hover:gap-2 transition-all">
-                                        Learn More <ArrowRight className="ml-1 w-4 h-4" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
-            </div>
+            {/* Managed Content Area */}
+            {htmlContent && (
+                <section className="py-16 bg-white border-b border-gray-100">
+                    <div className="container mx-auto px-4 max-w-4xl prose prose-lg rich-text">
+                        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                    </div>
+                </section>
+            )}
 
-            {/* Custom Solution CTA */}
-            <div className="bg-gray-50 py-20">
-                <div className="container mx-auto px-4 text-center space-y-6">
-                    <h2 className="text-3xl font-bold">Can't Find What You Need?</h2>
-                    <p className="text-gray-600 max-w-xl mx-auto">
-                        We specialize in completely custom projects. If you have unique requirements, our engineering team is ready to help.
-                    </p>
-                    <Button variant="default" size="lg" className="bg-yellow-500 text-black hover:bg-yellow-400 font-bold" asChild>
-                        <Link href="/contact">Contact Custom Team</Link>
-                    </Button>
+            {/* Categories Grid */}
+            <section className="py-24">
+                <div className="container mx-auto px-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {categories.map((item, i) => (
+                            <Link href={`/services/${item.slug}`} key={item.id}>
+                                <Card className="group cursor-pointer hover:shadow-2xl transition-all border-none shadow-sm h-full rounded-2xl overflow-hidden bg-gray-50/50 hover:bg-white border border-gray-100">
+                                    <CardContent className="p-10">
+                                        <div className="flex justify-between items-start mb-8">
+                                            <div className="bg-yellow-100 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:bg-yellow-500 group-hover:rotate-6 transition-all duration-300">
+                                                <PackageIcon className="w-8 h-8 text-yellow-600 group-hover:text-black transition-colors" />
+                                            </div>
+                                            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-3 py-1 rounded-full group-hover:bg-yellow-100 group-hover:text-yellow-700 transition-colors">
+                                                {item._count.products} Products
+                                            </span>
+                                        </div>
+                                        <h3 className="font-black text-2xl text-gray-900 group-hover:text-yellow-600 transition-colors mb-4">{item.name}</h3>
+                                        <div className="text-gray-600 leading-relaxed rich-text line-clamp-4">
+                                            {item.description ? (
+                                                <div dangerouslySetInnerHTML={{ __html: item.description }} />
+                                            ) : (
+                                                "Premium custom packaging solutions tailored specifically for your brand needs and product requirements."
+                                            )}
+                                        </div>
+
+                                        <div className="mt-8 flex items-center gap-2 text-zinc-900 font-bold group-hover:text-yellow-600 transition-colors">
+                                            Learn More <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </div>
+            </section>
+
+            {/* RFQ Form Section */}
+            <section className="py-20 bg-gray-50">
+                <div className="container mx-auto px-4">
+                    <QuoteForm
+                        theme="dark"
+                        title="Can't find what you're looking for?"
+                        subtitle="Request a custom quote and our packaging experts will get back to you within 24 hours."
+                        pageSource="All Categories Page"
+                    />
+                </div>
+            </section>
+        </main>
     )
 }

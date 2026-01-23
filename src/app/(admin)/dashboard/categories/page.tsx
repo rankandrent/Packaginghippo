@@ -194,8 +194,8 @@ export default function CategoriesPage() {
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant={cat.isActive ? 'default' : 'secondary'} className={cat.isActive ? 'bg-green-600 hover:bg-green-700' : ''}>
-                                                {cat.isActive ? 'Active' : 'Inactive'}
+                                            <Badge variant={cat.isActive ? 'default' : 'secondary'} className={cat.isActive ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-100'}>
+                                                {cat.isActive ? 'Published' : 'Draft'}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-right">

@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
                 name,
                 slug,
                 description,
+                isActive: false,
             },
         })
 

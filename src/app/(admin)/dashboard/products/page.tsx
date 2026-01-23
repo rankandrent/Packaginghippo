@@ -174,8 +174,8 @@ export default function ProductsPage() {
                                     <TableCell>{product.category?.name || '-'}</TableCell>
                                     <TableCell>{product.price ? `$${product.price}` : 'Quote'}</TableCell>
                                     <TableCell>
-                                        <span className={`px-2 py-1 rounded-full text-xs ${product.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100'}`}>
-                                            {product.isActive ? 'Active' : 'Inactive'}
+                                        <span className={`px-2 py-1 rounded-full text-xs ${product.isActive ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                            {product.isActive ? 'Published' : 'Draft'}
                                         </span>
                                     </TableCell>
                                     <TableCell className="text-right">

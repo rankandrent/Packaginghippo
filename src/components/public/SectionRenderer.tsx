@@ -176,8 +176,10 @@ function ProductGridSection({ content }: { content: any }) {
                                 <CardContent className="p-5 bg-white">
                                     <h3 className="font-bold text-lg text-gray-900 group-hover:text-yellow-600 transition-colors line-clamp-2">{item.name}</h3>
                                     <div className="mt-4 flex items-center justify-between text-sm">
-                                        <span className="font-medium text-gray-500">MOQ: 100</span>
-                                        <div className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full">Customizable</div>
+                                        <span className="font-medium text-gray-500">MOQ: {item.minOrder || '100'}</span>
+                                        <div className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full">
+                                            {item.isCustomizable !== false ? 'Customizable' : 'Standard'}
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -227,6 +229,7 @@ function SeoContentSection({ content }: { content: any }) {
                         <div
                             className="prose max-w-none text-gray-600 leading-relaxed rich-text"
                             dangerouslySetInnerHTML={{ __html: content.content }}
+                            suppressHydrationWarning
                         />
 
                         {/* Gradient Fade Overlay when collapsed */}

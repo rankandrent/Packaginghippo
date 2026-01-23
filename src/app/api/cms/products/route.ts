@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
                 categoryId,
                 sections: sections || [], // Default to empty array
                 images: [],
+                isActive: false,
             },
         })
 

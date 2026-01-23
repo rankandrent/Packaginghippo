@@ -18,9 +18,10 @@ type PageData = {
     title: string
     slug: string
     content: any
-    seo_title: string | null
-    meta_description: string | null
-    is_published: boolean
+    seoTitle: string | null
+    seoDesc: string | null
+    seoKeywords: string | null
+    isPublished: boolean
 }
 
 export default function PageEditor({ params }: { params: Promise<{ id: string }> }) {
@@ -28,27 +29,23 @@ export default function PageEditor({ params }: { params: Promise<{ id: string }>
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const router = useRouter()
-    // Unwrap params using React.use()
     const { id } = use(params)
 
     useEffect(() => {
         fetchPage()
-    }, [])
+    }, [id])
 
     async function fetchPage() {
         try {
             setLoading(true)
-            const { data, error } = await supabase
-                .from("cms_pages")
-                .select("*")
-                .eq("id", id)
-                .single()
-
-            if (error) throw error
-            setPage(data)
+            const res = await fetch(`/api/cms/pages`) // The API returns all, we find the one
+            const data = await res.json()
+            const found = data.pages.find((p: any) => p.id === id)
+            if (found) {
+                setPage(found)
+            }
         } catch (error) {
             console.error("Error fetching page:", error)
-            // toast.error("Could not load page")
         } finally {
             setLoading(false)
         }
@@ -60,22 +57,15 @@ export default function PageEditor({ params }: { params: Promise<{ id: string }>
 
         try {
             setSaving(true)
-            const { error } = await supabase
-                .from("cms_pages")
-                .update({
-                    title: page.title,
-                    slug: page.slug,
-                    content: page.content,
-                    seo_title: page.seo_title,
-                    meta_description: page.meta_description,
-                    is_published: page.is_published,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq("id", page.id)
+            const res = await fetch('/api/cms/pages', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(page),
+            })
 
-            if (error) throw error
-            // toast.success("Page saved successfully")
-            alert("Page saved!")
+            if (!res.ok) throw new Error('Failed to save')
+
+            alert("Page saved successfully!")
         } catch (error) {
             console.error("Error saving page:", error)
             alert("Error saving page")
@@ -152,14 +142,14 @@ export default function PageEditor({ params }: { params: Promise<{ id: string }>
                         <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"
-                                id="is_published"
+                                id="isPublished"
                                 className="h-4 w-4 rounded border-gray-300"
-                                checked={page.is_published}
+                                checked={page.isPublished}
                                 onChange={(e) =>
-                                    setPage({ ...page, is_published: e.target.checked })
+                                    setPage({ ...page, isPublished: e.target.checked })
                                 }
                             />
-                            <Label htmlFor="is_published">Published</Label>
+                            <Label htmlFor="isPublished">Published</Label>
                         </div>
                     </div>
 
@@ -174,23 +164,23 @@ export default function PageEditor({ params }: { params: Promise<{ id: string }>
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="seo_title">Meta Title</Label>
+                            <Label htmlFor="seoTitle">Meta Title</Label>
                             <Input
-                                id="seo_title"
-                                value={page.seo_title || ""}
+                                id="seoTitle"
+                                value={page.seoTitle || ""}
                                 onChange={(e) =>
-                                    setPage({ ...page, seo_title: e.target.value })
+                                    setPage({ ...page, seoTitle: e.target.value })
                                 }
                                 placeholder="Browser tab title"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="meta_description">Meta Description</Label>
+                            <Label htmlFor="seoDesc">Meta Description</Label>
                             <Textarea
-                                id="meta_description"
-                                value={page.meta_description || ""}
+                                id="seoDesc"
+                                value={page.seoDesc || ""}
                                 onChange={(e) =>
-                                    setPage({ ...page, meta_description: e.target.value })
+                                    setPage({ ...page, seoDesc: e.target.value })
                                 }
                                 placeholder="For search engines..."
                             />

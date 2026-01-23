@@ -176,9 +176,9 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                         <h3 className="font-semibold text-lg">Visibility</h3>
                         <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/20">
                             <div className="space-y-0.5">
-                                <Label htmlFor="isActive" className="text-base">Active Status</Label>
+                                <Label htmlFor="isActive" className="text-base">Published Status</Label>
                                 <p className="text-xs text-muted-foreground">
-                                    {category.isActive ? 'Category is visible in store' : 'Category is hidden'}
+                                    {category.isActive ? 'Category is live and visible' : 'Category is in draft mode'}
                                 </p>
                             </div>
                             <Switch

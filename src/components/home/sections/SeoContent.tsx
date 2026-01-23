@@ -33,6 +33,7 @@ export function SeoContent({ data }: { data: any }) {
                             prose-ol:list-decimal prose-ol:pl-5 prose-ol:mb-4
                             prose-li:mb-2"
                             dangerouslySetInnerHTML={{ __html: data.content }}
+                            suppressHydrationWarning
                         />
 
                         {/* Gradient Fade Overlay when collapsed */}

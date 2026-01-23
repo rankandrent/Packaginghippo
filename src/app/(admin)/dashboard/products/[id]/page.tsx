@@ -213,6 +213,7 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                         <ImageUploader
                             value={product.images || []}
                             onChange={(urls) => setProduct({ ...product, images: urls })}
+                            maxFiles={10}
                         />
                     </div>
 
@@ -252,7 +253,7 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                                 onChange={(e) => setProduct({ ...product, isActive: e.target.checked })}
                                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                             />
-                            <Label htmlFor="isActive">Active</Label>
+                            <Label htmlFor="isActive">Published</Label>
                         </div>
                     </div>
 

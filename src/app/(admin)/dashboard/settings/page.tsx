@@ -58,6 +58,7 @@ export default function SettingsPage() {
         ogImage: '',
     })
     const [footer, setFooter] = useState<FooterSettings>({})
+    const [robots, setRobots] = useState<string>('User-agent: *\nAllow: /')
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState<string | null>(null)
 
@@ -75,6 +76,7 @@ export default function SettingsPage() {
                 if (s.key === 'general') setGeneral(s.value)
                 if (s.key === 'seo') setSeo(s.value)
                 if (s.key === 'footer') setFooter(s.value)
+                if (s.key === 'robots') setRobots(s.value)
             })
         } catch (error) {
             console.error("Error fetching settings:", error)
@@ -321,6 +323,33 @@ export default function SettingsPage() {
                     >
                         {saving === 'footer' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <Save className="mr-2 h-4 w-4" /> Save Footer Settings
+                    </Button>
+                </CardContent>
+            </Card>
+
+            {/* Robots.txt Settings */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Robots.txt Content</CardTitle>
+                    <CardDescription>Configure crawl instructions for search engines</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label>Content</Label>
+                        <Textarea
+                            value={robots}
+                            onChange={(e) => setRobots(e.target.value)}
+                            placeholder="User-agent: *..."
+                            rows={10}
+                            className="font-mono text-sm bg-gray-50"
+                        />
+                    </div>
+                    <Button
+                        onClick={() => saveSettings('robots', robots)}
+                        disabled={saving === 'robots'}
+                    >
+                        {saving === 'robots' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Save className="mr-2 h-4 w-4" /> Save Robots.txt
                     </Button>
                 </CardContent>
             </Card>

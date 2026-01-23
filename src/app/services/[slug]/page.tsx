@@ -3,6 +3,7 @@ import prisma from "@/lib/db"
 import { Metadata } from "next"
 import { SectionRenderer, Section } from "@/components/public/SectionRenderer"
 import { QuoteForm } from "@/components/forms/QuoteForm"
+import { Breadcrumbs } from "@/components/public/Breadcrumbs"
 
 export const revalidate = 60 // ISR
 
@@ -99,8 +100,16 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         ]
     }
 
+    const breadcrumbItems = [
+        { label: "Services", href: "/services" },
+        { label: category.name }
+    ]
+
     return (
         <main className="min-h-screen">
+            <div className="container mx-auto px-4 pt-32 -mb-24 relative z-10">
+                <Breadcrumbs items={breadcrumbItems} />
+            </div>
             <SectionRenderer sections={sections} />
 
             <section className="py-20 bg-gray-50">
