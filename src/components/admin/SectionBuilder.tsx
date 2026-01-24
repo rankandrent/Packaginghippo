@@ -12,7 +12,7 @@ import { ImageUploader } from "./ImageUploader"
 
 export type Section = {
     id: string
-    type: 'hero' | 'text' | 'benefits' | 'faq' | 'cta' | 'gallery' | 'product_grid' | 'seo_content'
+    type: 'hero' | 'text' | 'benefits' | 'faq' | 'cta' | 'gallery' | 'product_grid' | 'seo_content' | 'customer_reviews' | 'features_bar' | 'logo_loop'
     title?: string
     content: any
 }
@@ -78,6 +78,9 @@ export function SectionBuilder({ sections = [], onChange }: SectionBuilderProps)
                 <Button size="sm" variant="outline" onClick={() => addSection('faq')}>+ FAQ</Button>
                 <Button size="sm" variant="outline" onClick={() => addSection('gallery')}>+ Gallery</Button>
                 <Button size="sm" variant="outline" onClick={() => addSection('cta')}>+ CTA</Button>
+                <Button size="sm" variant="outline" onClick={() => addSection('customer_reviews')}>+ Reviews</Button>
+                <Button size="sm" variant="outline" onClick={() => addSection('features_bar')}>+ Features</Button>
+                <Button size="sm" variant="outline" onClick={() => addSection('logo_loop')}>+ Logo Loop</Button>
             </div>
 
             <div className="space-y-4">
@@ -127,10 +130,13 @@ function getDefaultContent(type: string) {
         case 'text': return { content: '<p>Enter text content...</p>' }
         case 'product_grid': return { heading: 'Our Products' }
         case 'seo_content': return { heading: 'More Information', content: '<p>Enter long-form content here...</p>', collapsedHeight: 300 }
-        case 'benefits': return { heading: 'Key Benefits', items: [{ title: 'Benefit 1', desc: 'Description' }] }
+        case 'benefits': return { heading: 'Key Benefits', intro: '', items: [{ title: 'Benefit 1', desc: 'Description' }] }
         case 'faq': return { heading: 'Frequently Asked Questions', items: [{ q: 'Question?', a: 'Answer' }] }
         case 'gallery': return { heading: 'Image Gallery', images: [] }
         case 'cta': return { heading: 'Join Us', text: 'Call to action text', btnText: 'Click Me', btnLink: '#' }
+        case 'customer_reviews': return { heading: 'What Our Customers Say', subheading: 'Trusted by thousands of businesses worldwide', items: [{ name: 'John Doe', role: 'Business Owner', rating: 5, text: 'Excellent quality packaging!' }] }
+        case 'features_bar': return { heading: 'Our Features', items: [{ icon: 'check', title: 'Feature', subtitle: 'Detail' }] }
+        case 'logo_loop': return { heading: 'Trusted By', items: [] }
         default: return {}
     }
 }
@@ -140,17 +146,25 @@ function renderEditor(type: string, content: any, onChange: (key: string, value:
         case 'hero':
             return (
                 <div className="grid gap-4">
-                    <div>
-                        <Label>Heading</Label>
-                        <Input value={content.heading || ''} onChange={e => onChange('heading', e.target.value)} />
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <Label>Heading</Label>
+                            <Input value={content.heading || ''} onChange={e => onChange('heading', e.target.value)} />
+                        </div>
+                        <div>
+                            <Label>Subheading</Label>
+                            <Input value={content.subheading || ''} onChange={e => onChange('subheading', e.target.value)} />
+                        </div>
                     </div>
-                    <div>
-                        <Label>Subheading</Label>
-                        <Input value={content.subheading || ''} onChange={e => onChange('subheading', e.target.value)} />
-                    </div>
-                    <div>
-                        <Label>Background Image</Label>
-                        <ImageUploader value={content.image ? [content.image] : []} onChange={urls => onChange('image', urls[0])} maxFiles={1} />
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <Label>Main Image</Label>
+                            <ImageUploader value={content.image ? [content.image] : []} onChange={urls => onChange('image', urls[0])} maxFiles={1} />
+                        </div>
+                        <div>
+                            <Label>Background Image (Optional)</Label>
+                            <ImageUploader value={content.bgImage ? [content.bgImage] : []} onChange={urls => onChange('bgImage', urls[0])} maxFiles={1} />
+                        </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div><Label>CTA Text</Label><Input value={content.ctaText || ''} onChange={e => onChange('ctaText', e.target.value)} /></div>
@@ -339,6 +353,119 @@ function renderEditor(type: string, content: any, onChange: (key: string, value:
                     <div className="grid grid-cols-2 gap-4">
                         <div><Label>Button Text</Label><Input value={content.btnText || ''} onChange={e => onChange('btnText', e.target.value)} /></div>
                         <div><Label>Button Link</Label><Input value={content.btnLink || ''} onChange={e => onChange('btnLink', e.target.value)} /></div>
+                    </div>
+                </div>
+            )
+        case 'customer_reviews':
+            const reviews = Array.isArray(content.items) ? content.items : []
+            return (
+                <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <Label>Section Heading</Label>
+                            <Input value={content.heading || ''} onChange={e => onChange('heading', e.target.value)} />
+                        </div>
+                        <div>
+                            <Label>Subheading</Label>
+                            <Input value={content.subheading || ''} onChange={e => onChange('subheading', e.target.value)} />
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <Label>Reviews</Label>
+                        {reviews.map((review: any, idx: number) => (
+                            <div key={idx} className="p-4 border rounded-lg bg-muted/20 space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Input value={review.name || ''} placeholder="Name" onChange={e => {
+                                        const newItems = [...reviews]; newItems[idx] = { ...newItems[idx], name: e.target.value }; onChange('items', newItems)
+                                    }} />
+                                    <Input value={review.role || ''} placeholder="Role" onChange={e => {
+                                        const newItems = [...reviews]; newItems[idx] = { ...newItems[idx], role: e.target.value }; onChange('items', newItems)
+                                    }} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Input type="number" min={1} max={5} value={review.rating || 5} onChange={e => {
+                                        const newItems = [...reviews]; newItems[idx] = { ...newItems[idx], rating: parseInt(e.target.value) }; onChange('items', newItems)
+                                    }} />
+                                    <Input value={review.image || ''} placeholder="Image URL (optional)" onChange={e => {
+                                        const newItems = [...reviews]; newItems[idx] = { ...newItems[idx], image: e.target.value }; onChange('items', newItems)
+                                    }} />
+                                </div>
+                                <Textarea value={review.text || ''} placeholder="Review Text" rows={3} onChange={e => {
+                                    const newItems = [...reviews]; newItems[idx] = { ...newItems[idx], text: e.target.value }; onChange('items', newItems)
+                                }} />
+                                <Button variant="ghost" size="sm" className="text-destructive" onClick={() => {
+                                    const newItems = reviews.filter((_: any, i: number) => i !== idx); onChange('items', newItems)
+                                }}>
+                                    <Trash2 className="h-4 w-4 mr-2" /> Remove Review
+                                </Button>
+                            </div>
+                        ))}
+                        <Button type="button" variant="outline" size="sm" onClick={() => onChange('items', [...reviews, { name: '', role: '', rating: 5, text: '' }])}>
+                            <Plus className="mr-2 h-4 w-4" /> Add Review
+                        </Button>
+                    </div>
+                </div>
+            )
+        case 'features_bar':
+            const features = Array.isArray(content.items) ? content.items : []
+            const icons = ['dollar', 'clock', 'truck', 'package', 'palette', 'pen', 'sparkles', 'shield', 'zap', 'check']
+            return (
+                <div className="space-y-4">
+                    <div>
+                        <Label>Section Heading</Label>
+                        <Input value={content.heading || ''} onChange={e => onChange('heading', e.target.value)} />
+                    </div>
+                    <div className="space-y-3">
+                        <Label>Features</Label>
+                        {features.map((feature: any, idx: number) => (
+                            <div key={idx} className="flex gap-2 items-start p-3 border rounded-lg bg-muted/20">
+                                <div className="flex-1 grid grid-cols-3 gap-2">
+                                    <select className="h-10 border rounded-md px-2 text-sm" value={feature.icon || 'check'} onChange={e => {
+                                        const newItems = [...features]; newItems[idx] = { ...newItems[idx], icon: e.target.value }; onChange('items', newItems)
+                                    }}>
+                                        {icons.map(icon => <option key={icon} value={icon}>{icon}</option>)}
+                                    </select>
+                                    <Input value={feature.title || ''} placeholder="Title" onChange={e => {
+                                        const newItems = [...features]; newItems[idx] = { ...newItems[idx], title: e.target.value }; onChange('items', newItems)
+                                    }} />
+                                    <Input value={feature.subtitle || ''} placeholder="Subtitle" onChange={e => {
+                                        const newItems = [...features]; newItems[idx] = { ...newItems[idx], subtitle: e.target.value }; onChange('items', newItems)
+                                    }} />
+                                </div>
+                                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => {
+                                    const newItems = features.filter((_: any, i: number) => i !== idx); onChange('items', newItems)
+                                }}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                        <Button type="button" variant="outline" size="sm" onClick={() => onChange('items', [...features, { icon: 'check', title: '', subtitle: '' }])}>
+                            <Plus className="mr-2 h-4 w-4" /> Add Feature
+                        </Button>
+                    </div>
+                </div>
+            )
+        case 'logo_loop':
+            const logos = Array.isArray(content.items) ? content.items : []
+            return (
+                <div className="space-y-4">
+                    <div>
+                        <Label>Section Heading</Label>
+                        <Input value={content.heading || ''} onChange={e => onChange('heading', e.target.value)} />
+                    </div>
+                    <div className="space-y-4 border p-4 rounded-md">
+                        <Label>Logos</Label>
+                        <div className="grid grid-cols-4 gap-4 mb-4">
+                            {logos.map((logo: string, idx: number) => (
+                                <div key={idx} className="relative group border rounded-md p-2 flex items-center justify-center bg-gray-50 h-20">
+                                    {logo.startsWith('http') ? <img src={logo} className="max-h-full object-contain" /> : <span className="text-xs">{logo}</span>}
+                                    <button onClick={() => { const newItems = [...logos]; newItems.splice(idx, 1); onChange('items', newItems) }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Trash2 className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <ImageUploader value={[]} onChange={(urls) => onChange('items', [...logos, ...urls])} maxFiles={5} />
                     </div>
                 </div>
             )

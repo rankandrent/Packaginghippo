@@ -4,9 +4,18 @@ import prisma from '@/lib/db'
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url)
+        const id = searchParams.get('id')
         const slug = searchParams.get('slug')
         const category = searchParams.get('category')
         const publishedOnly = searchParams.get('publishedOnly') === 'true'
+
+        if (id) {
+            const post = await prisma.blogPost.findUnique({
+                where: { id },
+                include: { author: true, category: true }
+            })
+            return NextResponse.json(post)
+        }
 
         if (slug) {
             const post = await prisma.blogPost.findUnique({
@@ -61,7 +70,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json()
-        const { id, ...data } = body
+        const { id, author, category, createdAt, updatedAt, ...data } = body
 
         if (data.isPublished && !data.publishedAt) {
             data.publishedAt = new Date()
@@ -73,6 +82,7 @@ export async function PUT(request: NextRequest) {
         })
         return NextResponse.json(post)
     } catch (error) {
+        console.error("PUT /api/cms/blogs error:", error)
         return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 })
     }
 }

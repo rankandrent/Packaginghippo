@@ -166,6 +166,8 @@ model Author {
   role        String?    @default("Editor")
   bio         String?
   socialLinks Json?      // { twitter: "", linkedin: "", website: "" }
+  seoTitle    String?
+  seoDesc     String?
   posts       BlogPost[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt

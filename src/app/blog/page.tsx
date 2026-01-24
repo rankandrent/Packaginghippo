@@ -4,21 +4,29 @@ import { Calendar, User, ArrowRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
-async function getBlogs(category?: string) {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const url = new URL(`${baseUrl}/api/cms/blogs`)
-    url.searchParams.set('publishedOnly', 'true')
-    if (category) url.searchParams.set('category', category)
+import prisma from "@/lib/db"
 
-    const res = await fetch(url.toString(), { cache: 'no-store' })
-    if (!res.ok) return []
-    return res.json()
+async function getBlogs(category?: string, author?: string) {
+    const where: any = { isPublished: true }
+    if (category) {
+        where.category = { slug: category }
+    }
+    if (author) {
+        where.author = { slug: author }
+    }
+
+    const posts = await prisma.blogPost.findMany({
+        where,
+        include: { author: true, category: true },
+        orderBy: { createdAt: 'desc' }
+    })
+    return posts
 }
 
 async function getCategories() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/cms/blog-categories`, { cache: 'no-store' })
-    if (!res.ok) return []
-    return res.json()
+    return prisma.blogCategory.findMany({
+        orderBy: { name: 'asc' }
+    })
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -42,14 +50,17 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 }
 
-export default async function BlogListingPage({ searchParams }: { searchParams: { category?: string } }) {
-    const [posts, categories] = await Promise.all([
-        getBlogs(searchParams.category),
-        getCategories()
+export default async function BlogListingPage({ searchParams }: { searchParams: Promise<{ category?: string; author?: string }> }) {
+    const { category, author } = await searchParams
+    const [posts, categories, authorData] = await Promise.all([
+        getBlogs(category, author),
+        getCategories(),
+        author ? prisma.author.findUnique({ where: { slug: author } }) : Promise.resolve(null)
     ])
 
-    const featuredPost = searchParams.category ? null : posts[0]
-    const remainingPosts = searchParams.category ? posts : posts.slice(1)
+    const isFiltering = !!(category || author)
+    const featuredPost = isFiltering ? null : posts[0]
+    const remainingPosts = isFiltering ? posts : posts.slice(1)
 
     return (
         <div className="min-h-screen bg-gray-50 pt-24 pb-12 md:pt-32">
@@ -57,9 +68,11 @@ export default async function BlogListingPage({ searchParams }: { searchParams: 
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100 border-none px-4 py-1">OUR BLOG</Badge>
-                        <h1 className="text-4xl md:text-6xl font-black text-blue-900 mb-6 uppercase tracking-tight">Packaging Insights</h1>
+                        <h1 className="text-4xl md:text-6xl font-black text-blue-900 mb-6 uppercase tracking-tight">
+                            {authorData ? `Posts by ${authorData.name}` : (category ? `${category} Insights` : "Packaging Insights")}
+                        </h1>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                            Expert advice, industry trends, and premium packaging solutions to help your brand stand out.
+                            {authorData ? authorData.bio : "Expert advice, industry trends, and premium packaging solutions to help your brand stand out."}
                         </p>
                     </div>
 
@@ -69,7 +82,7 @@ export default async function BlogListingPage({ searchParams }: { searchParams: 
                             href="/blog"
                             className={cn(
                                 "px-6 py-2 rounded-full text-sm font-bold transition-all border",
-                                !searchParams.category ? "bg-blue-900 text-white border-blue-900 shadow-lg shadow-blue-900/20" : "bg-white text-gray-500 border-gray-200 hover:border-blue-900 hover:text-blue-900"
+                                !category ? "bg-blue-900 text-white border-blue-900 shadow-lg shadow-blue-900/20" : "bg-white text-gray-500 border-gray-200 hover:border-blue-900 hover:text-blue-900"
                             )}
                         >
                             All Posts
@@ -80,7 +93,7 @@ export default async function BlogListingPage({ searchParams }: { searchParams: 
                                 href={`/blog?category=${cat.slug}`}
                                 className={cn(
                                     "px-6 py-2 rounded-full text-sm font-bold transition-all border uppercase",
-                                    searchParams.category === cat.slug ? "bg-blue-900 text-white border-blue-900 shadow-lg shadow-blue-900/20" : "bg-white text-gray-500 border-gray-200 hover:border-blue-900 hover:text-blue-900"
+                                    category === cat.slug ? "bg-blue-900 text-white border-blue-900 shadow-lg shadow-blue-900/20" : "bg-white text-gray-500 border-gray-200 hover:border-blue-900 hover:text-blue-900"
                                 )}
                             >
                                 {cat.name}

@@ -6,8 +6,10 @@ import { Section } from "@/components/admin/SectionBuilder"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ChevronRight, Star, Check } from "lucide-react"
+import { ChevronRight, Star, Check, Info } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/public/Breadcrumbs"
+import { ProductHeroQuoteForm } from "@/components/forms/ProductHeroQuoteForm"
 
 export const revalidate = 60
 
@@ -62,66 +64,82 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
     return (
         <main className="min-h-screen bg-white">
-            {/* Standard Product Hero (Always present) */}
-            <section className="pt-10 pb-6 bg-gray-50">
+            <section className="pt-6 pb-12 bg-white">
                 <div className="container mx-auto px-4">
-                    <Breadcrumbs items={breadcrumbItems} />
-                    <div className="grid md:grid-cols-2 gap-8 items-start">
-                        {/* Images */}
-                        <div className="space-y-4">
-                            <div className="relative aspect-[3/2] max-h-[400px] rounded-2xl overflow-hidden bg-white shadow-sm border">
+                    <div className="mb-4">
+                        <Breadcrumbs items={breadcrumbItems} />
+                    </div>
+
+                    <div className="grid lg:grid-cols-12 gap-10 items-start">
+                        {/* Left Column - Images & Trust (Order 1) */}
+                        <div className="lg:col-span-5 space-y-6">
+                            <div className="relative aspect-[1/1] rounded-2xl overflow-hidden bg-gray-50 border shadow-sm">
                                 {product.images?.[0] ? (
                                     <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
                                 )}
                             </div>
-                            <div className="grid grid-cols-4 gap-2">
-                                {product.images?.slice(1, 5).map((img, i) => (
-                                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden border bg-white">
+
+                            {/* Thumbnails */}
+                            <div className="grid grid-cols-5 gap-2">
+                                {product.images?.slice(0, 5).map((img, i) => (
+                                    <div key={i} className={cn(
+                                        "relative aspect-square rounded-lg overflow-hidden border cursor-pointer hover:border-yellow-500 transition-all",
+                                        i === 0 ? "border-yellow-500 ring-2 ring-yellow-500/20" : "border-gray-100"
+                                    )}>
                                         <Image src={img} alt={`${product.name} ${i}`} fill className="object-cover" />
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Trust Badges */}
+                            <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-100">
+                                <div className="flex-1 bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-center gap-3">
+                                    <div className="bg-white border rounded p-1">
+                                        <svg viewBox="0 0 24 24" className="w-6 h-6"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-1 .67-2.28 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /></svg>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <div className="flex text-yellow-500">
+                                            {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
+                                        </div>
+                                        <span className="text-[10px] font-bold text-gray-900 uppercase tracking-tight">Google Business Review 5.0</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1 bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-center gap-3">
+                                    <div className="bg-[#00b67a] p-1 rounded">
+                                        <Star className="w-4 h-4 text-white fill-current" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <div className="flex gap-0.5">
+                                            {[...Array(5)].map((_, i) => <div key={i} className="w-3 h-3 bg-[#00b67a] rounded-sm flex items-center justify-center text-[8px] font-bold text-white">★</div>)}
+                                        </div>
+                                        <span className="text-[10px] font-bold text-gray-900 uppercase tracking-tight">Trustpilot Excellent</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Info */}
-                        <div className="space-y-3">
-                            <div>
-                                {product.category && <span className="text-yellow-600 font-bold tracking-wide text-xs uppercase">{product.category.name}</span>}
-                                <h1 className="text-2xl md:text-3xl font-black text-gray-900 mt-1 leading-tight">{product.name}</h1>
-                            </div>
+                        {/* Right Column - Info & Form (Order 2) */}
+                        <div className="lg:col-span-7 space-y-6">
+                            <div className="space-y-4">
+                                <div>
+                                    {product.category && <span className="text-yellow-600 font-bold tracking-wide text-xs uppercase mb-1 block">{product.category.name}</span>}
+                                    <h1 className="text-3xl md:text-5xl font-black text-gray-900 leading-[1.1] tracking-tight">{product.name}</h1>
+                                </div>
 
-                            {product.price && (
-                                <div className="text-2xl font-bold text-gray-900">${product.price}</div>
-                            )}
+                                <div className="prose prose-sm text-gray-600 max-w-none">
+                                    <p className="line-clamp-4">{product.shortDesc}</p>
+                                </div>
 
-                            <div className="prose prose-sm text-gray-600 max-w-none">
-                                <p>{product.shortDesc}</p>
-                            </div>
+                                {/* Compact Form Injection */}
+                                <div className="pt-2">
+                                    <ProductHeroQuoteForm productSlug={product.slug} />
+                                </div>
 
-                            <div className="flex gap-4 pt-2">
-                                <Button size="lg" className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold h-12 px-8 rounded-full shadow-sm" asChild>
-                                    <Link href="/quote">Get Custom Quote</Link>
-                                </Button>
-                            </div>
-
-                            {/* Specs */}
-                            <div className="bg-white p-3 rounded-xl border space-y-2">
-                                <h3 className="font-bold text-sm">Specifications</h3>
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
-                                    {product.dimensions && (
-                                        <div><span className="text-gray-500">Dimensions:</span> <br /> <span className="font-medium">{product.dimensions}</span></div>
-                                    )}
-                                    {product.materials && (
-                                        <div><span className="text-gray-500">Material:</span> <br /> <span className="font-medium">{product.materials}</span></div>
-                                    )}
-                                    {product.finishings && (
-                                        <div><span className="text-gray-500">Finishings:</span> <br /> <span className="font-medium">{product.finishings}</span></div>
-                                    )}
-                                    {product.minOrder && (
-                                        <div><span className="text-gray-500">Min Order:</span> <br /> <span className="font-medium">{product.minOrder} Units</span></div>
-                                    )}
+                                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 italic text-xs text-gray-500 flex items-center gap-2">
+                                    <Info className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                    Price starts from ${product.price || "3"}. Final cost depends on quantity, material and shipping.
                                 </div>
                             </div>
                         </div>
@@ -134,9 +152,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
             {/* Full Description if no text section exists */}
             {!sections.find(s => s.type === 'text') && product.description && (
-                <section className="py-16 container mx-auto px-4 prose max-w-4xl">
-                    <h2 className="text-3xl font-bold">Product Description</h2>
-                    <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                <section className="py-16 bg-white border-t">
+                    <div className="container mx-auto px-4 prose max-w-4xl">
+                        <h2 className="text-3xl font-bold mb-8">Product Overview</h2>
+                        <div className="text-gray-700 leading-relaxed rich-text" dangerouslySetInnerHTML={{ __html: product.description }} />
+                    </div>
                 </section>
             )}
         </main>

@@ -18,13 +18,14 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json()
-        const { id, content, isActive } = body
+        const { id, content, isActive, order } = body
 
         const updated = await prisma.homepageSection.update({
             where: { id },
             data: {
                 content,
                 isActive,
+                order,
                 updatedAt: new Date(),
             },
         })

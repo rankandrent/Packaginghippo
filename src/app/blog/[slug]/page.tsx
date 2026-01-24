@@ -1,23 +1,29 @@
 import Link from "next/link"
-import { Calendar, User, Share2, Facebook, Twitter, Linkedin, ChevronRight, Clock } from "lucide-react"
+import { Calendar, User, ChevronRight, Clock } from "lucide-react"
 import { notFound } from "next/navigation"
+import prisma from "@/lib/db"
 import { DynamicTOC } from "@/components/blog/DynamicTOC"
+import { ShareButtons } from "@/components/blog/ShareButtons"
+import { QuoteForm } from "@/components/forms/QuoteForm"
 
 async function getBlogPost(slug: string) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/cms/blogs?slug=${slug}`, { cache: 'no-store' })
-    if (!res.ok) return null
-    return res.json()
+    const post = await prisma.blogPost.findUnique({
+        where: { slug },
+        include: { author: true, category: true }
+    })
+    return post
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-    const post = await getBlogPost(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params
+    const post = await getBlogPost(slug)
     if (!post) return { title: 'Post Not Found' }
 
     return {
         title: post.seoTitle || post.title,
         description: post.seoDesc || post.excerpt,
         alternates: {
-            canonical: `/blog/${params.slug}`,
+            canonical: `/blog/${slug}`,
         },
         openGraph: {
             title: post.seoTitle || post.title,
@@ -36,17 +42,24 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     }
 }
 
-async function getRelatedPosts(categoryId: string, currentId: string) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/cms/blogs?publishedOnly=true`, { cache: 'no-store' })
-    if (!res.ok) return []
-    const all = await res.json()
-    return Array.isArray(all)
-        ? all.filter((p: any) => p.categoryId === categoryId && p.id !== currentId).slice(0, 3)
-        : []
+async function getRelatedPosts(categoryId: string | null, currentId: string) {
+    if (!categoryId) return []
+    const posts = await prisma.blogPost.findMany({
+        where: {
+            categoryId,
+            id: { not: currentId },
+            isPublished: true
+        },
+        include: { author: true, category: true },
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+    })
+    return posts
 }
 
-export default async function SingleBlogPage({ params }: { params: { slug: string } }) {
-    const post = await getBlogPost(params.slug)
+export default async function SingleBlogPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params
+    const post = await getBlogPost(slug)
     if (!post) notFound()
 
     const relatedPosts = await getRelatedPosts(post.categoryId, post.id)
@@ -131,32 +144,7 @@ export default async function SingleBlogPage({ params }: { params: { slug: strin
 
                             <div className="pt-8 space-y-4 border-t">
                                 <h3 className="font-bold text-blue-900 uppercase tracking-wider text-xs border-b pb-2 text-center md:text-left">Share This Post</h3>
-                                <div className="flex gap-3 justify-center md:justify-start">
-                                    <a
-                                        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all"
-                                    >
-                                        <Facebook className="w-4 h-4" />
-                                    </a>
-                                    <a
-                                        href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-2 bg-blue-50 text-blue-400 rounded-full hover:bg-blue-400 hover:text-white transition-all"
-                                    >
-                                        <Twitter className="w-4 h-4" />
-                                    </a>
-                                    <a
-                                        href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-700 hover:text-white transition-all"
-                                    >
-                                        <Linkedin className="w-4 h-4" />
-                                    </a>
-                                </div>
+                                <ShareButtons title={post.title} slug={post.slug} />
                             </div>
                         </div>
                     </div>
@@ -168,9 +156,19 @@ export default async function SingleBlogPage({ params }: { params: { slug: strin
                         )}
 
                         <div
-                            className="prose prose-lg max-w-none prose-headings:text-blue-900 prose-headings:uppercase prose-headings:font-black prose-a:text-blue-600"
+                            className="rich-text max-w-none"
                             dangerouslySetInnerHTML={{ __html: post.content }}
                         />
+
+                        {/* RFQ Form */}
+                        <div className="mt-16 pt-16 border-t">
+                            <QuoteForm
+                                theme="light"
+                                title="Custom Packaging Quote"
+                                subtitle="Interested in similar packaging? Get a custom quote for your business today."
+                                pageSource={`Blog: ${post.title}`}
+                            />
+                        </div>
 
                         {/* Author Info (EEAT) */}
                         <div className="mt-16 p-8 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
@@ -186,46 +184,15 @@ export default async function SingleBlogPage({ params }: { params: { slug: strin
                                     {post.author?.bio || "Expert in custom packaging solutions, sustainability, and brand development with years of experience in the industrial packaging sector."}
                                 </p>
                                 <div className="flex justify-center md:justify-start gap-4 pt-2">
-                                    <Link href="#" className="font-bold text-sm text-blue-900 hover:underline">View Profile</Link>
-                                    <Link href="#" className="font-bold text-sm text-blue-900 hover:underline">All Posts</Link>
+                                    <Link href={`/blog/author/${post.author?.slug}`} className="font-bold text-sm text-blue-900 hover:underline">View Profile</Link>
+                                    <Link href={`/blog?author=${post.author?.slug}`} className="font-bold text-sm text-blue-900 hover:underline">All Posts</Link>
                                 </div>
                             </div>
                         </div>
 
                         <div className="lg:hidden mt-8 flex flex-col items-center gap-4">
                             <p className="font-bold text-sm text-gray-400 uppercase tracking-widest">Share This Article</p>
-                            <div className="flex gap-4">
-                                <a
-                                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-3 bg-gray-100 rounded-full hover:bg-blue-600 hover:text-white transition-all text-blue-600"
-                                >
-                                    <Facebook className="w-5 h-5" />
-                                </a>
-                                <a
-                                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-3 bg-gray-100 rounded-full hover:bg-blue-400 hover:text-white transition-all text-blue-400"
-                                >
-                                    <Twitter className="w-5 h-5" />
-                                </a>
-                                <a
-                                    href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-3 bg-gray-100 rounded-full hover:bg-blue-700 hover:text-white transition-all text-blue-700"
-                                >
-                                    <Linkedin className="w-5 h-5" />
-                                </a>
-                                <button
-                                    onClick={() => navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_APP_URL}/blog/${post.slug}`)}
-                                    className="p-3 bg-gray-100 rounded-full hover:bg-gray-600 hover:text-white transition-all text-gray-600"
-                                >
-                                    <Share2 className="w-5 h-5" />
-                                </button>
-                            </div>
+                            <ShareButtons title={post.title} slug={post.slug} variant="bottom" />
                         </div>
                     </div>
 

@@ -14,7 +14,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Loader2, Save, Eye, EyeOff, RefreshCw, Plus, Trash2 } from "lucide-react"
+import { Loader2, Save, Eye, EyeOff, RefreshCw, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 
@@ -60,6 +60,7 @@ export default function HomepageEditor() {
                 body: JSON.stringify({
                     id: section.id,
                     content: section.content,
+                    order: section.order,
                     isActive: section.isActive,
                 }),
             })
@@ -95,6 +96,56 @@ export default function HomepageEditor() {
 
     const toggleActive = (id: string) => {
         setSections(sections.map(s => s.id === id ? { ...s, isActive: !s.isActive } : s))
+    }
+
+    const moveSection = async (index: number, direction: 'up' | 'down') => {
+        const newSections = [...sections]
+        const targetIndex = direction === 'up' ? index - 1 : index + 1
+        if (targetIndex < 0 || targetIndex >= newSections.length) return
+
+        // Swap order values
+        const current = { ...newSections[index] }
+        const target = { ...newSections[targetIndex] }
+
+        const tempOrder = current.order
+        current.order = target.order
+        target.order = tempOrder
+
+        newSections[index] = target
+        newSections[targetIndex] = current
+
+        // Sort by order to be safe
+        newSections.sort((a, b) => a.order - b.order)
+        setSections(newSections)
+
+        // Save both to DB
+        try {
+            const savePromises = [
+                fetch('/api/cms/homepage', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: current.id,
+                        content: current.content,
+                        order: current.order,
+                        isActive: current.isActive,
+                    }),
+                }),
+                fetch('/api/cms/homepage', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: target.id,
+                        content: target.content,
+                        order: target.order,
+                        isActive: target.isActive,
+                    }),
+                })
+            ]
+            await Promise.all(savePromises)
+        } catch (error) {
+            console.error("Error moving section:", error)
+        }
     }
 
 
@@ -136,6 +187,15 @@ export default function HomepageEditor() {
                             { icon: 'package', title: 'STARTING FROM', subtitle: '50 BOXES' },
                             { icon: 'palette', title: 'CUSTOMIZE SIZE', subtitle: '& STYLE' },
                             { icon: 'pen', title: 'FREE GRAPHIC', subtitle: 'DESIGNING' },
+                        ]
+                    }
+                    break
+                case 'logo_loop':
+                    title = 'Client Logo Carousel'
+                    content = {
+                        heading: 'TRUSTED BY LEADING BRANDS',
+                        items: [
+                            'Company 1', 'Company 2', 'Company 3', 'Company 4'
                         ]
                     }
                     break
@@ -190,20 +250,43 @@ export default function HomepageEditor() {
                 <Button onClick={() => createSection('features_bar')}>
                     <Plus className="w-4 h-4 mr-2" /> Add Features Bar
                 </Button>
+                <Button onClick={() => createSection('logo_loop')} className="bg-blue-900 hover:bg-blue-800">
+                    <Plus className="w-4 h-4 mr-2" /> Add Logo Carousel
+                </Button>
             </div>
 
             <Accordion type="single" collapsible className="w-full">
-                {sections.map((section) => (
+                {sections.map((section, index) => (
                     <AccordionItem key={section.id} value={section.id} className="border rounded-lg mb-2 px-2">
-                        <AccordionTrigger className="hover:no-underline">
-                            <div className="flex items-center gap-3">
-                                <span className={`w-2 h-2 rounded-full ${section.isActive ? 'bg-green-500' : 'bg-gray-300'}`} />
-                                <span className="capitalize font-semibold">
-                                    {section.title || section.sectionKey.replace(/_/g, " ")}
-                                </span>
-                                <span className="text-xs text-muted-foreground ml-2">({section.sectionKey})</span>
+                        <div className="flex items-center">
+                            <div className="flex flex-col gap-0 px-2 border-r mr-2">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); moveSection(index, 'up') }}
+                                    className="p-0.5 hover:bg-gray-100 rounded text-gray-400 hover:text-blue-900 disabled:opacity-20"
+                                    disabled={index === 0}
+                                >
+                                    <ArrowUp className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); moveSection(index, 'down') }}
+                                    className="p-0.5 hover:bg-gray-100 rounded text-gray-400 hover:text-blue-900 disabled:opacity-20"
+                                    disabled={index === sections.length - 1}
+                                >
+                                    <ArrowDown className="w-3.5 h-3.5" />
+                                </button>
                             </div>
-                        </AccordionTrigger>
+                            <AccordionTrigger className="hover:no-underline flex-1 py-4">
+                                <div className="flex items-center gap-3">
+                                    <span className={`w-2 h-2 rounded-full ${section.isActive ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                    <span className="capitalize font-semibold text-blue-900">
+                                        {section.title || section.sectionKey.replace(/_/g, " ")}
+                                    </span>
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest ml-2 leading-none border px-1.5 py-0.5 rounded bg-gray-50">
+                                        {section.sectionKey}
+                                    </span>
+                                </div>
+                            </AccordionTrigger>
+                        </div>
                         <AccordionContent className="space-y-4 p-4 pt-2">
 
                             {/* Visual Editor based on section type */}
@@ -233,17 +316,33 @@ export default function HomepageEditor() {
                             </div>
 
                             {/* Actions */}
-                            <div className="flex gap-2 pt-2">
+                            <div className="flex flex-wrap items-center gap-4 pt-4 border-t px-2">
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-xs font-black text-gray-400 uppercase">Order:</Label>
+                                    <Input
+                                        type="number"
+                                        className="w-16 h-8 text-xs font-bold"
+                                        value={section.order}
+                                        onChange={(e) => {
+                                            const newOrder = parseInt(e.target.value) || 0
+                                            setSections(sections.map(s => s.id === section.id ? { ...s, order: newOrder } : s))
+                                        }}
+                                    />
+                                </div>
                                 <Button
+                                    size="sm"
                                     onClick={() => saveSection(section)}
                                     disabled={saving === section.id}
+                                    className="bg-blue-900 hover:bg-blue-800 h-8"
                                 >
-                                    {saving === section.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    <Save className="mr-2 h-4 w-4" /> Save Changes
+                                    {saving === section.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                                    Save Changes
                                 </Button>
                                 <Button
+                                    size="sm"
                                     variant="outline"
                                     onClick={() => toggleActive(section.id)}
+                                    className="h-8"
                                 >
                                     {section.isActive ? 'Deactivate' : 'Activate'}
                                 </Button>

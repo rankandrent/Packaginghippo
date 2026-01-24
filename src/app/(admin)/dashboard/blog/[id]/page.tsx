@@ -56,14 +56,13 @@ export default function BlogEditorPage() {
 
     async function fetchPost() {
         try {
-            const res = await fetch(`/api/cms/blogs?slug=${params.id}`) // Actually using ID here if matches
-            // If ID not found by slug, we'll need to fetch by ID. Let's adjust the API or use a separate fetch.
-            // For now assuming we can fetch by ID in the same route
-            const res2 = await fetch(`/api/cms/blogs?id=${params.id}`)
-            const data = await res2.json()
+            const res = await fetch(`/api/cms/blogs?id=${params.id}`)
+            if (!res.ok) throw new Error('Failed to fetch post')
+            const data = await res.json()
             if (data) setPost(data)
         } catch (error) {
-            console.error(error)
+            console.error("Error fetching post:", error)
+            alert("Error loading post data")
         } finally {
             setFetching(false)
         }

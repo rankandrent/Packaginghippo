@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 
 export function LogoLoop({ data }: { data: any }) {
-    if (!data) return null
+    if (!data || data.isActive === false) return null
 
     // Default placeholder logos if none provided
     const logos = data.items || [
@@ -14,30 +14,32 @@ export function LogoLoop({ data }: { data: any }) {
 
     return (
         <section className="py-12 bg-white border-y border-gray-100 overflow-hidden">
-            <div className="container mx-auto px-4 mb-8 text-center">
+            <div className="container mx-auto px-4 mb-4 text-center">
                 {data.heading && (
-                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">
+                    <h3 className="text-xs font-black text-blue-900/40 uppercase tracking-[0.2em] mb-4">
                         {data.heading}
                     </h3>
                 )}
             </div>
 
-            <div className="flex relative overflow-hidden before:absolute before:left-0 before:top-0 before:z-10 before:h-full before:w-10 before:bg-gradient-to-r before:from-white before:to-transparent after:absolute after:right-0 after:top-0 after:z-10 after:h-full after:w-10 after:bg-gradient-to-l after:from-white after:to-transparent">
+            <div className="flex relative overflow-hidden">
+                {/* Gradient Masks for smooth fade */}
+                <div className="absolute left-0 top-0 z-10 h-full w-20 md:w-32 bg-gradient-to-r from-white to-transparent" />
+                <div className="absolute right-0 top-0 z-10 h-full w-20 md:w-32 bg-gradient-to-l from-white to-transparent" />
+
                 <motion.div
+                    animate={{ x: ["0%", "-33.33%"] }}
                     transition={{
                         duration: 30,
                         ease: "linear",
                         repeat: Infinity,
                     }}
-                    initial={{ translateX: 0 }}
-                    animate={{ translateX: "-50%" }}
-                    className="flex flex-none gap-16 pr-16 items-center"
+                    className="flex flex-none gap-10 md:gap-16 items-center py-4"
                 >
-                    {[...logos, ...logos].map((logo: string | any, index: number) => (
-                        <div key={index} className="flex items-center justify-center min-w-[150px] grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300">
-                            {/* Support both image URLs and simple text placeholders */}
+                    {[...logos, ...logos, ...logos].map((logo: string | any, index: number) => (
+                        <div key={index} className="flex items-center justify-center min-w-[100px] md:min-w-[140px] transition-all duration-500 hover:scale-110">
                             {typeof logo === 'string' && logo.startsWith('http') ? (
-                                <div className="relative h-12 w-32">
+                                <div className="relative h-12 w-32 filter grayscale hover:grayscale-0 transition-all duration-500 opacity-50 hover:opacity-100">
                                     <Image
                                         src={logo}
                                         alt="Client Logo"
@@ -46,7 +48,7 @@ export function LogoLoop({ data }: { data: any }) {
                                     />
                                 </div>
                             ) : (
-                                <span className="text-xl font-black text-gray-400 hover:text-blue-900 transition-colors">
+                                <span className="text-lg md:text-xl font-black text-gray-300 hover:text-blue-900 transition-all duration-500 uppercase tracking-tighter opacity-50 hover:opacity-100 italic">
                                     {typeof logo === 'string' ? logo : logo.name}
                                 </span>
                             )}

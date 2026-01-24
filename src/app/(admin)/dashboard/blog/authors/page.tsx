@@ -14,7 +14,16 @@ export default function BlogAuthorsPage() {
     const [loading, setLoading] = useState(false)
     const [fetching, setFetching] = useState(true)
     const [editingId, setEditingId] = useState<string | null>(null)
-    const [newAuthor, setNewAuthor] = useState({ name: "", slug: "", role: "", bio: "", image: "" })
+    const [newAuthor, setNewAuthor] = useState({
+        name: "",
+        slug: "",
+        role: "",
+        bio: "",
+        image: "",
+        socialLinks: { twitter: "", linkedin: "", website: "" },
+        seoTitle: "",
+        seoDesc: ""
+    })
 
     useEffect(() => {
         fetchAuthors()
@@ -67,7 +76,16 @@ export default function BlogAuthorsPage() {
     }
 
     function resetForm() {
-        setNewAuthor({ name: "", slug: "", role: "", bio: "", image: "" })
+        setNewAuthor({
+            name: "",
+            slug: "",
+            role: "",
+            bio: "",
+            image: "",
+            socialLinks: { twitter: "", linkedin: "", website: "" },
+            seoTitle: "",
+            seoDesc: ""
+        })
         setEditingId(null)
     }
 
@@ -78,7 +96,10 @@ export default function BlogAuthorsPage() {
             slug: author.slug,
             role: author.role || "",
             bio: author.bio || "",
-            image: author.image || ""
+            image: author.image || "",
+            socialLinks: author.socialLinks || { twitter: "", linkedin: "", website: "" },
+            seoTitle: author.seoTitle || "",
+            seoDesc: author.seoDesc || ""
         })
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
@@ -130,6 +151,44 @@ export default function BlogAuthorsPage() {
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Biography (EEAT)</label>
                                 <Textarea value={newAuthor.bio} onChange={(e) => setNewAuthor({ ...newAuthor, bio: e.target.value })} placeholder="Brief background of the author..." rows={4} />
                                 <p className="text-[10px] text-muted-foreground italic leading-tight">Biographies help search engines verify author expertise.</p>
+                            </div>
+
+                            <div className="space-y-4 pt-4 border-t">
+                                <h4 className="text-xs font-black text-blue-900 uppercase tracking-widest">Social Links</h4>
+                                <div className="space-y-2">
+                                    <Input
+                                        value={newAuthor.socialLinks.linkedin}
+                                        onChange={(e) => setNewAuthor({ ...newAuthor, socialLinks: { ...newAuthor.socialLinks, linkedin: e.target.value } })}
+                                        placeholder="LinkedIn URL"
+                                    />
+                                    <Input
+                                        value={newAuthor.socialLinks.twitter}
+                                        onChange={(e) => setNewAuthor({ ...newAuthor, socialLinks: { ...newAuthor.socialLinks, twitter: e.target.value } })}
+                                        placeholder="Twitter / X URL"
+                                    />
+                                    <Input
+                                        value={newAuthor.socialLinks.website}
+                                        onChange={(e) => setNewAuthor({ ...newAuthor, socialLinks: { ...newAuthor.socialLinks, website: e.target.value } })}
+                                        placeholder="Personal Website"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-4 pt-4 border-t">
+                                <h4 className="text-xs font-black text-blue-900 uppercase tracking-widest">SEO Metadata</h4>
+                                <div className="space-y-2">
+                                    <Input
+                                        value={newAuthor.seoTitle}
+                                        onChange={(e) => setNewAuthor({ ...newAuthor, seoTitle: e.target.value })}
+                                        placeholder="Meta Title"
+                                    />
+                                    <Textarea
+                                        value={newAuthor.seoDesc}
+                                        onChange={(e) => setNewAuthor({ ...newAuthor, seoDesc: e.target.value })}
+                                        placeholder="Meta Description"
+                                        rows={2}
+                                    />
+                                </div>
                             </div>
                             <Button className="w-full bg-blue-900 hover:bg-blue-800 font-bold uppercase transition-all" onClick={handleSave} disabled={loading || !newAuthor.name}>
                                 {loading ? <Loader2 className="animate-spin mr-2" /> : editingId ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}

@@ -7,12 +7,12 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowRight, CheckCircle, ChevronDown, Package, Star, Leaf, Box } from "lucide-react"
+import { ArrowRight, CheckCircle, ChevronDown, Package, Star, Leaf, Box, Quote, Clock, DollarSign, Truck, Palette, Pen, Sparkles, Shield, Zap, Check } from "lucide-react"
 
 // Types matching SectionBuilder
 export type Section = {
     id: string
-    type: 'hero' | 'text' | 'benefits' | 'faq' | 'cta' | 'gallery' | 'product_grid' | 'seo_content'
+    type: 'hero' | 'text' | 'benefits' | 'faq' | 'cta' | 'gallery' | 'product_grid' | 'seo_content' | 'customer_reviews' | 'features_bar' | 'logo_loop'
     title?: string
     content: any
 }
@@ -47,6 +47,12 @@ function RenderSection({ section }: { section: Section }) {
             return <CtaSection content={section.content} />
         case 'gallery':
             return <GallerySection content={section.content} />
+        case 'customer_reviews':
+            return <CustomerReviewsSection content={section.content} />
+        case 'features_bar':
+            return <FeaturesBarSection content={section.content} />
+        case 'logo_loop':
+            return <LogoLoopSection content={section.content} />
         default:
             return null
     }
@@ -204,7 +210,7 @@ function TextSection({ content }: { content: any }) {
         <section className="py-16 bg-white">
             <div className="container mx-auto px-4 prose max-w-4xl text-gray-700 leading-relaxed">
                 {content.heading && <h2 className="text-3xl font-bold text-gray-900 mb-6">{content.heading}</h2>}
-                <div dangerouslySetInnerHTML={{ __html: content.html }} />
+                <div className="rich-text" dangerouslySetInnerHTML={{ __html: content.html }} />
             </div>
         </section>
     )
@@ -263,7 +269,8 @@ function BenefitsSection({ content }: { content: any }) {
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16 max-w-3xl mx-auto">
                     <h2 className="text-4xl font-black mb-4">{content.heading || "Key Benefits"}</h2>
-                    <p className="text-lg text-gray-600">{content.subheading}</p>
+                    {content.intro && <p className="text-lg text-gray-600 mb-8">{content.intro}</p>}
+                    {!content.intro && content.subheading && <p className="text-lg text-gray-600">{content.subheading}</p>}
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
                     {content.items?.map((item: any, i: number) => (
@@ -360,6 +367,139 @@ function GallerySection({ content }: { content: any }) {
                     ))}
                 </div>
             </div>
+        </section>
+    )
+}
+
+function CustomerReviewsSection({ content }: { content: any }) {
+    const reviews = Array.isArray(content.items) ? content.items : []
+    return (
+        <section className="py-24 bg-white overflow-hidden">
+            <div className="container mx-auto px-4">
+                <div className="text-center mb-16">
+                    <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">{content.heading || "What Our Customers Say"}</h2>
+                    <p className="text-xl text-gray-500 max-w-2xl mx-auto">{content.subheading || "Trusted by businesses worldwide for premium packaging solutions."}</p>
+                </div>
+                <div className="grid md:grid-cols-3 gap-8">
+                    {reviews.map((review: any, i: number) => (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.1 }}
+                        >
+                            <Card className="h-full border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-300 rounded-3xl group">
+                                <CardContent className="p-8 flex flex-col h-full bg-white rounded-3xl">
+                                    <div className="flex gap-1 mb-6">
+                                        {[...Array(5)].map((_, starIdx) => (
+                                            <Star
+                                                key={starIdx}
+                                                className={`w-4 h-4 ${starIdx < (review.rating || 5) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <Quote className="w-8 h-8 text-yellow-500/20 mb-4 group-hover:text-yellow-500/40 transition-colors" />
+                                    <p className="text-gray-600 italic leading-relaxed mb-8 flex-grow">"{review.text}"</p>
+                                    <div className="flex items-center gap-4 pt-6 border-t border-gray-50">
+                                        {review.image ? (
+                                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-yellow-500/20">
+                                                <Image src={review.image} alt={review.name} width={48} height={48} className="object-cover" />
+                                            </div>
+                                        ) : (
+                                            <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-600 font-bold">
+                                                {review.name?.charAt(0) || 'U'}
+                                            </div>
+                                        )}
+                                        <div>
+                                            <h4 className="font-bold text-gray-900">{review.name}</h4>
+                                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">{review.role}</p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    )
+}
+
+function FeaturesBarSection({ content }: { content: any }) {
+    const features = Array.isArray(content.items) ? content.items : []
+    const iconMap: Record<string, any> = {
+        dollar: DollarSign,
+        clock: Clock,
+        truck: Truck,
+        package: Package,
+        palette: Palette,
+        pen: Pen,
+        sparkles: Sparkles,
+        shield: Shield,
+        zap: Zap,
+        check: Check
+    }
+
+    return (
+        <section className="py-12 bg-zinc-950 border-y border-white/5">
+            <div className="container mx-auto px-4">
+                {content.heading && (
+                    <div className="text-center mb-10">
+                        <h2 className="text-xl font-bold text-white uppercase tracking-widest opacity-60 italic">{content.heading}</h2>
+                    </div>
+                )}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+                    {features.map((feature: any, i: number) => {
+                        const Icon = iconMap[feature.icon] || Check
+                        return (
+                            <div key={i} className="flex flex-col items-center text-center group">
+                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-yellow-500 transition-all duration-300 group-hover:rotate-12">
+                                    <Icon className="w-6 h-6 text-yellow-500 group-hover:text-black transition-colors" />
+                                </div>
+                                <h3 className="text-white font-black text-sm uppercase tracking-tight">{feature.title}</h3>
+                                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-1">{feature.subtitle}</p>
+                            </div>
+                        )
+                    })}
+                </div>
+            </div>
+        </section>
+    )
+}
+
+function LogoLoopSection({ content }: { content: any }) {
+    const logos = Array.isArray(content.items) ? content.items : []
+    return (
+        <section className="py-16 bg-white overflow-hidden border-b border-gray-50">
+            <div className="container mx-auto px-4 mb-10 text-center">
+                {content.heading && <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">{content.heading}</h3>}
+            </div>
+            <div className="flex overflow-hidden relative group">
+                <div className="flex gap-16 animate-marquee whitespace-nowrap py-4">
+                    {[...logos, ...logos, ...logos].map((logo, i) => (
+                        <div key={i} className="flex-shrink-0 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 flex items-center justify-center h-12 w-32">
+                            {logo.startsWith('http') ? (
+                                <img src={logo} alt={`Client ${i}`} className="max-h-full max-w-full object-contain" />
+                            ) : (
+                                <span className="text-lg font-black text-gray-300">{logo}</span>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <style jsx>{`
+                @keyframes marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+                .animate-marquee {
+                    animation: marquee 30s linear infinite;
+                }
+                .animate-marquee:hover {
+                    animation-play-state: paused;
+                }
+            `}</style>
         </section>
     )
 }

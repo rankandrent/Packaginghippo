@@ -13,6 +13,9 @@ import {
     ListOrdered,
     Heading1,
     Heading2,
+    Heading3,
+    Heading4,
+    Heading5,
     Quote,
     Undo,
     Redo,
@@ -100,13 +103,25 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
                     variant="ghost"
                     size="icon"
                     onClick={() =>
+                        editor.chain().focus().toggleHeading({ level: 1 }).run()
+                    }
+                    className={cn(editor.isActive("heading", { level: 1 }) && "bg-muted")}
+                    title="Heading 1"
+                    type="button"
+                >
+                    <Heading1 className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
                         editor.chain().focus().toggleHeading({ level: 2 }).run()
                     }
                     className={cn(editor.isActive("heading", { level: 2 }) && "bg-muted")}
                     title="Heading 2"
                     type="button"
                 >
-                    <Heading1 className="h-4 w-4" />
+                    <Heading2 className="h-4 w-4" />
                 </Button>
                 <Button
                     variant="ghost"
@@ -118,7 +133,31 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
                     title="Heading 3"
                     type="button"
                 >
-                    <Heading2 className="h-4 w-4" />
+                    <Heading3 className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                        editor.chain().focus().toggleHeading({ level: 4 }).run()
+                    }
+                    className={cn(editor.isActive("heading", { level: 4 }) && "bg-muted")}
+                    title="Heading 4"
+                    type="button"
+                >
+                    <Heading4 className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                        editor.chain().focus().toggleHeading({ level: 5 }).run()
+                    }
+                    className={cn(editor.isActive("heading", { level: 5 }) && "bg-muted")}
+                    title="Heading 5"
+                    type="button"
+                >
+                    <Heading5 className="h-4 w-4" />
                 </Button>
                 <Button
                     variant="ghost"
