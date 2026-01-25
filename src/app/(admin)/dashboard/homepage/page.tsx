@@ -33,9 +33,60 @@ export default function HomepageEditor() {
     const [saving, setSaving] = useState<string | null>(null)
     const [showJson, setShowJson] = useState<string | null>(null)
 
+    // SEO Settings State
+    const [seoSettings, setSeoSettings] = useState({
+        title: '',
+        description: '',
+        keywords: ''
+    })
+    const [savingSeo, setSavingSeo] = useState(false)
+
     useEffect(() => {
         fetchSections()
+        fetchSeoSettings()
     }, [])
+
+    async function fetchSeoSettings() {
+        try {
+            const res = await fetch('/api/cms/settings?key=seo')
+            const data = await res.json()
+            if (data.setting?.value) {
+                setSeoSettings({
+                    title: data.setting.value.defaultTitle || '',
+                    description: data.setting.value.defaultDescription || '',
+                    keywords: data.setting.value.defaultKeywords || ''
+                })
+            }
+        } catch (error) {
+            console.error("Error fetching SEO settings:", error)
+        }
+    }
+
+    async function saveSeoSettings() {
+        try {
+            setSavingSeo(true)
+            const res = await fetch('/api/cms/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    key: 'seo',
+                    value: {
+                        defaultTitle: seoSettings.title,
+                        defaultDescription: seoSettings.description,
+                        defaultKeywords: seoSettings.keywords
+                    }
+                }),
+            })
+
+            if (!res.ok) throw new Error('Failed to save SEO')
+            alert("SEO Settings Saved!")
+        } catch (error) {
+            console.error("Error saving SEO:", error)
+            alert("Failed to save SEO settings")
+        } finally {
+            setSavingSeo(false)
+        }
+    }
 
     async function fetchSections() {
         try {
@@ -94,8 +145,30 @@ export default function HomepageEditor() {
         }
     }
 
-    const toggleActive = (id: string) => {
-        setSections(sections.map(s => s.id === id ? { ...s, isActive: !s.isActive } : s))
+    const toggleActive = async (id: string, currentStatus: boolean) => {
+        // Optimistic update
+        setSections(sections.map(s => s.id === id ? { ...s, isActive: !currentStatus } : s))
+
+        try {
+            setSaving(id)
+            const res = await fetch('/api/cms/homepage', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id,
+                    isActive: !currentStatus,
+                }),
+            })
+
+            if (!res.ok) throw new Error('Failed to update status')
+        } catch (error) {
+            console.error("Error updating status:", error)
+            // Revert on error
+            setSections(sections.map(s => s.id === id ? { ...s, isActive: currentStatus } : s))
+            alert("Failed to update status")
+        } finally {
+            setSaving(null)
+        }
     }
 
     const moveSection = async (index: number, direction: 'up' | 'down') => {
@@ -233,10 +306,64 @@ export default function HomepageEditor() {
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Homepage Editor</h2>
                     <p className="text-muted-foreground">
-                        Edit homepage sections. All changes are saved to MongoDB.
+                        Edit homepage sections and global SEO settings. All changes are saved to MongoDB.
                     </p>
                 </div>
             </div>
+
+            {/* Global SEO Settings */}
+            <Card className="border-blue-100 bg-blue-50/30">
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                        <span className="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded uppercase tracking-wider">Config</span>
+                        Homepage Meta Data
+                    </CardTitle>
+                    <CardDescription>
+                        Set the default Title, Description, and Keywords for the homepage.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label>Meta Title</Label>
+                        <Input
+                            value={seoSettings.title}
+                            onChange={(e) => setSeoSettings({ ...seoSettings, title: e.target.value })}
+                            placeholder="e.g. Packaging Hippo | Custom Boxes"
+                            className="bg-white"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Meta Description</Label>
+                        <Textarea
+                            value={seoSettings.description}
+                            onChange={(e) => setSeoSettings({ ...seoSettings, description: e.target.value })}
+                            placeholder="e.g. Premium custom packaging solutions..."
+                            rows={2}
+                            className="bg-white"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Keywords (comma separated)</Label>
+                        <Input
+                            value={seoSettings.keywords}
+                            onChange={(e) => setSeoSettings({ ...seoSettings, keywords: e.target.value })}
+                            placeholder="e.g. custom boxes, packaging, wholesale"
+                            className="bg-white"
+                        />
+                    </div>
+                    <div className="pt-2">
+                        <Button
+                            onClick={saveSeoSettings}
+                            disabled={savingSeo}
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                            {savingSeo && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Save SEO Settings
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
             <div className="flex flex-wrap gap-2">
                 <Button variant="outline" onClick={fetchSections}>
                     <RefreshCw className="w-4 h-4 mr-2" /> Refresh
@@ -341,8 +468,9 @@ export default function HomepageEditor() {
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => toggleActive(section.id)}
+                                    onClick={() => toggleActive(section.id, section.isActive)}
                                     className="h-8"
+                                    disabled={saving === section.id}
                                 >
                                     {section.isActive ? 'Deactivate' : 'Activate'}
                                 </Button>

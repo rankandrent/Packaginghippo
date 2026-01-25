@@ -11,6 +11,8 @@ async function getHomepageData() {
       orderBy: { order: 'asc' },
     })
 
+    console.log(`[Home] Fetched ${sections.length} active sections:`, sections.map(s => s.sectionKey))
+
     // Return array directly to preserve order
     return sections.map(s => ({
       key: s.sectionKey,

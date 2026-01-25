@@ -169,6 +169,7 @@
 .rich-text p {
   margin-bottom: 1.75rem;
   line-height: 1.8;
+  text-align: justify;
 }
 
 .rich-text p:last-child {

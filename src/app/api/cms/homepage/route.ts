@@ -29,6 +29,7 @@ export async function PUT(request: NextRequest) {
                 updatedAt: new Date(),
             },
         })
+        console.log(`[API] Updated section ${id}: isActive=${isActive}`)
 
         return NextResponse.json({ section: updated })
     } catch (error) {

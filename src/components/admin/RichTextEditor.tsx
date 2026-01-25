@@ -21,6 +21,7 @@ import {
     Redo,
     Link as LinkIcon,
     Image as ImageIcon,
+    Pilcrow,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -42,7 +43,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
         editorProps: {
             attributes: {
                 class:
-                    "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl m-5 focus:outline-none min-h-[300px]",
+                    "rich-text prose prose-sm sm:prose lg:prose-lg xl:prose-2xl m-5 focus:outline-none min-h-[300px]",
             },
         },
         onUpdate: ({ editor }) => {
@@ -80,7 +81,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
 
     return (
         <div className="border rounded-md">
-            <div className="flex flex-wrap gap-1 border-b bg-muted/50 p-2">
+            <div className="sticky top-0 z-50 flex flex-wrap gap-1 border-b bg-muted/80 backdrop-blur-sm p-2">
                 <Button
                     variant="ghost"
                     size="icon"
@@ -98,6 +99,16 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
                     type="button"
                 >
                     <Italic className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => editor.chain().focus().setParagraph().run()}
+                    className={cn(editor.isActive("paragraph") && "bg-muted")}
+                    title="Paragraph"
+                    type="button"
+                >
+                    <Pilcrow className="h-4 w-4" />
                 </Button>
                 <Button
                     variant="ghost"
@@ -219,7 +230,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
                     </Button>
                 </div>
             </div>
-            <EditorContent editor={editor} className="min-h-[300px] p-4 rich-text" />
+            <EditorContent editor={editor} className="min-h-[300px] max-h-[600px] overflow-y-auto p-4 rich-text" />
         </div>
     )
 }
