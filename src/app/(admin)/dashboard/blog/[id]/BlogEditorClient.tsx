@@ -12,6 +12,12 @@ import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { Badge } from "@/components/ui/badge"
 
+export const dynamicParams = false
+
+export async function generateStaticParams() {
+    return []
+}
+
 export default function BlogEditorPage() {
     const params = useParams()
     const router = useRouter()
@@ -35,40 +41,6 @@ export default function BlogEditorPage() {
         seoKeywords: "",
         isPublished: false
     })
-
-    const [scrapeUrl, setScrapeUrl] = useState("")
-    const [scraping, setScraping] = useState(false)
-
-    async function handleScrape() {
-        if (!scrapeUrl) return
-        setScraping(true)
-        try {
-            const res = await fetch('/api/cms/blogs/scrape', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: scrapeUrl }),
-            })
-            if (!res.ok) throw new Error('Failed to fetch')
-            const data = await res.json()
-
-            setPost(prev => ({
-                ...prev,
-                title: data.title || prev.title,
-                slug: data.title ? data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") : prev.slug,
-                content: data.content || prev.content,
-                excerpt: data.excerpt || prev.excerpt,
-                seoTitle: data.title || prev.seoTitle,
-                seoDesc: data.seoDesc || prev.seoDesc,
-                mainImage: data.mainImage || prev.mainImage
-            }))
-            alert("Content fetched successfully!")
-        } catch (error) {
-            console.error(error)
-            alert("Error fetching content from URL")
-        } finally {
-            setScraping(false)
-        }
-    }
 
     useEffect(() => {
         fetchMetadata()
@@ -137,38 +109,6 @@ export default function BlogEditorPage() {
                     Save Blog Post
                 </Button>
             </div>
-
-            {isNew && (
-                <Card className="border-blue-200 bg-blue-50/30">
-                    <CardHeader className="py-3">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-blue-600" />
-                            Quick Import from URL
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="py-3">
-                        <div className="flex gap-2">
-                            <Input
-                                placeholder="https://example.com/blog-post"
-                                value={scrapeUrl}
-                                onChange={(e) => setScrapeUrl(e.target.value)}
-                                className="bg-white"
-                            />
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={handleScrape}
-                                disabled={scraping || !scrapeUrl}
-                            >
-                                {scraping ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Fetch Content"}
-                            </Button>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground mt-2">
-                            Paste a blog URL to automatically fill the title, content, image, and SEO settings.
-                        </p>
-                    </CardContent>
-                </Card>
-            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
