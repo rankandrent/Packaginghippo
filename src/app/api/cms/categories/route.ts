@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json()
-        const { id, name, slug, description, imageUrl, seoTitle, seoDesc, seoKeywords, order, isActive, sections } = body
+        const { id, name, slug, description, imageUrl, seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, order, isActive, sections } = body
 
         const updated = await prisma.productCategory.update({
             where: { id },
@@ -76,6 +76,7 @@ export async function PUT(request: NextRequest) {
                 seoTitle,
                 seoDesc,
                 seoKeywords,
+                descriptionCollapsedHeight,
                 order,
                 isActive,
                 sections,

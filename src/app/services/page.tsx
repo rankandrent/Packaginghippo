@@ -96,13 +96,9 @@ export default async function ServicesPage() {
                                             </span>
                                         </div>
                                         <h3 className="font-black text-2xl text-gray-900 group-hover:text-yellow-600 transition-colors mb-4">{item.name}</h3>
-                                        <div className="text-gray-600 leading-relaxed rich-text line-clamp-4">
-                                            {item.description ? (
-                                                <div dangerouslySetInnerHTML={{ __html: item.description }} />
-                                            ) : (
-                                                "Premium custom packaging solutions tailored specifically for your brand needs and product requirements."
-                                            )}
-                                        </div>
+                                        <p className="text-gray-600 leading-relaxed line-clamp-4">
+                                            {item.description ? item.description.replace(/<[^>]+>/g, '') : "Premium custom packaging solutions tailored specifically for your brand needs and product requirements."}
+                                        </p>
 
                                         <div className="mt-8 flex items-center gap-2 text-zinc-900 font-bold group-hover:text-yellow-600 transition-colors">
                                             Learn More <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

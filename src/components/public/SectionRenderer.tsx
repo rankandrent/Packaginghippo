@@ -87,7 +87,7 @@ export function HeroSection({ content }: { content: any }) {
                         </div>
                     </div>
                     {content.image && (
-                        <div className="relative z-10 w-full aspect-square rounded-3xl overflow-hidden shadow-2xl transform rotate-[-3deg] border-4 border-white/10">
+                        <div className="relative z-10 w-full max-w-lg mx-auto aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl transform rotate-[-3deg] border-4 border-white/10">
                             <Image src={content.image} alt={content.heading} fill className="object-cover" />
                         </div>
                     )}

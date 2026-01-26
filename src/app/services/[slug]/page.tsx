@@ -3,7 +3,10 @@ import prisma from "@/lib/db"
 import { Metadata } from "next"
 import { SectionRenderer, Section } from "@/components/public/SectionRenderer"
 import { QuoteForm } from "@/components/forms/QuoteForm"
+
+
 import { Breadcrumbs } from "@/components/public/Breadcrumbs"
+import { CollapsibleText } from "@/components/public/CollapsibleText"
 
 export const revalidate = 60 // ISR
 
@@ -122,6 +125,16 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     />
                 </div>
             </section>
+
+            {/* Category Description (SEO Content) */}
+            {category.description && (
+                <section className="py-16 bg-white border-t">
+                    <div className="container mx-auto px-4 prose max-w-4xl">
+                        <h2 className="text-3xl font-bold mb-8">{category.name} Overview</h2>
+                        <CollapsibleText content={category.description} collapsedHeight={category.descriptionCollapsedHeight || 300} />
+                    </div>
+                </section>
+            )}
         </main>
     )
 }

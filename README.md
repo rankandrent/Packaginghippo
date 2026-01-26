@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Packaging Hippo
 
-## Getting Started
+Packaging Hippo is a modern, programmatic SEO and CMS platform tailored for the packaging industry. It enables dynamic product page generation, blog management, and efficient inquiry tracking.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Programmatic SEO**: Automatically generated city and niche-specific pages for maximum search visibility.
+- **Dynamic CMS**: Easy-to-use dashboard for managing products, categories, blogs, and inquiries.
+- **Inquiry System**: Integrated form and dashboard for tracking customer requests.
+- **Modern UI**: Built with Tailwind CSS, Framer Motion, and Shadcn UI for a premium, responsive experience.
+- **Rich Text Editing**: Tiptap-powered editor for blogs and product descriptions.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router)
+- **Database**: [Prisma](https://www.prisma.io/) with [Supabase](https://supabase.com/) (PostgreSQL)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Components**: [Shadcn UI](https://ui.shadcn.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Editor**: [Tiptap](https://tiptap.dev/)
+- **Authentication**: Custom authentication (Jose/JWT)
+
+## 🏁 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- A Supabase project (PostgreSQL database)
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd Packaginghippo
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**:
+   Create a `.env` file in the root directory and add your credentials:
+   ```env
+   DATABASE_URL="your-postgresql-connection-string"
+   SUPABASE_URL="your-supabase-url"
+   SUPABASE_ANON_KEY="your-supabase-anon-key"
+   JWT_SECRET="your-jwt-secret"
+   ```
+
+4. **Initialize Prisma**:
+   ```bash
+   npx prisma generate
+   ```
+
+5. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📂 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `src/app`: Next.js App Router pages and API routes.
+- `src/components`: Reusable UI components.
+- `src/lib`: Utility functions and shared logic.
+- `prisma`: Database schema and migrations.
+- `scripts`: Helper scripts for database verification and seeding.
 
-## Learn More
+## 🌐 Deployment
 
-To learn more about Next.js, take a look at the following resources:
+The project is configured for deployment on platforms like Netlify or Vercel. Ensure all environment variables are correctly set in your deployment dashboard.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Built with ❤️ by the Packaging Hippo Team.

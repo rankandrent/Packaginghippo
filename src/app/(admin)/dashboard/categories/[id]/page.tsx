@@ -22,6 +22,7 @@ type Category = {
     seoTitle: string | null
     seoDesc: string | null
     seoKeywords: string | null
+    descriptionCollapsedHeight: number
     isActive: boolean
     sections: any
 }
@@ -96,7 +97,7 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
     if (!category) return <div>Category not found</div>
 
     return (
-        <form onSubmit={saveCategory} className="max-w-4xl mx-auto space-y-6">
+        <form onSubmit={saveCategory} className="max-w-[1600px] mx-auto space-y-6">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <Link href="/dashboard/categories">
@@ -147,6 +148,15 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                                 content={category.description || ""}
                                 onChange={(html) => setCategory({ ...category, description: html })}
                             />
+                            <div className="flex items-center gap-2 mt-2">
+                                <Label className="text-xs text-muted-foreground whitespace-nowrap">Collapsed Height (px):</Label>
+                                <Input
+                                    type="number"
+                                    className="w-24 h-8 text-xs"
+                                    value={category.descriptionCollapsedHeight || 300}
+                                    onChange={(e) => setCategory({ ...category, descriptionCollapsedHeight: parseInt(e.target.value) || 300 })}
+                                />
+                            </div>
                         </div>
 
                         <div className="space-y-2">

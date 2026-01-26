@@ -10,6 +10,7 @@ import { ChevronRight, Star, Check, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/public/Breadcrumbs"
 import { ProductHeroQuoteForm } from "@/components/forms/ProductHeroQuoteForm"
+import { CollapsibleText } from "@/components/public/CollapsibleText"
 
 export const revalidate = 60
 
@@ -150,12 +151,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {/* Custom Dynamic Sections */}
             <SectionRenderer sections={sections} />
 
+
             {/* Full Description if no text section exists */}
             {!sections.find(s => s.type === 'text') && product.description && (
                 <section className="py-16 bg-white border-t">
                     <div className="container mx-auto px-4 prose max-w-4xl">
                         <h2 className="text-3xl font-bold mb-8">Product Overview</h2>
-                        <div className="text-gray-700 leading-relaxed rich-text" dangerouslySetInnerHTML={{ __html: product.description }} />
+                        <CollapsibleText content={product.description} collapsedHeight={product.descriptionCollapsedHeight || 300} />
                     </div>
                 </section>
             )}

@@ -69,6 +69,7 @@ model Page {
   seoTitle    String?
   seoDesc     String?
   seoKeywords String?
+  descriptionCollapsedHeight Int @default(300)
   isPublished Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -87,6 +88,7 @@ model ProductCategory {
   seoTitle    String?
   seoDesc     String?
   seoKeywords String?
+  descriptionCollapsedHeight Int @default(300)
   sections    Json?    // List of dynamic sections
   order       Int       @default(0)
   isActive    Boolean   @default(false)
@@ -119,6 +121,7 @@ model Product {
   seoTitle    String?
   seoDesc     String?
   seoKeywords String?
+  descriptionCollapsedHeight Int @default(300)
 
   isActive    Boolean   @default(false)
   createdAt   DateTime  @default(now())
@@ -201,6 +204,7 @@ model BlogPost {
   seoTitle    String?
   seoDesc     String?
   seoKeywords String?
+  descriptionCollapsedHeight Int @default(300)
   schema_json Json?         // For custom Article schema
   
   isPublished Boolean       @default(false)

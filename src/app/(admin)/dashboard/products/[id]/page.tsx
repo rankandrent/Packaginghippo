@@ -39,6 +39,7 @@ type Product = {
     seoTitle: string | null
     seoDesc: string | null
     seoKeywords: string | null
+    descriptionCollapsedHeight: number
     isActive: boolean
     sections: any // Json
 
@@ -172,8 +173,20 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                             <Textarea value={product.shortDesc || ""} onChange={(e) => setProduct({ ...product, shortDesc: e.target.value })} rows={2} />
                         </div>
                         <div className="space-y-2">
-                            <Label>Full Description (Rich Text)</Label>
-                            <RichTextEditor content={product.description || ""} onChange={(html) => setProduct({ ...product, description: html })} />
+                            <Label>Description</Label>
+                            <RichTextEditor
+                                content={product.description || ""} // Kept || "" for safety as description can be null
+                                onChange={(html) => setProduct({ ...product, description: html })}
+                            />
+                            <div className="flex items-center gap-2 mt-2">
+                                <Label className="text-xs text-muted-foreground whitespace-nowrap">Collapsed Height (px):</Label>
+                                <Input
+                                    type="number"
+                                    className="w-24 h-8 text-xs"
+                                    value={product.descriptionCollapsedHeight || 300}
+                                    onChange={(e) => setProduct({ ...product, descriptionCollapsedHeight: parseInt(e.target.value) || 300 })}
+                                />
+                            </div>
                         </div>
                     </div>
 
