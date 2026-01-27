@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
-import { Loader2, ArrowLeft, Save } from "lucide-react"
+import { Loader2, ArrowLeft, Save, Sparkles } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type Category = {
     id: string
@@ -34,6 +35,39 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
     const [saving, setSaving] = useState(false)
     const [sections, setSections] = useState<Section[]>([])
     const router = useRouter()
+
+    const [scrapeUrl, setScrapeUrl] = useState("")
+    const [scraping, setScraping] = useState(false)
+
+    async function handleScrape() {
+        if (!scrapeUrl) return
+        setScraping(true)
+        try {
+            const res = await fetch('/api/cms/categories/scrape', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: scrapeUrl }),
+            })
+            if (!res.ok) throw new Error('Failed to fetch')
+            const data = await res.json()
+
+            setCategory(prev => prev ? ({
+                ...prev,
+                name: data.name || prev.name,
+                slug: data.name ? data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") : prev.slug,
+                description: data.description || prev.description,
+                seoTitle: data.name || prev.seoTitle,
+                seoDesc: data.seoDesc || prev.seoDesc,
+                imageUrl: data.imageUrl || prev.imageUrl
+            }) : null)
+            alert("Content fetched successfully!")
+        } catch (error) {
+            console.error(error)
+            alert("Error fetching content from URL")
+        } finally {
+            setScraping(false)
+        }
+    }
 
     useEffect(() => {
         fetchCategory()
@@ -115,6 +149,36 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                     <Save className="mr-2 h-4 w-4" /> Save Changes
                 </Button>
             </div>
+
+            <Card className="border-blue-200 bg-blue-50/30">
+                <CardHeader className="py-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-blue-600" />
+                        Quick Import from URL
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="py-3">
+                    <div className="flex gap-2">
+                        <Input
+                            placeholder="https://example.com/category-page"
+                            value={scrapeUrl}
+                            onChange={(e) => setScrapeUrl(e.target.value)}
+                            className="bg-white"
+                        />
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleScrape}
+                            disabled={scraping || !scrapeUrl}
+                        >
+                            {scraping ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Fetch Content"}
+                        </Button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-2">
+                        Paste a category URL to automatically fill the name, description, image, and SEO settings.
+                    </p>
+                </CardContent>
+            </Card>
 
             <div className="grid gap-6 md:grid-cols-3">
                 <div className="md:col-span-2 space-y-6">

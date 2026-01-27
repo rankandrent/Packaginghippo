@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
-import { Loader2, ArrowLeft, Save, Plus, Trash2 } from "lucide-react"
+import { Loader2, ArrowLeft, Save, Plus, Trash2, Sparkles } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type Category = {
     id: string
@@ -58,6 +59,41 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
 
     // Helper for SectionBuilder type
     const [sections, setSections] = useState<Section[]>([])
+
+    const [scrapeUrl, setScrapeUrl] = useState("")
+    const [scraping, setScraping] = useState(false)
+
+    async function handleScrape() {
+        if (!scrapeUrl) return
+        setScraping(true)
+        try {
+            const res = await fetch('/api/cms/products/scrape', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: scrapeUrl }),
+            })
+            if (!res.ok) throw new Error('Failed to fetch')
+            const data = await res.json()
+
+            setProduct(prev => prev ? ({
+                ...prev,
+                name: data.name || prev.name,
+                slug: data.name ? data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") : prev.slug,
+                description: data.description || prev.description,
+                shortDesc: data.shortDesc || prev.shortDesc,
+                price: data.price || prev.price,
+                seoTitle: data.name || prev.seoTitle,
+                seoDesc: data.seoDesc || prev.seoDesc,
+                images: data.images && data.images.length > 0 ? data.images : prev.images
+            }) : null)
+            alert("Content fetched successfully!")
+        } catch (error) {
+            console.error(error)
+            alert("Error fetching content from URL")
+        } finally {
+            setScraping(false)
+        }
+    }
 
     useEffect(() => {
         const init = async () => {
@@ -151,6 +187,36 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                     <Save className="mr-2 h-4 w-4" /> Save Changes
                 </Button>
             </div>
+
+            <Card className="border-blue-200 bg-blue-50/30">
+                <CardHeader className="py-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-blue-600" />
+                        Quick Import from URL
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="py-3">
+                    <div className="flex gap-2">
+                        <Input
+                            placeholder="https://example.com/product-page"
+                            value={scrapeUrl}
+                            onChange={(e) => setScrapeUrl(e.target.value)}
+                            className="bg-white"
+                        />
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleScrape}
+                            disabled={scraping || !scrapeUrl}
+                        >
+                            {scraping ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Fetch Content"}
+                        </Button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-2">
+                        Paste a product URL to automatically fill the name, description, price, images, and SEO settings.
+                    </p>
+                </CardContent>
+            </Card>
 
             <div className="grid gap-8 md:grid-cols-3">
                 <div className="md:col-span-2 space-y-8">
