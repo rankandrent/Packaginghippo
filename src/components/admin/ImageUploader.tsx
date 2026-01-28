@@ -71,18 +71,28 @@ export function ImageUploader({
 
     const addByUrl = () => {
         if (!urlInput) return
-        if (maxFiles && value.length >= maxFiles) {
-            alert(`You can only have ${maxFiles} image(s).`)
+
+        // Split by newlines or commas and filter out empty strings
+        const urls = urlInput
+            .split(/[\n,]/)
+            .map(url => url.trim())
+            .filter(url => url.length > 0)
+
+        if (urls.length === 0) return
+
+        if (maxFiles && (value.length + urls.length) > maxFiles) {
+            alert(`You can only have up to ${maxFiles} images. Adding ${urls.length} would exceed this limit.`)
             return
         }
 
-        // Basic validation for URL
-        if (!urlInput.startsWith('http')) {
-            alert("Please enter a valid URL starting with http:// or https://")
+        // Basic validation for URLs
+        const invalidUrls = urls.filter(url => !url.startsWith('http'))
+        if (invalidUrls.length > 0) {
+            alert(`Please enter valid URLs starting with http:// or https://\nInvalid: ${invalidUrls[0]}${invalidUrls.length > 1 ? '...' : ''}`)
             return
         }
 
-        const newImages = maxFiles === 1 ? [urlInput] : [...value, urlInput]
+        const newImages = maxFiles === 1 ? [urls[0]] : [...value, ...urls]
         onChange(newImages)
         setUrlInput("")
     }
@@ -96,25 +106,30 @@ export function ImageUploader({
     return (
         <div className="space-y-4">
             {/* URL Input Section */}
-            <div className="flex gap-2">
-                <div className="relative flex-1">
-                    <LinkIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Paste image URL here..."
-                        className="pl-9 h-9"
+            <div className="flex flex-col gap-2">
+                <div className="relative">
+                    <LinkIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground z-10" />
+                    <textarea
+                        placeholder="Paste image URL(s) here... Separate by new lines or commas for bulk add."
+                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-9 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         value={urlInput}
                         onChange={(e) => setUrlInput(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
+                            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                                 e.preventDefault()
                                 addByUrl()
                             }
                         }}
                     />
                 </div>
-                <Button variant="secondary" size="sm" type="button" onClick={addByUrl} className="h-9">
-                    Add URL
-                </Button>
+                <div className="flex justify-between items-center bg-muted/30 p-2 rounded-md border border-dashed">
+                    <span className="text-[11px] text-muted-foreground">
+                        {urlInput.split(/[\n,]/).filter(u => u.trim()).length} URL(s) detected
+                    </span>
+                    <Button variant="secondary" size="sm" type="button" onClick={addByUrl} className="h-8">
+                        Add URL(s)
+                    </Button>
+                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">

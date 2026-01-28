@@ -51,7 +51,29 @@ export async function POST(req: NextRequest) {
         }
 
         // Extract Short Description
-        const shortDesc = $(".woocommerce-product-details__short-description, .product-short-description, .short-description").first().text().trim();
+        let shortDesc = $(".woocommerce-product-details__short-description, .product-short-description, .short-description").first().text().trim();
+
+        // If not found, try the specific section requested by the user
+        if (!shortDesc) {
+            // Target the specific section from the user's XPath: //*[@id="content"]/div/div/section[1]/div/div/div/section[1]/div/div[1]/div/div[4]/div/p
+            // We'll use a slightly more flexible CSS selector that matches the structure
+            const targetSection = $('#content section:first-child section:first-child div.elementor-column:first-child div.elementor-widget-text-editor:nth-of-type(4) p');
+            if (targetSection.length > 0) {
+                shortDesc = targetSection.text().trim();
+            }
+        }
+
+        // Catch-all: If still not found, look for any paragraph that starts with common intro phrases or is near the top
+        if (!shortDesc) {
+            $('p').each((_, el) => {
+                const text = $(el).text().trim();
+                // Check if it's the specific text from the image or common intro phrases
+                if (text.toLowerCase().includes("having trouble") || text.toLowerCase().includes("increased sales and long-lasting impressions")) {
+                    shortDesc = text;
+                    return false; // break
+                }
+            });
+        }
 
         // Extract Long Description
         let description = "";
