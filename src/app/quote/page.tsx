@@ -1,4 +1,5 @@
-"use client"
+\=\
+|"use client"
 
 import { QuoteForm } from "@/components/forms/QuoteForm"
 import { ShieldCheck, Truck, Clock, Sparkles, CheckCircle2 } from "lucide-react"
