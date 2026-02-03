@@ -38,6 +38,29 @@ async function getSiteSettings() {
   }
 }
 
+async function getTopProducts() {
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        isTopProduct: true,
+        isActive: true
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        images: true,
+      },
+      take: 10, // Limit to 10 products as per user request/design
+      orderBy: { updatedAt: 'desc' }
+    })
+    return products
+  } catch (error) {
+    console.error("Error fetching top products:", error)
+    return []
+  }
+}
+
 export async function generateMetadata() {
   const settings = await getSiteSettings()
   const seo = settings.seo || {}
@@ -63,13 +86,37 @@ export async function generateMetadata() {
   }
 }
 
+async function getTestimonials() {
+  try {
+    const testimonials = await prisma.testimonial.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: 'desc' },
+      take: 6
+    })
+    return testimonials
+  } catch (error) {
+    console.error("Error fetching testimonials:", error)
+    return []
+  }
+}
+
+import { HomeSchema } from "@/components/home/HomeSchema"
+
 export default async function Home() {
   const sections = await getHomepageData()
   const settings = await getSiteSettings()
+  const topProducts = await getTopProducts()
+  const testimonials = await getTestimonials()
 
   return (
     <main>
-      <HomePageClient sections={sections as any} settings={settings} />
+      <HomeSchema />
+      <HomePageClient
+        sections={sections as any}
+        settings={settings}
+        topProducts={topProducts}
+        testimonials={testimonials}
+      />
     </main>
   )
 }

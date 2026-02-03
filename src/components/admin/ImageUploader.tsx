@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { supabase } from "@/lib/supabase"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ImagePlus, X, Loader2, Link as LinkIcon, UploadCloud } from "lucide-react"
@@ -36,34 +36,27 @@ export function ImageUploader({
             }
 
             const file = e.target.files[0]
-            const fileExt = file.name.split(".").pop()
-            const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`
-            const filePath = `${fileName}`
+            const formData = new FormData()
+            formData.append("file", file)
 
-            // Upload to Supabase Storage
-            const { error: uploadError } = await supabase.storage
-                .from(bucket)
-                .upload(filePath, file)
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            })
 
-            if (uploadError) {
-                throw uploadError
-            }
-
-            // Get Public URL
-            const {
-                data: { publicUrl },
-            } = supabase.storage.from(bucket).getPublicUrl(filePath)
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || "Upload failed")
 
             // If maxFiles is 1, replace existing image. Otherwise append.
             if (maxFiles === 1) {
-                onChange([publicUrl])
+                onChange([data.url])
             } else {
-                onChange([...value, publicUrl])
+                onChange([...value, data.url])
             }
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error uploading image:", error)
-            alert("Error uploading image. Make sure the 'products' bucket exists or use Add by URL.")
+            alert(error.message || "Error uploading image")
         } finally {
             setUploading(false)
         }
@@ -162,7 +155,7 @@ export function ImageUploader({
                             )}
                             <div className="text-[10px] font-medium text-muted-foreground leading-tight">
                                 Upload File
-                                <span className="block font-normal opacity-60 text-[9px] mt-0.5">(Supabase)</span>
+                                <span className="block font-normal opacity-60 text-[9px] mt-0.5">(Cloudinary)</span>
                             </div>
                         </div>
                         <input

@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import prisma from "@/lib/db"
 import { RichTextEditor } from "@/components/admin/RichTextEditor" // We might need a read-only viewer, or just render HTML
+import { PageSchema } from "@/components/schema/PageSchema"
 
 // Allow caching for 60 seconds
 export const revalidate = 60
@@ -71,13 +72,7 @@ export default async function DynamicPage({ params }: Props) {
         <div className="container mx-auto px-4 py-12 max-w-4xl">
             <h1 className="text-4xl font-bold mb-8">{page.title}</h1>
 
-            {/* Search Engine Schema - Removed as schema_json is not in Prisma model yet */}
-            {/* {page.schema_json && (
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(page.schema_json) }}
-                />
-            )} */}
+            <PageSchema page={page} />
 
             {/* Content Rendering */}
             <div

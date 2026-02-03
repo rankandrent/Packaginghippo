@@ -17,7 +17,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog"
-import { Plus, Pencil, Trash2, Loader2, Search, Filter } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, Search, Filter, Eye } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 type Category = {
@@ -200,6 +200,14 @@ export default function CategoriesPage() {
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => window.open(`/services/${cat.slug}`, '_blank')}
+                                                    title="View Category"
+                                                >
+                                                    <Eye className="h-4 w-4 text-blue-500" />
+                                                </Button>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

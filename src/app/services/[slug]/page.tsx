@@ -45,6 +45,35 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
+import TestimonialsSection from "@/components/home/TestimonialsSection"
+
+async function getTestimonials(categoryId?: string) {
+    try {
+        const testimonials = await prisma.testimonial.findMany({
+            where: {
+                isActive: true,
+                OR: [
+                    { categoryId: categoryId },
+                    { productId: null, categoryId: null }
+                ]
+            },
+            take: 6
+        })
+
+        return testimonials.sort((a: any, b: any) => {
+            if (a.categoryId === categoryId && b.categoryId !== categoryId) return -1
+            if (a.categoryId !== categoryId && b.categoryId === categoryId) return 1
+            return 0
+        }).map((t: any) => ({
+            ...t,
+            rating: t.rating
+        }))
+    } catch (error) {
+        console.error("Error fetching testimonials:", error)
+        return []
+    }
+}
+
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
     const category = await getCategory(slug)
@@ -52,6 +81,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     if (!category) {
         notFound()
     }
+
+    const testimonials = await getTestimonials(category.id)
 
     // Cast sections to proper type
     let sections = (category.sections as unknown as Section[]) || []
@@ -135,6 +166,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     </div>
                 </section>
             )}
+
+            <TestimonialsSection testimonials={testimonials} />
         </main>
     )
 }

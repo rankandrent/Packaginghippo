@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
                 sections: sections || [], // Default to empty array
                 images: [],
                 isActive: false,
+                isTopProduct: false,
             },
         })
 
@@ -79,7 +80,7 @@ export async function PUT(request: NextRequest) {
             id, name, slug, description, shortDesc,
             images, minOrder, price, categoryId,
             dimensions, materials, finishings,
-            seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, isActive, sections
+            seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, isActive, isTopProduct, sections
         } = body
 
         const updated = await prisma.product.update({
@@ -101,6 +102,7 @@ export async function PUT(request: NextRequest) {
                 seoKeywords,
                 descriptionCollapsedHeight,
                 isActive,
+                isTopProduct,
                 sections, // Save dynamic sections
                 updatedAt: new Date(),
             },

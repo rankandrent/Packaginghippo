@@ -14,7 +14,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, Eye } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,6 +26,8 @@ type Product = {
     slug: string
     price: number | null
     isActive: boolean
+    isTopProduct: boolean
+    images: string[]
     category: { name: string; slug: string }
 }
 
@@ -103,6 +105,28 @@ export default function ProductsPage() {
         }
     }
 
+    async function toggleTopProduct(product: Product) {
+        try {
+            // Optimistic update
+            const newStatus = !product.isTopProduct
+            setProducts(products.map(p => p.id === product.id ? { ...p, isTopProduct: newStatus } : p))
+
+            const res = await fetch('/api/cms/products', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: product.id, isTopProduct: newStatus }),
+            })
+
+            if (!res.ok) throw new Error('Failed to update')
+            router.refresh()
+        } catch (error) {
+            console.error("Error updating top product status:", error)
+            alert("Error updating status")
+            // Revert on error
+            setProducts(products.map(p => p.id === product.id ? { ...p, isTopProduct: !product.isTopProduct } : p))
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex justify-center py-8">
@@ -158,10 +182,12 @@ export default function ProductsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead>Image</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Slug</TableHead>
                                 <TableHead>Category</TableHead>
                                 <TableHead>Price</TableHead>
+                                <TableHead>Top Product</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -169,16 +195,47 @@ export default function ProductsPage() {
                         <TableBody>
                             {products.map((product) => (
                                 <TableRow key={product.id}>
+                                    <TableCell>
+                                        <div className="h-12 w-12 rounded bg-muted/50 overflow-hidden relative border">
+                                            {product.images && product.images[0] ? (
+                                                <img
+                                                    src={product.images[0]}
+                                                    alt={product.name}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                                                    No Img
+                                                </div>
+                                            )}
+                                        </div>
+                                    </TableCell>
                                     <TableCell className="font-medium">{product.name}</TableCell>
                                     <TableCell className="text-muted-foreground">{product.slug}</TableCell>
                                     <TableCell>{product.category?.name || '-'}</TableCell>
                                     <TableCell>{product.price ? `$${product.price}` : 'Quote'}</TableCell>
+                                    <TableCell>
+                                        <input
+                                            type="checkbox"
+                                            checked={product.isTopProduct || false}
+                                            onChange={() => toggleTopProduct(product)}
+                                            className="h-4 w-4 rounded border-gray-300 text-primary cursor-pointer"
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <span className={`px-2 py-1 rounded-full text-xs ${product.isActive ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                                             {product.isActive ? 'Published' : 'Draft'}
                                         </span>
                                     </TableCell>
                                     <TableCell className="text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => window.open(`/products/${product.slug}`, '_blank')}
+                                            title="View Product"
+                                        >
+                                            <Eye className="h-4 w-4 text-blue-500" />
+                                        </Button>
                                         <Button
                                             variant="ghost"
                                             size="icon"

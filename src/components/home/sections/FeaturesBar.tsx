@@ -10,7 +10,10 @@ import {
     Sparkles,
     Shield,
     Zap,
-    CheckCircle
+    CheckCircle,
+    Monitor,
+    Ruler,
+    Ban
 } from "lucide-react"
 
 const iconMap: { [key: string]: any } = {
@@ -24,6 +27,9 @@ const iconMap: { [key: string]: any } = {
     shield: Shield,
     zap: Zap,
     check: CheckCircle,
+    monitor: Monitor,
+    ruler: Ruler,
+    ban: Ban
 }
 
 interface Feature {
@@ -35,16 +41,16 @@ interface Feature {
 export function FeaturesBar({ data }: { data: any }) {
     const heading = data?.heading || "ONE PLACE - Where you get all your custom packaging needs"
     const features: Feature[] = data?.items || [
-        { icon: "dollar", title: "NO DIE &", subtitle: "PLATE CHARGES" },
+        { icon: "ban", title: "NO DIE &", subtitle: "PLATE CHARGES" },
         { icon: "clock", title: "QUICK", subtitle: "TURNAROUND TIME" },
         { icon: "truck", title: "FREE", subtitle: "SHIPPING" },
         { icon: "package", title: "STARTING FROM", subtitle: "50 BOXES" },
-        { icon: "palette", title: "CUSTOMIZE SIZE", subtitle: "& STYLE" },
-        { icon: "pen", title: "FREE GRAPHIC", subtitle: "DESIGNING" },
+        { icon: "ruler", title: "CUSTOMIZE SIZE", subtitle: "& STYLE" },
+        { icon: "monitor", title: "FREE GRAPHIC", subtitle: "DESIGNING" },
     ]
 
     return (
-        <section className="py-8 bg-gradient-to-r from-gray-100 to-gray-50 border-y border-gray-200">
+        <section className="py-12 bg-[#F0FDF4] border-y border-emerald-100">
             <div className="container mx-auto px-4">
                 {heading && (
                     <h3 className="text-center text-lg md:text-xl font-semibold text-gray-800 mb-8">
@@ -60,8 +66,8 @@ export function FeaturesBar({ data }: { data: any }) {
                                 key={idx}
                                 className="flex flex-col items-center text-center group"
                             >
-                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-gray-400 flex items-center justify-center mb-3 group-hover:border-primary group-hover:bg-primary/5 transition-all">
-                                    <IconComponent className="w-8 h-8 md:w-10 md:h-10 text-gray-600 group-hover:text-primary transition-colors" />
+                                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-emerald-200 bg-white flex items-center justify-center mb-4 group-hover:border-emerald-500 group-hover:shadow-lg transition-all duration-300">
+                                    <IconComponent className="w-10 h-10 md:w-12 md:h-12 text-emerald-600 group-hover:text-emerald-700 transition-colors" />
                                 </div>
                                 <p className="text-xs md:text-sm font-bold text-gray-800 uppercase tracking-wide">
                                     {feature.title}

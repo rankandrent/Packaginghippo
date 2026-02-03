@@ -13,10 +13,10 @@ export function LogoLoop({ data }: { data: any }) {
     ]
 
     return (
-        <section className="py-12 bg-white border-y border-gray-100 overflow-hidden">
-            <div className="container mx-auto px-4 mb-4 text-center">
+        <section className="py-6 bg-white border-y border-gray-100 overflow-hidden">
+            <div className="container mx-auto px-4 mb-2 text-center">
                 {data.heading && (
-                    <h3 className="text-xs font-black text-blue-900/40 uppercase tracking-[0.2em] mb-4">
+                    <h3 className="text-xs font-black text-blue-900/40 uppercase tracking-[0.2em] mb-2">
                         {data.heading}
                     </h3>
                 )}
@@ -34,12 +34,12 @@ export function LogoLoop({ data }: { data: any }) {
                         ease: "linear",
                         repeat: Infinity,
                     }}
-                    className="flex flex-none gap-10 md:gap-16 items-center py-4"
+                    className="flex flex-none gap-6 md:gap-12 items-center py-2"
                 >
                     {[...logos, ...logos, ...logos].map((logo: string | any, index: number) => (
-                        <div key={index} className="flex items-center justify-center min-w-[100px] md:min-w-[140px] transition-all duration-500 hover:scale-110">
+                        <div key={index} className="flex items-center justify-center min-w-[140px] md:min-w-[200px] transition-all duration-500 hover:scale-110">
                             {typeof logo === 'string' && logo.startsWith('http') ? (
-                                <div className="relative h-12 w-32 filter grayscale hover:grayscale-0 transition-all duration-500 opacity-50 hover:opacity-100">
+                                <div className="relative h-20 w-48 filter grayscale hover:grayscale-0 transition-all duration-500 opacity-50 hover:opacity-100">
                                     <Image
                                         src={logo}
                                         alt="Client Logo"
@@ -48,7 +48,7 @@ export function LogoLoop({ data }: { data: any }) {
                                     />
                                 </div>
                             ) : (
-                                <span className="text-lg md:text-xl font-black text-gray-300 hover:text-blue-900 transition-all duration-500 uppercase tracking-tighter opacity-50 hover:opacity-100 italic">
+                                <span className="text-xl md:text-2xl font-black text-gray-300 hover:text-blue-900 transition-all duration-500 uppercase tracking-tighter opacity-50 hover:opacity-100 italic">
                                     {typeof logo === 'string' ? logo : logo.name}
                                 </span>
                             )}

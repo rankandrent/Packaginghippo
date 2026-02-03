@@ -17,10 +17,10 @@ type NavbarProps = {
 }
 
 const DEFAULT_MENU = [
-    { label: "Home", href: "/" },
-    { label: "Custom Packaging", href: "/products", hasChildren: true },
-    { label: "Request A Quote", href: "/quote" },
-    { label: "Contact Us", href: "/contact" }
+    { id: "home", label: "Home", href: "/" },
+    { id: "products", label: "Custom Packaging", href: "/products", hasChildren: true },
+    { id: "quote", label: "Request A Quote", href: "/quote" },
+    { id: "contact", label: "Contact Us", href: "/contact" }
 ]
 
 export function Navbar({ settings, menuData }: NavbarProps) {

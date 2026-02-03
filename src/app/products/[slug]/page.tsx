@@ -49,11 +49,60 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
+import TestimonialsSection from "@/components/home/TestimonialsSection"
+
+async function getTestimonials(productId?: string) {
+    try {
+        const where: any = { isActive: true }
+        if (productId) {
+            where.productId = productId
+        } else {
+            // If no product ID, maybe we want general ones? 
+            // But for product page we strictly want product ones?
+            // Or maybe we want "General + Product"?
+            // Let's stick to strict product for now as requested.
+        }
+
+        const testimonials = await prisma.testimonial.findMany({
+            where: {
+                isActive: true,
+                OR: [
+                    { productId: productId }, // Specific to this product
+                    { productId: null, categoryId: null } // General site-wide (fallback/mix)
+                ]
+            },
+            orderBy: [
+                { productId: 'desc' }, // items with productId come first (if we sort by that? No, ID isn't sortable like that easily. But we can sort by creation)
+                { createdAt: 'desc' }
+            ],
+            take: 6
+        })
+
+        // We want to prioritize specific ones.
+        // Prisma sort by relevance isn't native.
+        // Let's fetch specific ones separate or sort in JS.
+        // JS sort:
+        return testimonials.sort((a: any, b: any) => {
+            if (a.productId === productId && b.productId !== productId) return -1
+            if (a.productId !== productId && b.productId === productId) return 1
+            return 0
+        }).map((t: any) => ({
+            ...t,
+            rating: t.rating
+        }))
+    } catch (error) {
+        console.error("Error fetching testimonials:", error)
+        return []
+    }
+}
+
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
     const product = await getProduct(slug)
 
     if (!product) notFound()
+
+    const testimonials = await getTestimonials(product.id)
 
     const sections = (product.sections as unknown as Section[]) || []
 
@@ -161,6 +210,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     </div>
                 </section>
             )}
+
+            <TestimonialsSection testimonials={testimonials} />
         </main>
     )
 }

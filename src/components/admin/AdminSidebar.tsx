@@ -16,7 +16,8 @@ import {
     Menu,
     BookOpen,
     MessageSquare,
-    AlertTriangle
+    AlertTriangle,
+    Star
 } from "lucide-react"
 
 const sidebarItems = [
@@ -44,6 +45,11 @@ const sidebarItems = [
         title: "Homepage",
         href: "/dashboard/homepage",
         icon: Home,
+    },
+    {
+        title: "Testimonials",
+        href: "/dashboard/testimonials",
+        icon: Star,
     },
     {
         title: "Settings",

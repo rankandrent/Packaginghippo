@@ -93,6 +93,7 @@ model ProductCategory {
   order       Int       @default(0)
   isActive    Boolean   @default(false)
   products    Product[]
+  testimonials Testimonial[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -124,6 +125,8 @@ model Product {
   descriptionCollapsedHeight Int @default(300)
 
   isActive    Boolean   @default(false)
+  isTopProduct Boolean  @default(false)
+  testimonials Testimonial[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -211,4 +214,26 @@ model BlogPost {
   publishedAt DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+}
+
+// ============================================
+// TESTIMONIALS
+// ============================================
+
+model Testimonial {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  role      String? // e.g., "CEO, Company X"
+  content   String
+  rating    Float    @default(5.0)
+  image     String? // Avatar URL
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productId String? @db.ObjectId
+  product   Product? @relation(fields: [productId], references: [id])
+  
+  categoryId String? @db.ObjectId
+  category   ProductCategory? @relation(fields: [categoryId], references: [id])
 }

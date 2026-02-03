@@ -41,6 +41,7 @@ type Product = {
     seoKeywords: string | null
     descriptionCollapsedHeight: number
     isActive: boolean
+    isTopProduct: boolean
     sections: any // Json
 
     // Legacy fields from Supabase version if needed or just use sections?
@@ -273,6 +274,16 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                             />
                             <Label htmlFor="isActive">Published</Label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="isTopProduct"
+                                checked={product.isTopProduct || false}
+                                onChange={(e) => setProduct({ ...product, isTopProduct: e.target.checked })}
+                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                            />
+                            <Label htmlFor="isTopProduct">Top Product</Label>
                         </div>
                     </div>
 
