@@ -5,6 +5,7 @@ import prisma from "@/lib/db"
 import { DynamicTOC } from "@/components/blog/DynamicTOC"
 import { ShareButtons } from "@/components/blog/ShareButtons"
 import { QuoteForm } from "@/components/forms/QuoteForm"
+import { JsonLd } from "@/components/seo/JsonLd"
 
 async function getBlogPost(slug: string) {
     const post = await prisma.blogPost.findUnique({
@@ -97,6 +98,18 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                 }}
             />
 
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://packaginghippo.com" },
+                        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://packaginghippo.com/blog" },
+                        { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://packaginghippo.com/blog/${post.slug}` }
+                    ]
+                }}
+            />
+
             {/* Header / Hero */}
             <div className="bg-gray-50 pt-24 pb-12 md:pt-32 border-b">
                 <div className="container mx-auto px-4">
@@ -140,7 +153,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                     {/* Left Sidebar - Table of Contents */}
                     <div className="hidden lg:block">
                         <div className="sticky top-32 space-y-8">
-                            <DynamicTOC />
+                            <DynamicTOC selector=".rich-text" />
 
                             <div className="pt-8 space-y-4 border-t">
                                 <h3 className="font-bold text-blue-900 uppercase tracking-wider text-xs border-b pb-2 text-center md:text-left">Share This Post</h3>

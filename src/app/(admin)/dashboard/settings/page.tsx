@@ -17,6 +17,7 @@ type GeneralSettings = {
     email: string
     address: string
     logoUrl: string
+    whatsapp?: string
 }
 
 type SeoSettings = {
@@ -33,6 +34,8 @@ type FooterSettings = {
         instagram?: string
         linkedin?: string
         twitter?: string
+        behance?: string
+        youtube?: string
     }
     columns?: {
         productsTitle?: string
@@ -40,6 +43,7 @@ type FooterSettings = {
         contactTitle?: string
     }
     copyrightText?: string
+    paymentMethodsImage?: string
 }
 
 export default function SettingsPage() {
@@ -144,10 +148,17 @@ export default function SettingsPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Phone</Label>
                             <Input
                                 value={general.phone}
                                 onChange={(e) => setGeneral({ ...general, phone: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>WhatsApp Number</Label>
+                            <Input
+                                value={general.whatsapp || ''}
+                                onChange={(e) => setGeneral({ ...general, whatsapp: e.target.value })}
+                                placeholder="e.g. +1234567890"
                             />
                         </div>
                         <div className="space-y-2">
@@ -279,6 +290,22 @@ export default function SettingsPage() {
                                 placeholder="https://twitter.com/..."
                             />
                         </div>
+                        <div className="space-y-2">
+                            <Label>Behance URL</Label>
+                            <Input
+                                value={footer.social?.behance ?? ''}
+                                onChange={(e) => setFooter({ ...footer, social: { ...footer.social, behance: e.target.value } })}
+                                placeholder="https://behance.net/..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>YouTube URL</Label>
+                            <Input
+                                value={footer.social?.youtube ?? ''}
+                                onChange={(e) => setFooter({ ...footer, social: { ...footer.social, youtube: e.target.value } })}
+                                placeholder="https://youtube.com/..."
+                            />
+                        </div>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-4">
@@ -315,6 +342,18 @@ export default function SettingsPage() {
                             onChange={(e) => setFooter({ ...footer, copyrightText: e.target.value })}
                             placeholder="© 2024 PackagingHippo. All rights reserved."
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Payment Methods / Trust Badges Image URL</Label>
+                        <Input
+                            value={footer.paymentMethodsImage ?? ''}
+                            onChange={(e) => setFooter({ ...footer, paymentMethodsImage: e.target.value })}
+                            placeholder="https://example.com/payment-icons.png"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            If provided, this image will replace the default Trustpilot and Payment icons section in the footer.
+                        </p>
                     </div>
 
                     <Button

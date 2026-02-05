@@ -11,7 +11,9 @@ interface ShareButtonsProps {
 }
 
 export function ShareButtons({ title, slug, variant = 'sidebar' }: ShareButtonsProps) {
-    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/blog/${slug}` : ""
+    const shareUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}${window.location.pathname}`
+        : ""
 
     const copyToClipboard = () => {
         if (typeof window !== 'undefined') {

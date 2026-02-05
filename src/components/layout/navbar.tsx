@@ -37,15 +37,15 @@ export function Navbar({ settings, menuData }: NavbarProps) {
         if (hasChildren) {
             return (
                 <div key={item.id} className="group relative h-full flex items-center">
-                    <Link href={item.href} className="text-sm font-bold text-gray-700 group-hover:text-blue-900 uppercase tracking-wide flex items-center gap-1">
+                    <Link href={item.href} className="text-sm font-bold text-gray-700 group-hover:text-primary uppercase tracking-wide flex items-center gap-1">
                         {item.label} <ChevronDown className="w-3 h-3" />
                     </Link>
                     {/* Nested Dropdown */}
-                    <div className="absolute top-full left-0 min-w-[250px] bg-white shadow-xl border-t-2 border-yellow-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-2 rounded-b-lg">
+                    <div className="absolute top-full left-0 min-w-[250px] bg-white shadow-xl border-t-2 border-accent opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-2 rounded-b-lg">
                         <ul className="space-y-1">
                             {item.children.map((child: any) => (
                                 <li key={child.id}>
-                                    <Link href={child.href} className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-900 hover:bg-gray-50 rounded">
+                                    <Link href={child.href} className="block px-4 py-2 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded">
                                         {child.label}
                                     </Link>
                                     {/* Support 2nd level nesting if needed? For now simple dropdown */}
@@ -58,7 +58,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
         }
 
         return (
-            <Link key={item.id} href={item.href} className="text-sm font-bold text-gray-700 hover:text-blue-900 uppercase tracking-wide h-full flex items-center">
+            <Link key={item.id} href={item.href} className="text-sm font-bold text-gray-700 hover:text-primary uppercase tracking-wide h-full flex items-center">
                 {item.label}
             </Link>
         )
@@ -78,14 +78,14 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                     {/* Logo */}
                     <Link href="/" className="flex-shrink-0 flex items-center gap-2">
                         {/* Placeholder Logo Icon */}
-                        <div className="w-10 h-10 bg-blue-900 flex items-center justify-center rounded text-white font-bold text-xl">
+                        <div className="w-10 h-10 bg-primary flex items-center justify-center rounded text-white font-bold text-xl">
                             PH
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-2xl font-black text-blue-900 tracking-tighter uppercase leading-none">
+                            <span className="text-2xl font-black text-primary tracking-tighter uppercase leading-none">
                                 {siteName.replace("Hippo", "")}
                             </span>
-                            <span className="text-xl font-bold text-yellow-500 uppercase leading-none tracking-widest">
+                            <span className="text-xl font-bold text-accent uppercase leading-none tracking-widest">
                                 Hippo
                             </span>
                         </div>
@@ -99,7 +99,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                 placeholder="Search products..."
                                 className="w-full bg-gray-50 border-gray-200 rounded-l-md rounded-r-none h-11 focus-visible:ring-0 focus-visible:ring-offset-0"
                             />
-                            <Button className="h-11 rounded-l-none rounded-r-md bg-blue-900 hover:bg-blue-800 px-6">
+                            <Button className="h-11 rounded-l-none rounded-r-md bg-primary hover:bg-primary/90 px-6">
                                 <Search className="w-5 h-5" />
                             </Button>
                         </div>
@@ -108,15 +108,15 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                     {/* Right Actions */}
                     <div className="hidden lg:flex items-center gap-8">
                         <div className="flex items-center gap-3">
-                            <Phone className="w-8 h-8 text-blue-900 fill-blue-900/10" />
+                            <Phone className="w-8 h-8 text-primary fill-primary/10" />
                             <div className="flex flex-col">
                                 <span className="text-xs text-gray-500 font-medium">Call Us 24/7</span>
                                 <span className="text-sm font-bold text-gray-900">{phone}</span>
                             </div>
                         </div>
                         <div className="relative">
-                            <ShoppingCart className="w-8 h-8 text-blue-900" />
-                            <span className="absolute -top-1 -right-1 bg-blue-900 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
+                            <ShoppingCart className="w-8 h-8 text-primary" />
+                            <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
                         </div>
                     </div>
 
@@ -134,7 +134,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                         {displayItems.map((item) => renderMenuItem(item))}
                     </nav>
 
-                    <Button asChild className="bg-blue-900 hover:bg-blue-800 text-white font-bold uppercase tracking-wider rounded-md h-10 px-6">
+                    <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider rounded-md h-10 px-6">
                         <Link href="/quote">Request A Quote</Link>
                     </Button>
                 </div>
@@ -155,10 +155,10 @@ export function Navbar({ settings, menuData }: NavbarProps) {
 
                     <div className="pt-2 flex flex-col gap-3">
                         <div className="flex items-center gap-3">
-                            <Phone className="w-5 h-5 text-blue-900" />
+                            <Phone className="w-5 h-5 text-primary" />
                             <span className="text-sm font-bold">{phone}</span>
                         </div>
-                        <Button asChild className="w-full bg-blue-900 hover:bg-blue-800">
+                        <Button asChild className="w-full bg-primary hover:bg-primary/90">
                             <Link href="/quote" onClick={() => setIsOpen(false)}>Request A Quote</Link>
                         </Button>
                     </div>

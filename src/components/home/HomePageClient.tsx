@@ -22,6 +22,7 @@ import { FeaturesBar } from "./sections/FeaturesBar"
 import { QuoteSection } from "./sections/QuoteSection"
 import { TopProductsSection } from "./TopProductsSection"
 import TestimonialsSection from "./TestimonialsSection"
+import { CustomQuoteFormSection } from "./CustomQuoteFormSection"
 
 type HomepageData = Record<string, any>
 
@@ -50,6 +51,7 @@ const SECTION_COMPONENTS: Record<string, React.FC<{ data: any }>> = {
     customer_reviews: CustomerReviews,
     features_bar: FeaturesBar,
     quote_form: QuoteSection,
+    custom_quote_form: (props: { data: any }) => <CustomQuoteFormSection image={props.data?.image} />,
 }
 
 export default function HomePageClient({

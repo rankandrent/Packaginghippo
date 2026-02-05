@@ -272,6 +272,12 @@ export default function HomepageEditor() {
                         ]
                     }
                     break
+                case 'custom_quote_form':
+                    title = 'Custom Quote Form'
+                    content = {
+                        image: ''
+                    }
+                    break
                 default:
                     title = `New ${key.replace(/_/g, ' ')}`
                     content = { heading: 'New Section' }
@@ -379,6 +385,9 @@ export default function HomepageEditor() {
                 </Button>
                 <Button onClick={() => createSection('logo_loop')} className="bg-blue-900 hover:bg-blue-800">
                     <Plus className="w-4 h-4 mr-2" /> Add Logo Carousel
+                </Button>
+                <Button onClick={() => createSection('custom_quote_form')}>
+                    <Plus className="w-4 h-4 mr-2" /> Add Quote Form
                 </Button>
             </div>
 
@@ -553,6 +562,48 @@ function SectionEditor({ section, onUpdate }: { section: HomepageSection, onUpda
                             bucket="products" // Reusing products bucket for now
                             onChange={(urls) => {
                                 if (urls.length > 0) addLogo(urls[0])
+                            }}
+                            maxFiles={1}
+                        />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Custom Quote Form Editor
+    if (section.sectionKey === 'custom_quote_form') {
+        return (
+            <div className="space-y-4">
+                <div className="bg-blue-50 p-4 rounded text-sm text-blue-800">
+                    Customize the quote form section. Currently, you can only update the sidebar image.
+                </div>
+                <div className="space-y-2">
+                    <Label>Side Image</Label>
+                    <div className="border rounded-md p-4 bg-muted/20">
+                        {content.image ? (
+                            <div className="relative aspect-video w-full max-h-60 mb-4 overflow-hidden rounded-md border bg-white">
+                                <img src={content.image} alt="Side Image" className="w-full h-full object-contain" />
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute top-2 right-2"
+                                    onClick={() => onUpdate('image', '')}
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-muted-foreground text-sm">
+                                No image uploaded
+                            </div>
+                        )}
+                        <ImageUploader
+                            value={[]}
+                            bucket="homepage"
+                            onChange={(urls) => {
+                                if (urls.length > 0) onUpdate('image', urls[0])
                             }}
                             maxFiles={1}
                         />

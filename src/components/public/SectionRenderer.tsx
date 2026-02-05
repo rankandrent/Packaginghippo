@@ -8,28 +8,34 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowRight, CheckCircle, ChevronDown, Package, Star, Leaf, Box, Quote, Clock, DollarSign, Truck, Palette, Pen, Sparkles, Shield, Zap, Check } from "lucide-react"
+import { PopularProducts } from "@/components/category/PopularProducts"
 
 // Types matching SectionBuilder
 export type Section = {
     id: string
-    type: 'hero' | 'text' | 'benefits' | 'faq' | 'cta' | 'gallery' | 'product_grid' | 'seo_content' | 'customer_reviews' | 'features_bar' | 'logo_loop'
+    type: 'hero' | 'text' | 'benefits' | 'faq' | 'cta' | 'gallery' | 'product_grid' | 'seo_content' | 'customer_reviews' | 'features_bar' | 'logo_loop' | 'popular_products'
     title?: string
     content: any
 }
 
-export function SectionRenderer({ sections }: { sections: Section[] }) {
+export function SectionRenderer({ sections, popularProducts, categoryName }: { sections: Section[], popularProducts?: any[], categoryName?: string }) {
     if (!sections || !Array.isArray(sections)) return null
 
     return (
         <div className="flex flex-col">
             {sections.map(section => (
-                <RenderSection key={section.id} section={section} />
+                <RenderSection
+                    key={section.id}
+                    section={section}
+                    popularProducts={popularProducts}
+                    categoryName={categoryName}
+                />
             ))}
         </div>
     )
 }
 
-function RenderSection({ section }: { section: Section }) {
+function RenderSection({ section, popularProducts, categoryName }: { section: Section, popularProducts?: any[], categoryName?: string }) {
     switch (section.type) {
         case 'hero':
             return <HeroSection content={section.content} />
@@ -37,6 +43,10 @@ function RenderSection({ section }: { section: Section }) {
             return <TextSection content={section.content} />
         case 'product_grid':
             return <ProductGridSection content={section.content} />
+        case 'popular_products':
+            // If data is passed, use it. Otherwise, render nothing or fetch (but we prefer passing)
+            if (!popularProducts) return null
+            return <PopularProducts categoryName={categoryName || "Packaging"} products={popularProducts} />
         case 'seo_content':
             return <SeoContentSection content={section.content} />
         case 'benefits':
@@ -60,7 +70,7 @@ function RenderSection({ section }: { section: Section }) {
 
 // --- SUB COMPONENTS ---
 
-export function HeroSection({ content }: { content: any }) {
+export function HeroSection({ content, breadcrumbs }: { content: any, breadcrumbs?: React.ReactNode }) {
     return (
         <section className="relative bg-zinc-950 pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/20 via-zinc-950 to-zinc-950"></div>
@@ -70,6 +80,11 @@ export function HeroSection({ content }: { content: any }) {
                 </div>
             )}
             <div className="container mx-auto px-4 relative z-10">
+                {breadcrumbs && (
+                    <div className="mb-8">
+                        {breadcrumbs}
+                    </div>
+                )}
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-6">
                         <h1 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
@@ -182,9 +197,10 @@ function ProductGridSection({ content }: { content: any }) {
                                 <CardContent className="p-5 bg-white">
                                     <h3 className="font-bold text-lg text-gray-900 group-hover:text-yellow-600 transition-colors line-clamp-2">{item.name}</h3>
                                     <div className="mt-4 flex items-center justify-between text-sm">
-                                        <span className="font-medium text-gray-500">MOQ: {item.minOrder || '100'}</span>
-                                        <div className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full">
-                                            {item.isCustomizable !== false ? 'Customizable' : 'Standard'}
+                                        <div className="mt-4 flex items-center justify-between text-sm">
+                                            <div className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full">
+                                                {item.isCustomizable !== false ? 'Customizable' : 'Standard'}
+                                            </div>
                                         </div>
                                     </div>
                                 </CardContent>

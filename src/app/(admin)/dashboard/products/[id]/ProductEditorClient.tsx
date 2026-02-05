@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
+import { ProductTabsEditor } from "@/components/admin/ProductTabsEditor"
 import { Loader2, ArrowLeft, Save, Plus, Trash2 } from "lucide-react"
 
 type Category = {
@@ -42,7 +43,9 @@ type Product = {
     descriptionCollapsedHeight: number
     isActive: boolean
     isTopProduct: boolean
+    isFeaturedInCategory: boolean
     sections: any // Json
+    tabs: any // Json for product tabs
 
     // Legacy fields from Supabase version if needed or just use sections?
     // User wants "sections". SectionBuilder is enough for generic "benefits/features".
@@ -65,6 +68,7 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
 
     // Helper for SectionBuilder type
     const [sections, setSections] = useState<Section[]>([])
+    const [tabs, setTabs] = useState<any>({})
 
     useEffect(() => {
         const init = async () => {
@@ -84,6 +88,10 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
             // Parse sections if existing
             if (data.product.sections && Array.isArray(data.product.sections)) {
                 setSections(data.product.sections)
+            }
+            // Parse tabs if existing
+            if (data.product.tabs) {
+                setTabs(data.product.tabs)
             }
         } catch (error) {
             console.error("Error fetching product:", error)
@@ -112,7 +120,8 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...product,
-                    sections: sections // Save the sections from state
+                    sections: sections, // Save the sections from state
+                    tabs: tabs // Save the tabs from state
                 }),
             })
 
@@ -224,6 +233,9 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                         </div>
                         <SectionBuilder sections={sections} onChange={setSections} />
                     </div>
+
+                    {/* PRODUCT TABS */}
+                    <ProductTabsEditor value={tabs} onChange={setTabs} />
                 </div>
 
                 <div className="space-y-6">
@@ -284,6 +296,16 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                             />
                             <Label htmlFor="isTopProduct">Top Product</Label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="isFeaturedInCategory"
+                                checked={product.isFeaturedInCategory || false}
+                                onChange={(e) => setProduct({ ...product, isFeaturedInCategory: e.target.checked })}
+                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                            />
+                            <Label htmlFor="isFeaturedInCategory">Featured in Category (Popular)</Label>
                         </div>
                     </div>
 

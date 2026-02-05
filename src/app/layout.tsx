@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import prisma from "@/lib/db";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +28,12 @@ async function getSettings() {
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const seo = settings.seo || {};
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://packaginghippo.com';
+
+  // Use host from headers to ensure canonicals match the current environment (fixed staging canonical issue)
+  const headerList = await headers();
+  const host = headerList.get('host') || 'packaginghippo.com';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
 
   return {
     metadataBase: new URL(baseUrl),
@@ -36,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: seo.defaultDescription || "Premium custom packaging boxes with your logo. Get a free quote today.",
     keywords: seo.defaultKeywords,
     alternates: {
-      canonical: '/',
+      canonical: './',
     },
     openGraph: {
       type: 'website',
@@ -68,9 +76,60 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Packaging Hippo",
+            "url": "https://packaginghippo.com",
+            "logo": "https://packaginghippo.com/logo.png",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "+1-510-500-9533",
+              "contactType": "customer service",
+              "email": "sales@packaginghippo.com"
+            }
+          }}
+        />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Packaging Hippo",
+            "url": "https://packaginghippo.com",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://packaginghippo.com/products?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }}
+        />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "Packaging Hippo",
+            "image": "https://packaginghippo.com/logo.png",
+            "url": "https://packaginghippo.com",
+            "telephone": "+1-510-500-8533",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "123 Packaging Street",
+              "addressLocality": "New York",
+              "addressRegion": "NY",
+              "postalCode": "10001",
+              "addressCountry": "US"
+            },
+            "priceRange": "$$"
+          }}
+        />
         <Navbar settings={generalSettings} menuData={menuSettings} />
         <main>{children}</main>
         <Footer />
+        <WhatsAppButton />
       </body>
     </html>
   );

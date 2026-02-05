@@ -80,7 +80,7 @@ export async function PUT(request: NextRequest) {
             id, name, slug, description, shortDesc,
             images, minOrder, price, categoryId,
             dimensions, materials, finishings,
-            seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, isActive, isTopProduct, sections
+            seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, isActive, isTopProduct, sections, tabs
         } = body
 
         const updated = await prisma.product.update({
@@ -104,6 +104,7 @@ export async function PUT(request: NextRequest) {
                 isActive,
                 isTopProduct,
                 sections, // Save dynamic sections
+                tabs, // Save product tabs
                 updatedAt: new Date(),
             },
         })

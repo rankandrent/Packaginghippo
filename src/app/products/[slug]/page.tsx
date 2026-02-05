@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/public/Breadcrumbs"
 import { ProductHeroQuoteForm } from "@/components/forms/ProductHeroQuoteForm"
 import { CollapsibleText } from "@/components/public/CollapsibleText"
+import { JsonLd } from "@/components/seo/JsonLd"
+import { ProductTabs } from "@/components/product/ProductTabs"
 
 export const revalidate = 60
 
@@ -114,6 +116,37 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
     return (
         <main className="min-h-screen bg-white">
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "Product",
+                    "name": product.name,
+                    "description": product.shortDesc || product.seoDesc,
+                    "image": product.images,
+                    "brand": {
+                        "@type": "Brand",
+                        "name": "Packaging Hippo"
+                    },
+                    "offers": {
+                        "@type": "AggregateOffer",
+                        "availability": "https://schema.org/InStock",
+                        "priceCurrency": "USD",
+                        "lowPrice": product.price || "1.00"
+                    }
+                }}
+            />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": breadcrumbItems.map((item, index) => ({
+                        "@type": "ListItem",
+                        "position": index + 1,
+                        "name": item.label,
+                        "item": item.href ? `https://packaginghippo.com${item.href}` : undefined
+                    }))
+                }}
+            />
             <section className="pt-6 pb-12 bg-white">
                 <div className="container mx-auto px-4">
                     <div className="mb-4">
@@ -210,6 +243,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     </div>
                 </section>
             )}
+
+            <ProductTabs tabs={product.tabs as any} />
 
             <TestimonialsSection testimonials={testimonials} />
         </main>

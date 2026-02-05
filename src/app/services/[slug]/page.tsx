@@ -2,17 +2,30 @@ import { notFound } from "next/navigation"
 import prisma from "@/lib/db"
 import { Metadata } from "next"
 import { SectionRenderer, Section } from "@/components/public/SectionRenderer"
-import { QuoteForm } from "@/components/forms/QuoteForm"
 
 
 import { Breadcrumbs } from "@/components/public/Breadcrumbs"
 import { CollapsibleText } from "@/components/public/CollapsibleText"
+import { JsonLd } from "@/components/seo/JsonLd"
 
 export const revalidate = 60 // ISR
 
 async function getCategory(slug: string) {
     const category = await prisma.productCategory.findUnique({
         where: { slug, isActive: true },
+        include: {
+            products: {
+                where: { isActive: true },
+                select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    shortDesc: true,
+                    images: true,
+                    price: true
+                }
+            }
+        }
     })
     return category
 }
@@ -74,6 +87,90 @@ async function getTestimonials(categoryId?: string) {
     }
 }
 
+
+async function getRelatedCategories(currentSlug: string) {
+    const categories = await prisma.productCategory.findMany({
+        where: {
+            isActive: true,
+            slug: { not: currentSlug }
+        },
+        take: 4,
+        orderBy: {
+            createdAt: 'desc' // Or 'random' if supported, but simple ordering for now
+        },
+        select: {
+            id: true,
+            name: true,
+            slug: true,
+            imageUrl: true,
+            description: true
+        }
+    });
+    return categories;
+}
+
+async function getPopularProducts(categoryId: string) {
+    const products = await prisma.product.findMany({
+        where: {
+            categoryId: categoryId,
+            isActive: true,
+            isFeaturedInCategory: true
+        },
+        take: 8,
+        select: {
+            id: true,
+            name: true,
+            slug: true,
+            shortDesc: true,
+            images: true,
+            price: true
+        }
+    });
+
+    // If no manually selected products, fallback to top products or just random active ones
+    if (products.length === 0) {
+        return await prisma.product.findMany({
+            where: {
+                categoryId: categoryId,
+                isActive: true
+            },
+            take: 4,
+            orderBy: {
+                createdAt: 'desc'
+            },
+            select: {
+                id: true,
+                name: true,
+                slug: true,
+                shortDesc: true,
+                images: true,
+                price: true
+            }
+        })
+    }
+
+    return products;
+}
+
+import { RelatedCategories } from "@/components/category/RelatedCategories"
+import { PopularProducts } from "@/components/category/PopularProducts"
+import { CustomQuoteFormSection } from "@/components/home/CustomQuoteFormSection"
+
+async function getQuoteFormImage() {
+    try {
+        const section = await prisma.homepageSection.findFirst({
+            where: {
+                sectionKey: 'custom_quote_form',
+                isActive: true
+            }
+        })
+        return (section?.content as any)?.image || null
+    } catch (error) {
+        console.error("Error fetching quote form image:", error)
+        return null
+    }
+}
+
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
     const category = await getCategory(slug)
@@ -83,6 +180,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     }
 
     const testimonials = await getTestimonials(category.id)
+    const relatedCategories = await getRelatedCategories(slug)
+    const popularProducts = await getPopularProducts(category.id)
+    const quoteFormImage = await getQuoteFormImage()
 
     // Cast sections to proper type
     let sections = (category.sections as unknown as Section[]) || []
@@ -99,6 +199,21 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     image: category.imageUrl || "",
                     ctaText: "Get a Quote",
                     ctaLink: "/quote"
+                }
+            },
+            {
+                id: 'default-popular',
+                type: 'popular_products',
+                content: {}
+            },
+            {
+                id: 'default-cta',
+                type: 'cta',
+                content: {
+                    heading: "Ready to Order?",
+                    subheading: "Get a custom quote for your packaging needs today.",
+                    buttonText: "Request Quote",
+                    link: "/quote"
                 }
             },
             {
@@ -120,16 +235,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                         { title: "Fast Turnaround", desc: "Get your boxes delivered on time, every time." }
                     ]
                 }
-            },
-            {
-                id: 'default-cta',
-                type: 'cta',
-                content: {
-                    heading: "Ready to Order?",
-                    subheading: "Get a custom quote for your packaging needs today.",
-                    buttonText: "Request Quote",
-                    link: "/quote"
-                }
             }
         ]
     }
@@ -141,21 +246,64 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
     return (
         <main className="min-h-screen">
-            <div className="container mx-auto px-4 pt-32 -mb-24 relative z-10">
-                <Breadcrumbs items={breadcrumbItems} />
-            </div>
-            <SectionRenderer sections={sections} />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "CollectionPage",
+                    "name": category.name,
+                    "description": category.seoDesc || category.description,
+                    "url": `https://packaginghippo.com/services/${slug}`,
+                    "mainEntity": {
+                        "@type": "ItemList",
+                        "numberOfItems": category.products.length,
+                        "itemListElement": category.products.map((product, index) => ({
+                            "@type": "ListItem",
+                            "position": index + 1,
+                            "item": {
+                                "@type": "Product",
+                                "name": product.name,
+                                "description": product.shortDesc,
+                                "url": `https://packaginghippo.com/products/${product.slug}`,
+                                "image": product.images?.[0],
+                                "brand": {
+                                    "@type": "Brand",
+                                    "name": "Packaging Hippo"
+                                },
+                                "offers": {
+                                    "@type": "Offer",
+                                    "availability": "https://schema.org/InStock",
+                                    "priceCurrency": "USD",
+                                    "price": product.price || "1.00"
+                                }
+                            }
+                        }))
+                    }
+                }}
+            />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": breadcrumbItems.map((item, index) => ({
+                        "@type": "ListItem",
+                        "position": index + 1,
+                        "name": item.label,
+                        "item": item.href ? `https://packaginghippo.com${item.href}` : undefined
+                    }))
+                }}
+            />
+            <SectionRenderer
+                sections={sections}
+                popularProducts={popularProducts}
+                categoryName={category.name}
+                breadcrumbs={<Breadcrumbs items={breadcrumbItems} />}
+            />
 
-            <section className="py-20 bg-gray-50">
-                <div className="container mx-auto px-4">
-                    <QuoteForm
-                        theme="dark"
-                        title={`Get a Quote for ${category.name}`}
-                        subtitle="Professional packaging solutions tailored for your business."
-                        pageSource={`Category: ${category.name}`}
-                    />
-                </div>
-            </section>
+            <TestimonialsSection testimonials={testimonials} />
+
+            <RelatedCategories categories={relatedCategories} />
+
+            <CustomQuoteFormSection image={quoteFormImage} />
 
             {/* Category Description (SEO Content) */}
             {category.description && (
@@ -166,8 +314,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     </div>
                 </section>
             )}
-
-            <TestimonialsSection testimonials={testimonials} />
         </main>
     )
 }
