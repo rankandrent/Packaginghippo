@@ -84,7 +84,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-gray-900">Phone</h3>
-                                        <p className="text-gray-600">+1 845 379 9277</p>
+                                        <p className="text-gray-600">(445) 447-7678</p>
                                     </div>
                                 </div>
 
@@ -104,7 +104,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-gray-900">Address</h3>
-                                        <p className="text-gray-600">123 Packaging Street, Industrial District, NY 10001</p>
+                                        <p className="text-gray-600">1946 W 3rd Street, 1st Floor, Brooklyn, NY 11223</p>
                                     </div>
                                 </div>
                             </div>

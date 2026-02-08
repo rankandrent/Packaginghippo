@@ -60,6 +60,9 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: {
       index: true,
       follow: true,
+    },
+    verification: {
+      google: 'tN09cpHIVr6FO5LCFC__PzhMtihqEmX2TXdZnsenlw0',
     }
   };
 }
@@ -85,9 +88,17 @@ export default async function RootLayout({
             "logo": "https://packaginghippo.com/logo.png",
             "contactPoint": {
               "@type": "ContactPoint",
-              "telephone": "+1-510-500-9533",
+              "telephone": "+1-445-447-7678",
               "contactType": "customer service",
               "email": "sales@packaginghippo.com"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "1946 W 3rd Street 1st Floor",
+              "addressLocality": "Brooklyn",
+              "addressRegion": "NY",
+              "postalCode": "11223",
+              "addressCountry": "US"
             }
           }}
         />
@@ -114,13 +125,13 @@ export default async function RootLayout({
             "name": "Packaging Hippo",
             "image": "https://packaginghippo.com/logo.png",
             "url": "https://packaginghippo.com",
-            "telephone": "+1-510-500-8533",
+            "telephone": "+1-445-447-7678",
             "address": {
               "@type": "PostalAddress",
-              "streetAddress": "123 Packaging Street",
-              "addressLocality": "New York",
+              "streetAddress": "1946 W 3rd Street 1st Floor",
+              "addressLocality": "Brooklyn",
               "addressRegion": "NY",
-              "postalCode": "10001",
+              "postalCode": "11223",
               "addressCountry": "US"
             },
             "priceRange": "$$"
