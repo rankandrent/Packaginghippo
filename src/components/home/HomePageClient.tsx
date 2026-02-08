@@ -23,6 +23,8 @@ import { QuoteSection } from "./sections/QuoteSection"
 import { TopProductsSection } from "./TopProductsSection"
 import TestimonialsSection from "./TestimonialsSection"
 import { CustomQuoteFormSection } from "./CustomQuoteFormSection"
+import { VideoSection } from "./sections/VideoSection"
+import { GallerySection } from "./sections/GallerySection"
 
 type HomepageData = Record<string, any>
 
@@ -52,6 +54,8 @@ const SECTION_COMPONENTS: Record<string, React.FC<{ data: any }>> = {
     features_bar: FeaturesBar,
     quote_form: QuoteSection,
     custom_quote_form: (props: { data: any }) => <CustomQuoteFormSection image={props.data?.image} />,
+    video_section: VideoSection,
+    gallery_section: GallerySection,
 }
 
 export default function HomePageClient({
@@ -79,6 +83,15 @@ export default function HomePageClient({
                 // If it's the old popular products section, hide it because we are injecting TopProducts specifically after 'how_it_works'
                 if (section.key === 'popular_products') {
                     return null
+                }
+
+                if (section.key === 'hero') {
+                    const Component = SECTION_COMPONENTS[section.key]
+                    return (
+                        <div key={`${section.key}-wrapper`}>
+                            <Component key={`${section.key}-${index}`} data={section.content} />
+                        </div>
+                    )
                 }
 
                 const Component = SECTION_COMPONENTS[section.key]

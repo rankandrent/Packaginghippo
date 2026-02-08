@@ -18,7 +18,7 @@ export type Section = {
     content: any
 }
 
-export function SectionRenderer({ sections, popularProducts, categoryName }: { sections: Section[], popularProducts?: any[], categoryName?: string }) {
+export function SectionRenderer({ sections, popularProducts, categoryName, breadcrumbs }: { sections: Section[], popularProducts?: any[], categoryName?: string, breadcrumbs?: React.ReactNode }) {
     if (!sections || !Array.isArray(sections)) return null
 
     return (
@@ -29,16 +29,17 @@ export function SectionRenderer({ sections, popularProducts, categoryName }: { s
                     section={section}
                     popularProducts={popularProducts}
                     categoryName={categoryName}
+                    breadcrumbs={breadcrumbs}
                 />
             ))}
         </div>
     )
 }
 
-function RenderSection({ section, popularProducts, categoryName }: { section: Section, popularProducts?: any[], categoryName?: string }) {
+function RenderSection({ section, popularProducts, categoryName, breadcrumbs }: { section: Section, popularProducts?: any[], categoryName?: string, breadcrumbs?: React.ReactNode }) {
     switch (section.type) {
         case 'hero':
-            return <HeroSection content={section.content} />
+            return <HeroSection content={section.content} breadcrumbs={breadcrumbs} />
         case 'text':
             return <TextSection content={section.content} />
         case 'product_grid':

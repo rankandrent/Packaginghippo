@@ -14,7 +14,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Loader2, Save, Eye, EyeOff, RefreshCw, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react"
+import { Loader2, Save, Eye, EyeOff, RefreshCw, Plus, Trash2, ArrowUp, ArrowDown, Video, Image as ImageIcon } from "lucide-react"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 
@@ -88,12 +88,23 @@ export default function HomepageEditor() {
         }
     }
 
+    // Helper to sort active first, then by order
+    const sortSections = (list: HomepageSection[]) => {
+        return [...list].sort((a, b) => {
+            // Active first
+            if (a.isActive && !b.isActive) return -1
+            if (!a.isActive && b.isActive) return 1
+            // Then by order
+            return a.order - b.order
+        })
+    }
+
     async function fetchSections() {
         try {
             setLoading(true)
             const res = await fetch('/api/cms/homepage')
             const data = await res.json()
-            setSections(data.sections || [])
+            setSections(sortSections(data.sections || []))
         } catch (error) {
             console.error("Error fetching sections:", error)
         } finally {
@@ -278,6 +289,22 @@ export default function HomepageEditor() {
                         image: ''
                     }
                     break
+                case 'video_section':
+                    title = 'Video Section'
+                    content = {
+                        heading: 'See How We Work',
+                        subheading: 'Watch our process and see the quality we deliver.',
+                        videoUrl: 'https://www.youtube.com/watch?v=C7s5rc3fEMk'
+                    }
+                    break
+                case 'gallery_section':
+                    title = 'Our Gallery'
+                    content = {
+                        heading: 'OUR GALLERY',
+                        subheading: 'Explore our latest work and custom packaging solutions.',
+                        items: [] // Array of { url, alt, title }
+                    }
+                    break
                 default:
                     title = `New ${key.replace(/_/g, ' ')}`
                     content = { heading: 'New Section' }
@@ -388,6 +415,12 @@ export default function HomepageEditor() {
                 </Button>
                 <Button onClick={() => createSection('custom_quote_form')}>
                     <Plus className="w-4 h-4 mr-2" /> Add Quote Form
+                </Button>
+                <Button onClick={() => createSection('video_section')} className="bg-red-600 hover:bg-red-700">
+                    <Video className="w-4 h-4 mr-2" /> Add Video Section
+                </Button>
+                <Button onClick={() => createSection('gallery_section')} className="bg-purple-600 hover:bg-purple-700">
+                    <ImageIcon className="w-4 h-4 mr-2" /> Add Gallery
                 </Button>
             </div>
 
@@ -606,6 +639,142 @@ function SectionEditor({ section, onUpdate }: { section: HomepageSection, onUpda
                                 if (urls.length > 0) onUpdate('image', urls[0])
                             }}
                             maxFiles={1}
+                        />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Video Section Editor
+    if (section.sectionKey === 'video_section') {
+        return (
+            <div className="space-y-4">
+                <div className="bg-red-50 p-4 rounded text-sm text-red-800">
+                    Embed a YouTube video. Just paste the full URL.
+                </div>
+                <div className="space-y-2">
+                    <Label>Heading</Label>
+                    <Input
+                        value={content.heading || ''}
+                        onChange={e => onUpdate('heading', e.target.value)}
+                        placeholder="e.g. See How We Work"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Subheading</Label>
+                    <Input
+                        value={content.subheading || ''}
+                        onChange={e => onUpdate('subheading', e.target.value)}
+                        placeholder="e.g. Watch our process..."
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>YouTube URL</Label>
+                    <Input
+                        value={content.videoUrl || ''}
+                        onChange={e => onUpdate('videoUrl', e.target.value)}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                    />
+                </div>
+            </div>
+        )
+    }
+
+    // Gallery Section Editor
+    if (section.sectionKey === 'gallery_section') {
+        const items = Array.isArray(content.items) ? content.items : []
+
+        const addImages = (urls: string[]) => {
+            const newItems = urls.map(url => ({
+                url,
+                alt: '',
+                title: ''
+            }))
+            onUpdate('items', [...items, ...newItems])
+        }
+
+        const updateItem = (index: number, field: string, value: string) => {
+            const newItems = [...items]
+            newItems[index] = { ...newItems[index], [field]: value }
+            onUpdate('items', newItems)
+        }
+
+        const removeItem = (index: number) => {
+            const newItems = items.filter((_: any, i: number) => i !== index)
+            onUpdate('items', newItems)
+        }
+
+        return (
+            <div className="space-y-4">
+                <div className="bg-purple-50 p-4 rounded text-sm text-purple-800">
+                    Manage your gallery images. Don't forget to add Alt Text for SEO!
+                </div>
+                <div className="space-y-2">
+                    <Label>Heading</Label>
+                    <Input
+                        value={content.heading || ''}
+                        onChange={e => onUpdate('heading', e.target.value)}
+                        placeholder="e.g. OUR GALLERY"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Subheading</Label>
+                    <Input
+                        value={content.subheading || ''}
+                        onChange={e => onUpdate('subheading', e.target.value)}
+                        placeholder="e.g. Explore our work..."
+                    />
+                </div>
+
+                <div className="space-y-4 border p-4 rounded-md">
+                    <Label>Gallery Images</Label>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        {items.map((item: any, idx: number) => (
+                            <div key={idx} className="border rounded-md p-3 flex gap-3 bg-gray-50 relative group">
+                                <div className="w-24 h-24 flex-shrink-0 bg-white border rounded overflow-hidden">
+                                    <img src={item.url} alt={item.alt} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="flex-1 space-y-2">
+                                    <div className="space-y-1">
+                                        <Label className="text-[10px] uppercase text-muted-foreground">Alt Text (SEO)</Label>
+                                        <Input
+                                            value={item.alt || ''}
+                                            onChange={e => updateItem(idx, 'alt', e.target.value)}
+                                            placeholder="Describe image..."
+                                            className="h-8 text-xs"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label className="text-[10px] uppercase text-muted-foreground">Title (Hover)</Label>
+                                        <Input
+                                            value={item.title || ''}
+                                            onChange={e => updateItem(idx, 'title', e.target.value)}
+                                            placeholder="Image Title..."
+                                            className="h-8 text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => removeItem(idx)}
+                                    className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Add New Images</Label>
+                        <ImageUploader
+                            value={[]}
+                            bucket="gallery"
+                            onChange={(urls) => {
+                                if (urls.length > 0) addImages(urls)
+                            }}
+                            maxFiles={5}
                         />
                     </div>
                 </div>
