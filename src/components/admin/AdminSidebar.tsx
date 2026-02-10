@@ -18,7 +18,8 @@ import {
     MessageSquare,
     AlertTriangle,
     Star,
-    Image
+    Image,
+    Link as LinkIcon
 } from "lucide-react"
 
 const sidebarItems = [
@@ -56,6 +57,11 @@ const sidebarItems = [
         title: "Settings",
         href: "/dashboard/settings",
         icon: Settings,
+    },
+    {
+        title: "Redirects",
+        href: "/dashboard/redirects",
+        icon: LinkIcon,
     },
     {
         title: "Menu",

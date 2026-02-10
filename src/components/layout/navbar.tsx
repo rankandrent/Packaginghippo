@@ -2,10 +2,11 @@
 // Navigation component for Packaging Hippo
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, FormEvent } from "react"
 import { Menu, X, Phone, Search, ShoppingCart, MessageCircle, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useRouter, useSearchParams } from "next/navigation"
 
 type NavbarProps = {
     settings?: {
@@ -24,11 +25,26 @@ const DEFAULT_MENU = [
 ]
 
 export function Navbar({ settings, menuData }: NavbarProps) {
+    const router = useRouter()
+    const searchParams = useSearchParams()
+
+    // Initialize search from URL if present
+    const initialSearch = searchParams?.get('search') || ""
+    const [searchQuery, setSearchQuery] = useState(initialSearch)
+
     const [isOpen, setIsOpen] = useState(false)
     const siteName = settings?.siteName || "PackagingHippo"
     const phone = settings?.phone || "+1 845 379 9277"
 
     const navItems = menuData || DEFAULT_MENU;
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault()
+        if (searchQuery.trim()) {
+            router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+            setIsOpen(false) // Close mobile menu if open
+        }
+    }
 
     // Helper for Recursive Menu Rendering
     const renderMenuItem = (item: any) => {
@@ -93,16 +109,19 @@ export function Navbar({ settings, menuData }: NavbarProps) {
 
                     {/* Search Bar */}
                     <div className="hidden lg:flex flex-1 max-w-2xl mx-auto">
-                        <div className="relative w-full flex">
+                        <form onSubmit={handleSearch} className="relative w-full flex">
                             <Input
                                 type="text"
+                                name="search"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search products..."
                                 className="w-full bg-gray-50 border-gray-200 rounded-l-md rounded-r-none h-11 focus-visible:ring-0 focus-visible:ring-offset-0"
                             />
-                            <Button className="h-11 rounded-l-none rounded-r-md bg-primary hover:bg-primary/90 px-6">
+                            <Button type="submit" className="h-11 rounded-l-none rounded-r-md bg-primary hover:bg-primary/90 px-6">
                                 <Search className="w-5 h-5" />
                             </Button>
-                        </div>
+                        </form>
                     </div>
 
                     {/* Right Actions */}
@@ -143,7 +162,15 @@ export function Navbar({ settings, menuData }: NavbarProps) {
             {/* Mobile Menu */}
             {isOpen && (
                 <div className="lg:hidden bg-white border-t border-gray-100 p-4 space-y-4 absolute w-full shadow-xl z-50">
-                    <Input type="text" placeholder="Search products..." className="w-full bg-gray-50 mb-4" />
+                    <form onSubmit={handleSearch}>
+                        <Input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search products..."
+                            className="w-full bg-gray-50 mb-4"
+                        />
+                    </form>
 
                     <nav className="flex flex-col space-y-3">
                         {navItems.map((item, idx) => (

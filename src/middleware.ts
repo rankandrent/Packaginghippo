@@ -38,9 +38,11 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set('x-invoke-path', pathname);
+    return response;
 }
 
 export const config = {
-    matcher: '/dashboard/:path*',
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

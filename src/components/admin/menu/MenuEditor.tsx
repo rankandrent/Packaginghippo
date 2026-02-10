@@ -167,7 +167,25 @@ export function MenuEditor({ initialData, onChange }: MenuEditorProps) {
                 newActiveItem.parentId = null
             } else if (finalDepth === previousItem.depth + 1) {
                 // It's a child of previous
-                newActiveItem.parentId = previousItem.id
+
+                // Check if creating cycle
+                let isCycle = false
+                let verifyParentId: string | null = previousItem.id
+                while (verifyParentId) {
+                    if (verifyParentId === active.id) {
+                        isCycle = true; break;
+                    }
+                    const parentNode = newItems.find(i => i.id === verifyParentId)
+                    verifyParentId = parentNode ? parentNode.parentId : null
+                }
+
+                if (isCycle) {
+                    newActiveItem.depth = 0;
+                    newActiveItem.parentId = null;
+                } else {
+                    newActiveItem.parentId = previousItem.id;
+                }
+
             } else if (finalDepth === previousItem.depth) {
                 // Sibling of previous
                 newActiveItem.parentId = previousItem.parentId
@@ -182,7 +200,27 @@ export function MenuEditor({ initialData, onChange }: MenuEditorProps) {
                         break
                     }
                 }
-                newActiveItem.parentId = ancestor ? ancestor.id : null
+
+                let validParentId = ancestor ? ancestor.id : null
+
+                // Verify cycle for ancestor too
+                let isCycle = false
+                let verifyAncestorId: string | null = validParentId
+                while (verifyAncestorId) {
+                    if (verifyAncestorId === active.id) {
+                        isCycle = true
+                        break
+                    }
+                    const parentNode = newItems.find(i => i.id === verifyAncestorId)
+                    verifyAncestorId = parentNode ? parentNode.parentId : null
+                }
+
+                if (isCycle) {
+                    newActiveItem.depth = 0
+                    newActiveItem.parentId = null
+                } else {
+                    newActiveItem.parentId = validParentId
+                }
             }
         }
 

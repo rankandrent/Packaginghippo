@@ -43,6 +43,6 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ setting })
     } catch (error) {
         console.error('Error updating settings:', error)
-        return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 })
+        return NextResponse.json({ error: 'Failed to update settings', details: error instanceof Error ? error.message : String(error) }, { status: 500 })
     }
 }

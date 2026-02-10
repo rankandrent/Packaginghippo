@@ -59,11 +59,14 @@ export default function MenuSettingsPage() {
                 body: JSON.stringify({ key: 'menu', value: menu }),
             })
 
-            if (!res.ok) throw new Error('Failed to save')
+            if (!res.ok) {
+                const errorData = await res.json()
+                throw new Error(errorData.details || errorData.error || 'Failed to save')
+            }
             alert("Menu settings saved!")
         } catch (error) {
             console.error(error)
-            alert("Error saving settings")
+            alert(`Error saving settings: ${error instanceof Error ? error.message : String(error)}`)
         } finally {
             setSaving(false)
         }
