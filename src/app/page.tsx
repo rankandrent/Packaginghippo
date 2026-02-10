@@ -102,11 +102,32 @@ async function getTestimonials() {
 
 import { HomeSchema } from "@/components/home/HomeSchema"
 
+async function getCategories() {
+  try {
+    const categories = await prisma.productCategory.findMany({
+      where: { isActive: true },
+      orderBy: { order: 'asc' },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        imageUrl: true,
+        description: true
+      }
+    })
+    return categories
+  } catch (error) {
+    console.error("Error fetching categories:", error)
+    return []
+  }
+}
+
 export default async function Home() {
   const sections = await getHomepageData()
   const settings = await getSiteSettings()
   const topProducts = await getTopProducts()
   const testimonials = await getTestimonials()
+  const categories = await getCategories()
 
   return (
     <main>
@@ -116,6 +137,7 @@ export default async function Home() {
         settings={settings}
         topProducts={topProducts}
         testimonials={testimonials}
+        categories={categories}
       />
     </main>
   )

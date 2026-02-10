@@ -25,6 +25,7 @@ import TestimonialsSection from "./TestimonialsSection"
 import { CustomQuoteFormSection } from "./CustomQuoteFormSection"
 import { VideoSection } from "./sections/VideoSection"
 import { GallerySection } from "./sections/GallerySection"
+import { CategoriesSection } from "./CategoriesSection"
 
 type HomepageData = Record<string, any>
 
@@ -62,12 +63,14 @@ export default function HomePageClient({
     sections,
     settings,
     topProducts = [],
-    testimonials = []
+    testimonials = [],
+    categories = []
 }: {
     sections: Section[],
     settings?: any,
     topProducts?: any[],
-    testimonials?: any[]
+    testimonials?: any[],
+    categories?: any[]
 }) {
     // If no sections from DB, you might want to show defaults or nothing.
     // Ideally we seed the DB. If strictly nothing, page will be empty.
@@ -80,68 +83,47 @@ export default function HomePageClient({
     return (
         <div className="flex flex-col min-h-screen">
             {sections.map((section, index) => {
-                // If it's the old popular products section, hide it because we are injecting TopProducts specifically after 'how_it_works'
-                if (section.key === 'popular_products') {
-                    return null
+                // Special handling for components that need extra data
+                if (section.key === 'top_products') {
+                    return (
+                        <TopProductsSection
+                            key={`${section.key}-${index}`}
+                            products={topProducts}
+                        />
+                    )
                 }
 
-                if (section.key === 'hero') {
-                    const Component = SECTION_COMPONENTS[section.key]
+                if (section.key === 'testimonials') {
                     return (
-                        <div key={`${section.key}-wrapper`}>
-                            <Component key={`${section.key}-${index}`} data={section.content} />
-                        </div>
+                        <TestimonialsSection
+                            key={`${section.key}-${index}`}
+                            testimonials={testimonials}
+                        />
+                    )
+                }
+
+                if (section.key === 'categories') {
+                    return (
+                        <CategoriesSection
+                            key={`${section.key}-${index}`}
+                            categories={categories}
+                        />
                     )
                 }
 
                 const Component = SECTION_COMPONENTS[section.key]
                 if (!Component) {
-                    // Check if it's the new top products section just in case key differs
-                    if (section.key === 'top_products') {
-                        return null // Hide if present, we will inject manually
-                    }
                     console.warn(`No component found for section key: ${section.key}`)
                     return null
                 }
 
                 // Render the current section
-                const content = <Component key={`${section.key}-${index}`} data={section.content} />
-
-                // If this is the FAQ section, inject FeaturesBar BEFORE it
-                if (section.key === 'faq') {
-                    return (
-                        <div key={`${section.key}-wrapper`}>
-                            <FeaturesBar data={null} />{/* Use default data which matches the requirement */}
-                            {content}
-                        </div>
-                    )
-                }
-
-                // If existing features_bar is found in list, hide it to avoid duplication
-                if (section.key === 'features_bar') {
-                    return null
-                }
-
-                // If this is the "How It Works" section ("How We Turn Your Ideas Into Reality"), inject TopProducts after it
-                if (section.key === 'how_it_works') {
-                    return (
-                        <div key={`${section.key}-wrapper`}>
-                            {content}
-                            <TopProductsSection products={topProducts} />
-                        </div>
-                    )
-                }
-
-                return content
+                return (
+                    <div key={`${section.key}-wrapper`}>
+                        <Component key={`${section.key}-${index}`} data={section.content} />
+                    </div>
+                )
             })}
-            {/* Fallback: if no popular_products section found in the list, append it at the end or specific place? 
-                 User wants it to show. 
-                 If sections are managed by admin, maybe they deleted it.
-                 Safest is to rely on existing section or ask user to add it.
-                 But I'll assume it replaces the existing "Popular Products" section which seems to be standard.
-             */}
-
-            <TestimonialsSection testimonials={testimonials} />
         </div>
     )
 }
