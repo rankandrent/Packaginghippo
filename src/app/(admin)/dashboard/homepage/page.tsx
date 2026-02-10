@@ -127,11 +127,14 @@ export default function HomepageEditor() {
                 }),
             })
 
-            if (!res.ok) throw new Error('Failed to save')
+            if (!res.ok) {
+                const errorData = await res.json()
+                throw new Error(errorData.details || errorData.error || 'Failed to save')
+            }
             alert("Section saved!")
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error saving section:", error)
-            alert("Error saving section")
+            alert(`Error saving section: ${error.message}`)
         } finally {
             setSaving(null)
         }
@@ -315,11 +318,14 @@ export default function HomepageEditor() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sectionKey: key, title, content }),
             })
-            if (!res.ok) throw new Error("Failed to create")
+            if (!res.ok) {
+                const errorData = await res.json()
+                throw new Error(errorData.details || errorData.error || 'Failed to create')
+            }
             await fetchSections()
-        } catch (e) {
-            console.error(e)
-            alert("Failed to create section")
+        } catch (error: any) {
+            console.error(error)
+            alert(`Failed to create section: ${error.message}`)
         } finally {
             setLoading(false)
         }

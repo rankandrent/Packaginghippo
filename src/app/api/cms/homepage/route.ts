@@ -32,9 +32,12 @@ export async function PUT(request: NextRequest) {
         console.log(`[API] Updated section ${id}: isActive=${isActive}`)
 
         return NextResponse.json({ section: updated })
-    } catch (error) {
-        console.error('Error updating homepage section:', error)
-        return NextResponse.json({ error: 'Failed to update section' }, { status: 500 })
+    } catch (error: any) {
+        console.error("Error updating homepage section:", error)
+        return NextResponse.json(
+            { error: "Failed to update section", details: error.message },
+            { status: 500 }
+        )
     }
 }
 // POST create a new homepage section
@@ -67,8 +70,11 @@ export async function POST(request: NextRequest) {
         })
 
         return NextResponse.json({ section: newSection })
-    } catch (error) {
-        console.error('Error creating homepage section:', error)
-        return NextResponse.json({ error: 'Failed to create section' }, { status: 500 })
+    } catch (error: any) {
+        console.error("Error creating homepage section:", error)
+        return NextResponse.json(
+            { error: "Failed to create section", details: error.message },
+            { status: 500 }
+        )
     }
 }
