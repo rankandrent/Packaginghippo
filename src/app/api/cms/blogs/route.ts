@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
         const slug = searchParams.get('slug')
         const category = searchParams.get('category')
         const publishedOnly = searchParams.get('publishedOnly') === 'true'
+        const featuredOnly = searchParams.get('featuredOnly') === 'true'
 
         if (id) {
             const post = await prisma.blogPost.findUnique({
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest) {
 
         const where: any = {}
         if (publishedOnly) where.isPublished = true
+        if (featuredOnly) where.isFeatured = true
         if (category) where.category = { slug: category }
 
         const posts = await prisma.blogPost.findMany({
@@ -58,6 +60,7 @@ export async function POST(request: NextRequest) {
                 seoDesc: body.seoDesc,
                 seoKeywords: body.seoKeywords,
                 isPublished: body.isPublished,
+                isFeatured: body.isFeatured || false,
                 publishedAt: body.isPublished ? new Date() : null,
             }
         })

@@ -36,7 +36,7 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {products.map((product) => (
                         <div key={product.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100">
-                            <Link href={`/products/${product.slug}`} className="relative aspect-square overflow-hidden bg-gray-100">
+                            <Link href={`/${product.slug}`} className="relative aspect-square overflow-hidden bg-gray-100">
                                 {product.images && product.images[0] ? (
                                     <Image
                                         src={product.images[0]}
@@ -57,7 +57,7 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
 
                             <div className="p-6 flex flex-col flex-grow">
                                 <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                                    <Link href={`/products/${product.slug}`}>
+                                    <Link href={`/${product.slug}`}>
                                         {product.name}
                                     </Link>
                                 </h3>
@@ -73,7 +73,7 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                                         </span>
                                     </div>
                                     <Link
-                                        href={`/products/${product.slug}`}
+                                        href={`/${product.slug}`}
                                         className="bg-blue-600 text-white p-2 rounded-full hover:bg-yellow-500 hover:text-blue-900 transition-colors shadow-md group-hover:scale-110 transform duration-300"
                                     >
                                         <ArrowRight className="w-5 h-5" />

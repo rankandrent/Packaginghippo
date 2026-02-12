@@ -41,14 +41,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ]
 
         const productEntries: MetadataRoute.Sitemap = products.map((p) => ({
-            url: `${baseUrl}/products/${p.slug}`,
+            url: `${baseUrl}/${p.slug}`,
             lastModified: p.updatedAt,
             changeFrequency: 'weekly',
             priority: 0.8,
         }))
 
         const categoryEntries: MetadataRoute.Sitemap = categories.map((c) => ({
-            url: `${baseUrl}/services/${c.slug}`,
+            url: `${baseUrl}/${c.slug}`,
             lastModified: c.updatedAt,
             changeFrequency: 'weekly',
             priority: 0.9,

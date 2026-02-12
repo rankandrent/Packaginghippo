@@ -31,7 +31,7 @@ export function TopProductsSection({ products = [] }: { products: Product[] }) {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                     {products.map((product) => (
-                        <Link href={`/products/${product.slug}`} key={product.id} className="group block text-center">
+                        <Link href={`/${product.slug}`} key={product.id} className="group block text-center">
                             <div className="relative aspect-square mb-4 rounded-xl overflow-hidden bg-gray-50 group-hover:shadow-lg transition-all duration-300">
                                 {product.images && product.images[0] ? (
                                     <Image

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight } from "lucide-react"
 
@@ -60,12 +61,23 @@ export function PopularProducts({ data }: { data: any }) {
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                         {categories.map((item: any, i: number) => (
-                            <Link href={`/services/${item.slug}`} key={i}>
+                            <Link href={`/${item.slug}`} key={i}>
                                 <Card className="group cursor-pointer hover:shadow-xl transition-all border-none shadow-sm h-full rounded-2xl overflow-hidden bg-white">
                                     <CardContent className="p-8">
-                                        <div className="mb-6 bg-yellow-50 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:bg-yellow-500 group-hover:rotate-6 transition-all duration-300">
-                                            <PackageIcon className="w-7 h-7 text-yellow-600 group-hover:text-black transition-colors" />
-                                        </div>
+                                        {item.imageUrl ? (
+                                            <div className="relative w-full aspect-video mb-6 rounded-xl overflow-hidden bg-gray-100">
+                                                <Image
+                                                    src={item.imageUrl}
+                                                    alt={item.name}
+                                                    fill
+                                                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="mb-6 bg-yellow-50 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:bg-yellow-500 group-hover:rotate-6 transition-all duration-300">
+                                                <PackageIcon className="w-7 h-7 text-yellow-600 group-hover:text-black transition-colors" />
+                                            </div>
+                                        )}
                                         <h3 className="font-black text-xl text-gray-900 group-hover:text-yellow-600 transition-colors mb-3">{item.name}</h3>
                                         <div className="text-gray-500 text-sm leading-relaxed line-clamp-3">
                                             {item.description ? (

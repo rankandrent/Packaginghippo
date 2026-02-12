@@ -1,6 +1,7 @@
-
 import { NextRequest, NextResponse } from "next/server"
 import { v2 as cloudinary } from 'cloudinary'
+import https from 'https'
+import crypto from 'crypto'
 
 // Configure Cloudinary
 cloudinary.config({
@@ -22,6 +23,11 @@ export async function POST(request: NextRequest) {
         const arrayBuffer = await file.arrayBuffer()
         const buffer = Buffer.from(arrayBuffer)
 
+        // Create a custom agent to handle legacy server connections (fix for SSL error)
+        const agent = new https.Agent({
+            secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
+        })
+
         // Upload to Cloudinary via stream
         const result = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
@@ -30,7 +36,9 @@ export async function POST(request: NextRequest) {
                     // Auto-optimize: compress size and convert to best format (standard web practice)
                     transformation: [
                         { quality: "auto", fetch_format: "auto" }
-                    ]
+                    ],
+                    // @ts-ignore - Cloudinary types might not include agent but the underlying request supports it
+                    agent: agent
                 },
                 (error, result) => {
                     if (error) reject(error)

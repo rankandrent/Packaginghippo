@@ -83,11 +83,11 @@ export async function Footer() {
                     <div>
                         <h4 className="font-bold text-lg mb-6 text-yellow-500">{productsTitle}</h4>
                         <ul className="space-y-3 text-sm text-gray-400">
-                            <li><Link href="/services/mailer-boxes" className="hover:text-white">Mailer Boxes</Link></li>
-                            <li><Link href="/services/rigid-boxes" className="hover:text-white">Rigid Boxes</Link></li>
-                            <li><Link href="/services/folding-cartons" className="hover:text-white">Folding Cartons</Link></li>
-                            <li><Link href="/services/display-boxes" className="hover:text-white">Display Boxes</Link></li>
-                            <li><Link href="/services/eco-friendly" className="hover:text-white">Eco-Friendly</Link></li>
+                            <li><Link href="/mailer-boxes" className="hover:text-white">Mailer Boxes</Link></li>
+                            <li><Link href="/rigid-boxes" className="hover:text-white">Rigid Boxes</Link></li>
+                            <li><Link href="/folding-cartons" className="hover:text-white">Folding Cartons</Link></li>
+                            <li><Link href="/display-boxes" className="hover:text-white">Display Boxes</Link></li>
+                            <li><Link href="/eco-friendly" className="hover:text-white">Eco-Friendly</Link></li>
                         </ul>
                     </div>
 

@@ -122,12 +122,34 @@ async function getCategories() {
   }
 }
 
+async function getFeaturedBlogs() {
+  try {
+    const posts = await prisma.blogPost.findMany({
+      where: {
+        isPublished: true,
+        isFeatured: true
+      },
+      include: {
+        author: { select: { name: true, image: true } },
+        category: { select: { name: true, slug: true } }
+      },
+      orderBy: { publishedAt: 'desc' },
+      take: 3
+    })
+    return posts
+  } catch (error) {
+    console.error("Error fetching featured blogs:", error)
+    return []
+  }
+}
+
 export default async function Home() {
   const sections = await getHomepageData()
   const settings = await getSiteSettings()
   const topProducts = await getTopProducts()
   const testimonials = await getTestimonials()
   const categories = await getCategories()
+  const featuredBlogs = await getFeaturedBlogs()
 
   return (
     <main>
@@ -136,8 +158,9 @@ export default async function Home() {
         sections={sections as any}
         settings={settings}
         topProducts={topProducts}
-        testimonials={testimonials}
+
         categories={categories}
+        featuredBlogs={featuredBlogs}
       />
     </main>
   )

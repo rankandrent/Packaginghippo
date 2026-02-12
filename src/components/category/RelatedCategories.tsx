@@ -38,7 +38,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                     {categories.map((category) => (
                         <Link
                             key={category.id}
-                            href={`/services/${category.slug}`}
+                            href={`/${category.slug}`}
                             className="group bg-gray-50 rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
                         >
                             <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-200">

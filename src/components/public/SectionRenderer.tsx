@@ -13,12 +13,49 @@ import { PopularProducts } from "@/components/category/PopularProducts"
 // Types matching SectionBuilder
 export type Section = {
     id: string
-    type: 'hero' | 'text' | 'benefits' | 'faq' | 'cta' | 'gallery' | 'product_grid' | 'seo_content' | 'customer_reviews' | 'features_bar' | 'logo_loop' | 'popular_products'
+    type:
+    | 'hero'
+    | 'text'
+    | 'benefits'
+    | 'faq'
+    | 'cta'
+    | 'gallery'
+    | 'product_grid'
+    | 'seo_content'
+    | 'customer_reviews'
+    | 'features_bar'
+    | 'logo_loop'
+    | 'popular_products'
+    | 'intro'
+    | 'services_list'
+    | 'how_it_works'
+    | 'eco_friendly'
+    | 'printing'
+    | 'industries'
+    | 'steps'
+    | 'ordering_process'
+    | 'why_choose_us'
+    | 'video_section'
+    | 'quote_form'
+    | 'custom_quote_form'
+    | 'featured_blogs'
     title?: string
     content: any
 }
 
-export function SectionRenderer({ sections, popularProducts, categoryName, breadcrumbs }: { sections: Section[], popularProducts?: any[], categoryName?: string, breadcrumbs?: React.ReactNode }) {
+export function SectionRenderer({
+    sections,
+    popularProducts,
+    categoryName,
+    breadcrumbs,
+    featuredBlogs = []
+}: {
+    sections: Section[],
+    popularProducts?: any[],
+    categoryName?: string,
+    breadcrumbs?: React.ReactNode,
+    featuredBlogs?: any[]
+}) {
     if (!sections || !Array.isArray(sections)) return null
 
     return (
@@ -30,13 +67,43 @@ export function SectionRenderer({ sections, popularProducts, categoryName, bread
                     popularProducts={popularProducts}
                     categoryName={categoryName}
                     breadcrumbs={breadcrumbs}
+                    featuredBlogs={featuredBlogs}
                 />
             ))}
         </div>
     )
 }
 
-function RenderSection({ section, popularProducts, categoryName, breadcrumbs }: { section: Section, popularProducts?: any[], categoryName?: string, breadcrumbs?: React.ReactNode }) {
+// --- HOMEPAGE COMPONENTS ---
+import { Intro } from "@/components/home/sections/Intro"
+import { ServicesList } from "@/components/home/sections/ServicesList"
+import { Benefits } from "@/components/home/sections/Benefits"
+import { HowItWorks } from "@/components/home/sections/HowItWorks"
+import { EcoFriendly } from "@/components/home/sections/EcoFriendly"
+import { Printing } from "@/components/home/sections/Printing"
+import { Industries } from "@/components/home/sections/Industries"
+import { Steps } from "@/components/home/sections/Steps"
+import { OrderingProcess } from "@/components/home/sections/OrderingProcess"
+import { WhyChooseUs } from "@/components/home/sections/WhyChooseUs"
+import { VideoSection } from "@/components/home/sections/VideoSection"
+import { QuoteSection } from "@/components/home/sections/QuoteSection"
+import { CustomQuoteFormSection } from "@/components/home/CustomQuoteFormSection"
+import { FeaturedBlogs } from "@/components/home/sections/FeaturedBlogs"
+import { CTA } from "@/components/home/sections/CTA"
+
+function RenderSection({
+    section,
+    popularProducts,
+    categoryName,
+    breadcrumbs,
+    featuredBlogs
+}: {
+    section: Section,
+    popularProducts?: any[],
+    categoryName?: string,
+    breadcrumbs?: React.ReactNode,
+    featuredBlogs?: any[]
+}) {
     switch (section.type) {
         case 'hero':
             return <HeroSection content={section.content} breadcrumbs={breadcrumbs} />
@@ -45,17 +112,17 @@ function RenderSection({ section, popularProducts, categoryName, breadcrumbs }: 
         case 'product_grid':
             return <ProductGridSection content={section.content} />
         case 'popular_products':
-            // If data is passed, use it. Otherwise, render nothing or fetch (but we prefer passing)
             if (!popularProducts) return null
             return <PopularProducts categoryName={categoryName || "Packaging"} products={popularProducts} />
         case 'seo_content':
             return <SeoContentSection content={section.content} />
         case 'benefits':
-            return <BenefitsSection content={section.content} />
+            // If it has 'items', use the homepage component, otherwise fallback to simple one
+            return <Benefits data={section.content} />
         case 'faq':
             return <FaqSection content={section.content} />
         case 'cta':
-            return <CtaSection content={section.content} />
+            return <CTA data={section.content} />
         case 'gallery':
             return <GallerySection content={section.content} />
         case 'customer_reviews':
@@ -64,6 +131,22 @@ function RenderSection({ section, popularProducts, categoryName, breadcrumbs }: 
             return <FeaturesBarSection content={section.content} />
         case 'logo_loop':
             return <LogoLoopSection content={section.content} />
+
+        // NEW SECTIONS
+        case 'intro': return <Intro data={section.content} />
+        case 'services_list': return <ServicesList data={section.content} />
+        case 'how_it_works': return <HowItWorks data={section.content} />
+        case 'eco_friendly': return <EcoFriendly data={section.content} />
+        case 'printing': return <Printing data={section.content} />
+        case 'industries': return <Industries data={section.content} />
+        case 'steps': return <Steps data={section.content} />
+        case 'ordering_process': return <OrderingProcess data={section.content} />
+        case 'why_choose_us': return <WhyChooseUs data={section.content} />
+        case 'video_section': return <VideoSection data={section.content} />
+        case 'quote_form': return <QuoteSection data={section.content} />
+        case 'custom_quote_form': return <CustomQuoteFormSection image={section.content.image} />
+        case 'featured_blogs': return <FeaturedBlogs posts={featuredBlogs || []} />
+
         default:
             return null
     }
@@ -186,7 +269,7 @@ function ProductGridSection({ content }: { content: any }) {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {products.map((item: any, i: number) => (
-                        <Link href={`/products/${item.slug}`} key={i}>
+                        <Link href={`/${item.slug}`} key={i}>
                             <Card className="group cursor-pointer hover:shadow-lg transition-all border-none shadow-sm h-full rounded-xl overflow-hidden">
                                 <div className="aspect-[4/3] relative bg-white flex items-center justify-center p-4">
                                     {item.images?.[0] ? (

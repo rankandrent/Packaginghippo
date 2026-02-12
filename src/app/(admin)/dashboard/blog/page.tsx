@@ -14,7 +14,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Plus, Pencil, Trash2, Loader2, ExternalLink, User, FolderOpen } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, ExternalLink, User, FolderOpen, Star } from "lucide-react"
 import Link from "next/link"
 
 type BlogPost = {
@@ -27,6 +27,7 @@ type BlogPost = {
     author?: { name: string }
     category?: { name: string }
     createdAt: string
+    isFeatured: boolean
 }
 
 export default function BlogListPage() {
@@ -64,6 +65,29 @@ export default function BlogListPage() {
         } catch (error) {
             console.error("Error deleting blog:", error)
             alert("Error deleting blog")
+        }
+    }
+
+    async function toggleFeatured(post: BlogPost) {
+        try {
+            const newStatus = !post.isFeatured
+            // Optimistic update
+            setPosts(posts.map(p => p.id === post.id ? { ...p, isFeatured: newStatus } : p))
+
+            const res = await fetch('/api/cms/blogs', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: post.id, isFeatured: newStatus }),
+            })
+
+            if (!res.ok) {
+                // Revert if failed
+                setPosts(posts.map(p => p.id === post.id ? { ...p, isFeatured: post.isFeatured } : p))
+                throw new Error('Failed to update')
+            }
+        } catch (error) {
+            console.error("Error updating featured status:", error)
+            // alert("Error updating featured status") // Optional: maybe too intrusive
         }
     }
 
@@ -109,6 +133,7 @@ export default function BlogListPage() {
                                 <TableHead>Title</TableHead>
                                 <TableHead>Author</TableHead>
                                 <TableHead>Category</TableHead>
+                                <TableHead>Featured</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Date</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
@@ -120,6 +145,16 @@ export default function BlogListPage() {
                                     <TableCell className="font-medium max-w-xs truncate">{post.title}</TableCell>
                                     <TableCell>{post.author?.name || 'N/A'}</TableCell>
                                     <TableCell>{post.category?.name || 'N/A'}</TableCell>
+                                    <TableCell>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => toggleFeatured(post)}
+                                            className={post.isFeatured ? "text-yellow-500 hover:text-yellow-600" : "text-muted-foreground hover:text-yellow-500"}
+                                        >
+                                            <Star className={`h-4 w-4 ${post.isFeatured ? "fill-current" : ""}`} />
+                                        </Button>
+                                    </TableCell>
                                     <TableCell>
                                         <span className={`px-2 py-1 rounded-full text-xs ${post.isPublished ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                                             {post.isPublished ? 'Published' : 'Draft'}

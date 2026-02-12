@@ -32,22 +32,25 @@ export function CategoriesSection({ categories = [] }: { categories: Category[] 
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                     {categories.map((category) => (
-                        <Link href={`/services/${category.slug}`} key={category.id} className="group block text-center h-full">
-                            <div className="relative aspect-square mb-4 rounded-xl overflow-hidden bg-gray-50 border border-transparent group-hover:border-green-500 group-hover:shadow-lg transition-all duration-300">
+                        <Link href={`/${category.slug}`} key={category.id} className="group block text-center h-full">
+                            <div className="relative aspect-[4/3] mb-4 rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-xl group-hover:border-green-500/50 transition-all duration-300 transform group-hover:-translate-y-1">
                                 {category.imageUrl ? (
                                     <Image
                                         src={category.imageUrl}
                                         alt={category.name}
                                         fill
-                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-100">
-                                        <span className="text-4xl font-black text-gray-200">{category.name.charAt(0)}</span>
+                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50/50 group-hover:bg-gray-50 transition-colors">
+                                        <span className="text-4xl font-black text-gray-200 group-hover:text-green-200 transition-colors duration-300">{category.name.charAt(0)}</span>
                                     </div>
                                 )}
-                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <span className="text-white text-sm font-bold">View Products</span>
+                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                                    <span className="bg-white/90 text-gray-900 text-xs font-bold px-4 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                        View Products
+                                    </span>
                                 </div>
                             </div>
                             <h3 className="font-bold text-gray-900 group-hover:text-green-600 transition-colors text-sm md:text-base px-2">

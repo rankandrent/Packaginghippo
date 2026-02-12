@@ -26,6 +26,7 @@ import { CustomQuoteFormSection } from "./CustomQuoteFormSection"
 import { VideoSection } from "./sections/VideoSection"
 import { GallerySection } from "./sections/GallerySection"
 import { CategoriesSection } from "./CategoriesSection"
+import { FeaturedBlogs } from "./sections/FeaturedBlogs"
 
 type HomepageData = Record<string, any>
 
@@ -64,13 +65,16 @@ export default function HomePageClient({
     settings,
     topProducts = [],
     testimonials = [],
-    categories = []
+    categories = [],
+    featuredBlogs = []
 }: {
     sections: Section[],
     settings?: any,
     topProducts?: any[],
     testimonials?: any[],
-    categories?: any[]
+
+    categories?: any[],
+    featuredBlogs?: any[]
 }) {
     // If no sections from DB, you might want to show defaults or nothing.
     // Ideally we seed the DB. If strictly nothing, page will be empty.
@@ -79,6 +83,10 @@ export default function HomePageClient({
     // If sections is empty, maybe we should render defaults? 
     // The user said "Remove existing sections... Develop new". 
     // Let's assume the DB is/will be populated.
+
+    console.log("[HomePageClient] Sections:", sections.map(s => s.key))
+    console.log("[HomePageClient] Featured Blogs Count:", featuredBlogs?.length)
+    console.log("[HomePageClient] First Blog:", featuredBlogs?.[0])
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -107,6 +115,15 @@ export default function HomePageClient({
                         <CategoriesSection
                             key={`${section.key}-${index}`}
                             categories={categories}
+                        />
+                    )
+                }
+
+                if (section.key === 'featured_blogs') {
+                    return (
+                        <FeaturedBlogs
+                            key={`${section.key}-${index}`}
+                            posts={featuredBlogs}
                         />
                     )
                 }

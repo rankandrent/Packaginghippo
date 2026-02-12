@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Loader2, Upload, Copy, Check, Image as ImageIcon, ExternalLink, RefreshCw, Pencil } from "lucide-react"
+import { Loader2, Upload, Copy, Check, Image as ImageIcon, ExternalLink, RefreshCw, Pencil, Trash2 } from "lucide-react"
 
 type CloudinaryResource = {
     public_id: string
@@ -33,6 +33,10 @@ export default function MediaLibraryPage() {
     const [editingImage, setEditingImage] = useState<CloudinaryResource | null>(null)
     const [newAltText, setNewAltText] = useState("")
     const [updatingAlt, setUpdatingAlt] = useState(false)
+
+    // Delete State
+    const [deletingImage, setDeletingImage] = useState<CloudinaryResource | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     useEffect(() => {
         fetchImages()
@@ -137,6 +141,31 @@ export default function MediaLibraryPage() {
         }
     }
 
+    const deleteImage = async () => {
+        if (!deletingImage) return
+
+        setIsDeleting(true)
+        try {
+            const res = await fetch(`/api/media?public_id=${deletingImage.public_id}`, {
+                method: "DELETE",
+            })
+            const data = await res.json()
+
+            if (res.ok) {
+                // Remove from local state
+                setImages(prev => prev.filter(img => img.public_id !== deletingImage.public_id))
+                setDeletingImage(null)
+            } else {
+                alert("Failed to delete image: " + (data.error || "Unknown error"))
+            }
+        } catch (error) {
+            console.error("Delete error", error)
+            alert("Error deleting image")
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -224,6 +253,15 @@ export default function MediaLibraryPage() {
                                         >
                                             <Pencil className="h-3 w-3" />
                                         </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="destructive"
+                                            className="h-8 w-8 p-0"
+                                            onClick={() => setDeletingImage(image)}
+                                            title="Delete Image"
+                                        >
+                                            <Trash2 className="h-3 w-3" />
+                                        </Button>
                                     </div>
                                     <Button
                                         size="sm"
@@ -281,6 +319,36 @@ export default function MediaLibraryPage() {
                         <Button onClick={saveAltText} disabled={updatingAlt}>
                             {updatingAlt && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Save Changes
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={!!deletingImage} onOpenChange={(open) => !open && setDeletingImage(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Image</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <p>Are you sure you want to delete this image? This action cannot be undone.</p>
+                        {deletingImage && (
+                            <div className="mt-4 p-2 border rounded bg-muted flex items-center gap-4">
+                                <div className="relative w-16 h-16 bg-white shrink-0">
+                                    <img src={deletingImage.secure_url} alt="To delete" className="object-contain w-full h-full" />
+                                </div>
+                                <div className="text-sm truncate">
+                                    <p className="font-medium">{deletingImage.public_id.split('/').pop()}</p>
+                                    <p className="text-muted-foreground text-xs">{deletingImage.public_id}</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setDeletingImage(null)} disabled={isDeleting}>Cancel</Button>
+                        <Button variant="destructive" onClick={deleteImage} disabled={isDeleting}>
+                            {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Delete
                         </Button>
                     </DialogFooter>
                 </DialogContent>
