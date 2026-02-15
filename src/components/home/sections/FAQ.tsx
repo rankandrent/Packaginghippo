@@ -42,9 +42,9 @@ export function FAQ({ data }: { data: any }) {
 
     return (
         <section className="py-24 bg-white">
-            <div className="container mx-auto px-4 max-w-3xl">
+            <div className="container mx-auto px-4 max-w-6xl">
                 <h2 className="text-4xl font-black text-center mb-16">{data.heading}</h2>
-                <div className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
                     {data.items?.map((item: any, i: number) => (
                         <FaqItem key={i} question={item.q} answer={item.a} />
                     ))}

@@ -57,15 +57,12 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
 
                                 <div className="absolute bottom-4 left-4 right-4">
-                                    <h3 className="text-white text-lg font-bold truncate shadow-sm">
+                                    <h3 className="text-white text-lg font-bold truncate shadow-sm uppercase">
                                         {category.name}
                                     </h3>
                                 </div>
                             </div>
-                            <div className="p-4">
-                                <p className="text-sm text-gray-600 line-clamp-2 mb-3 h-10">
-                                    {category.description ? category.description.replace(/<[^>]*>?/gm, '') : 'Explore our high-quality packaging solutions.'}
-                                </p>
+                            <div className="p-4 text-center">
                                 <span className="inline-flex items-center text-sm font-bold text-blue-600 group-hover:text-yellow-500 transition-colors">
                                     Explore <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                                 </span>

@@ -78,14 +78,7 @@ export function PopularProducts({ data }: { data: any }) {
                                                 <PackageIcon className="w-7 h-7 text-yellow-600 group-hover:text-black transition-colors" />
                                             </div>
                                         )}
-                                        <h3 className="font-black text-xl text-gray-900 group-hover:text-yellow-600 transition-colors mb-3">{item.name}</h3>
-                                        <div className="text-gray-500 text-sm leading-relaxed line-clamp-3">
-                                            {item.description ? (
-                                                <div dangerouslySetInnerHTML={{ __html: item.description.slice(0, 120) + '...' }} />
-                                            ) : (
-                                                "Premium packaging solution for your brand."
-                                            )}
-                                        </div>
+                                        <h3 className="font-black text-xl text-gray-900 group-hover:text-yellow-600 transition-colors uppercase tracking-tight">{item.name}</h3>
                                     </CardContent>
                                 </Card>
                             </Link>

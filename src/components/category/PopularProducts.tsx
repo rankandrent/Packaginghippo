@@ -56,14 +56,11 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                             </Link>
 
                             <div className="p-6 flex flex-col flex-grow">
-                                <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                <h3 className="text-lg font-black text-gray-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">
                                     <Link href={`/${product.slug}`}>
                                         {product.name}
                                     </Link>
                                 </h3>
-                                <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-grow">
-                                    {product.shortDesc || "Custom tailored packaging solution for your brand."}
-                                </p>
 
                                 <div className="flex items-center justify-between mt-auto">
                                     <div className="flex flex-col">

@@ -117,23 +117,26 @@ export default async function ServicesPage() {
                         {categories.map((item, i) => (
                             <Link href={`/services/${item.slug}`} key={item.id}>
                                 <Card className="group cursor-pointer hover:shadow-2xl transition-all border-none shadow-sm h-full rounded-2xl overflow-hidden bg-gray-50/50 hover:bg-white border border-gray-100">
-                                    <CardContent className="p-10">
-                                        <div className="flex justify-between items-start mb-8">
-                                            <div className="bg-yellow-100 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:bg-yellow-500 group-hover:rotate-6 transition-all duration-300">
-                                                <PackageIcon className="w-8 h-8 text-yellow-600 group-hover:text-black transition-colors" />
+                                    <div className="relative aspect-[16/10] overflow-hidden">
+                                        {item.imageUrl ? (
+                                            <img
+                                                src={item.imageUrl}
+                                                alt={item.name}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-yellow-50 flex items-center justify-center">
+                                                <PackageIcon className="w-12 h-12 text-yellow-500 opacity-50" />
                                             </div>
-                                            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-3 py-1 rounded-full group-hover:bg-yellow-100 group-hover:text-yellow-700 transition-colors">
-                                                {item._count.products} Products
+                                        )}
+                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                                            <span className="bg-white/90 text-gray-900 text-xs font-bold px-4 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                                View Products
                                             </span>
                                         </div>
-                                        <h3 className="font-black text-2xl text-gray-900 group-hover:text-yellow-600 transition-colors mb-4">{item.name}</h3>
-                                        <p className="text-gray-600 leading-relaxed line-clamp-4">
-                                            {item.description ? item.description.replace(/<[^>]+>/g, '') : "Premium custom packaging solutions tailored specifically for your brand needs and product requirements."}
-                                        </p>
-
-                                        <div className="mt-8 flex items-center gap-2 text-zinc-900 font-bold group-hover:text-yellow-600 transition-colors">
-                                            Learn More <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                        </div>
+                                    </div>
+                                    <CardContent className="p-6 text-center">
+                                        <h3 className="font-bold text-xl text-gray-900 group-hover:text-yellow-600 transition-colors uppercase tracking-tight">{item.name}</h3>
                                     </CardContent>
                                 </Card>
                             </Link>
