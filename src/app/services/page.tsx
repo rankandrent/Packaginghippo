@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import prisma from "@/lib/db"
 import { QuoteForm } from "@/components/forms/QuoteForm"
+import { JsonLd } from "@/components/seo/JsonLd"
 
 export const dynamic = 'force-dynamic'
 
@@ -57,6 +58,36 @@ export default async function ServicesPage() {
 
     return (
         <main className="min-h-screen bg-white">
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "CollectionPage",
+                    "@id": "https://packaginghippo.com/services",
+                    "name": page?.title || "All Packaging Categories",
+                    "description": page?.seoDesc || "Browse our complete range of custom packaging categories. From corrugated boxes to luxury rigid packaging.",
+                    "url": "https://packaginghippo.com/services",
+                    "mainEntity": {
+                        "@type": "ItemList",
+                        "numberOfItems": categories.length,
+                        "itemListElement": categories.map((item, index) => ({
+                            "@type": "ListItem",
+                            "position": index + 1,
+                            "url": `https://packaginghippo.com/services/${item.slug}`,
+                            "name": item.name
+                        }))
+                    }
+                }}
+            />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://packaginghippo.com" },
+                        { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://packaginghippo.com/services" }
+                    ]
+                }}
+            />
             {/* Header Section */}
             <div className="bg-zinc-950 pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden relative">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/10 via-zinc-950 to-zinc-950"></div>
@@ -73,7 +104,7 @@ export default async function ServicesPage() {
             {/* Managed Content Area */}
             {htmlContent && (
                 <section className="py-16 bg-white border-b border-gray-100">
-                    <div className="container mx-auto px-4 max-w-4xl prose prose-lg rich-text">
+                    <div className="container mx-auto px-4 prose prose-lg max-w-none text-gray-700 leading-relaxed rich-text">
                         <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
                     </div>
                 </section>

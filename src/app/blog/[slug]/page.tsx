@@ -72,29 +72,28 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
     return (
         <div className="min-h-screen bg-white">
             {/* Structured Data for SEO */}
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "BlogPosting",
-                        "headline": post.seoTitle || post.title,
-                        "description": post.seoDesc || post.excerpt,
-                        "image": post.mainImage,
-                        "author": {
-                            "@type": "Person",
-                            "name": post.author?.name || "Admin"
-                        },
-                        "publisher": {
-                            "@type": "Organization",
-                            "name": "Packaging Hippo",
-                            "logo": {
-                                "@type": "ImageObject",
-                                "url": "https://packaginghippo.com/logo.png"
-                            }
-                        },
-                        "datePublished": post.publishedAt || post.createdAt
-                    })
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "BlogPosting",
+                    "@id": `https://packaginghippo.com/blog/${post.slug}`,
+                    "headline": post.seoTitle || post.title,
+                    "description": post.seoDesc || post.excerpt,
+                    "image": post.mainImage ? [post.mainImage] : [],
+                    "author": {
+                        "@type": "Person",
+                        "name": post.author?.name || "Admin",
+                        "url": post.author?.slug ? `https://packaginghippo.com/blog/author/${post.author.slug}` : undefined
+                    },
+                    "publisher": {
+                        "@id": "https://packaginghippo.com/#organization"
+                    },
+                    "datePublished": post.publishedAt || post.createdAt,
+                    "dateModified": post.updatedAt || post.publishedAt || post.createdAt,
+                    "mainEntityOfPage": {
+                        "@type": "WebPage",
+                        "@id": `https://packaginghippo.com/blog/${post.slug}`
+                    }
                 }}
             />
 

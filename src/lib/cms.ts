@@ -186,3 +186,21 @@ export async function getFeaturedBlogs() {
         return []
     }
 }
+
+export async function getHomepageSections() {
+    try {
+        const sections = await prisma.homepageSection.findMany({
+            where: { isActive: true },
+            orderBy: { order: 'asc' }
+        })
+        return sections.map(s => ({
+            id: s.id,
+            type: s.sectionKey as any,
+            title: s.title || '',
+            content: s.content
+        }))
+    } catch (error) {
+        console.error("Error fetching homepage sections:", error)
+        return []
+    }
+}

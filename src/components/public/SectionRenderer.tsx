@@ -48,13 +48,17 @@ export function SectionRenderer({
     popularProducts,
     categoryName,
     breadcrumbs,
-    featuredBlogs = []
+    featuredBlogs = [],
+    quoteFormImage,
+    homepageSections = []
 }: {
     sections: Section[],
     popularProducts?: any[],
     categoryName?: string,
     breadcrumbs?: React.ReactNode,
-    featuredBlogs?: any[]
+    featuredBlogs?: any[],
+    quoteFormImage?: any,
+    homepageSections?: Section[]
 }) {
     if (!sections || !Array.isArray(sections)) return null
 
@@ -68,6 +72,8 @@ export function SectionRenderer({
                     categoryName={categoryName}
                     breadcrumbs={breadcrumbs}
                     featuredBlogs={featuredBlogs}
+                    quoteFormImage={quoteFormImage}
+                    homepageSections={homepageSections}
                 />
             ))}
         </div>
@@ -96,14 +102,24 @@ function RenderSection({
     popularProducts,
     categoryName,
     breadcrumbs,
-    featuredBlogs
+    featuredBlogs,
+    quoteFormImage,
+    homepageSections = []
 }: {
     section: Section,
     popularProducts?: any[],
     categoryName?: string,
     breadcrumbs?: React.ReactNode,
-    featuredBlogs?: any[]
+    featuredBlogs?: any[],
+    quoteFormImage?: any,
+    homepageSections?: Section[]
 }) {
+    // Helper to get content from home if current section is a placeholder or has no items
+    const getSharedContent = () => {
+        const shared = homepageSections.find(s => s.type === section.type)
+        return shared ? shared.content : section.content
+    }
+
     switch (section.type) {
         case 'hero':
             return <HeroSection content={section.content} breadcrumbs={breadcrumbs} />
@@ -117,34 +133,33 @@ function RenderSection({
         case 'seo_content':
             return <SeoContentSection content={section.content} />
         case 'benefits':
-            // If it has 'items', use the homepage component, otherwise fallback to simple one
-            return <Benefits data={section.content} />
+            return <Benefits data={getSharedContent()} />
         case 'faq':
-            return <FaqSection content={section.content} />
+            return <FaqSection content={getSharedContent()} />
         case 'cta':
             return <CTA data={section.content} />
         case 'gallery':
             return <GallerySection content={section.content} />
         case 'customer_reviews':
-            return <CustomerReviewsSection content={section.content} />
+            return <CustomerReviewsSection content={getSharedContent()} />
         case 'features_bar':
-            return <FeaturesBarSection content={section.content} />
+            return <FeaturesBarSection content={getSharedContent()} />
         case 'logo_loop':
-            return <LogoLoopSection content={section.content} />
+            return <LogoLoopSection content={getSharedContent()} />
 
         // NEW SECTIONS
         case 'intro': return <Intro data={section.content} />
-        case 'services_list': return <ServicesList data={section.content} />
-        case 'how_it_works': return <HowItWorks data={section.content} />
-        case 'eco_friendly': return <EcoFriendly data={section.content} />
-        case 'printing': return <Printing data={section.content} />
-        case 'industries': return <Industries data={section.content} />
-        case 'steps': return <Steps data={section.content} />
-        case 'ordering_process': return <OrderingProcess data={section.content} />
-        case 'why_choose_us': return <WhyChooseUs data={section.content} />
-        case 'video_section': return <VideoSection data={section.content} />
-        case 'quote_form': return <QuoteSection data={section.content} />
-        case 'custom_quote_form': return <CustomQuoteFormSection image={section.content.image} />
+        case 'services_list': return <ServicesList data={getSharedContent()} />
+        case 'how_it_works': return <HowItWorks data={getSharedContent()} />
+        case 'eco_friendly': return <EcoFriendly data={getSharedContent()} />
+        case 'printing': return <Printing data={getSharedContent()} />
+        case 'industries': return <Industries data={getSharedContent()} />
+        case 'steps': return <Steps data={getSharedContent()} />
+        case 'ordering_process': return <OrderingProcess data={getSharedContent()} />
+        case 'why_choose_us': return <WhyChooseUs data={getSharedContent()} />
+        case 'video_section': return <VideoSection data={getSharedContent()} />
+        case 'quote_form': return <QuoteSection data={getSharedContent()} />
+        case 'custom_quote_form': return <CustomQuoteFormSection image={quoteFormImage || section.content.image} />
         case 'featured_blogs': return <FeaturedBlogs posts={featuredBlogs || []} />
 
         default:
@@ -308,7 +323,7 @@ function TextSection({ content }: { content: any }) {
     if (!content.html) return null
     return (
         <section className="py-16 bg-white">
-            <div className="container mx-auto px-4 prose max-w-4xl text-gray-700 leading-relaxed">
+            <div className="container mx-auto px-4 prose max-w-none text-gray-700 leading-relaxed">
                 {content.heading && <h2 className="text-3xl font-bold text-gray-900 mb-6">{content.heading}</h2>}
                 <div className="rich-text" dangerouslySetInnerHTML={{ __html: content.html }} />
             </div>

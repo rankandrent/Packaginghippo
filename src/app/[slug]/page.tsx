@@ -25,7 +25,8 @@ import {
     getRelatedCategories,
     getPopularProducts,
     getQuoteFormImage,
-    getFeaturedBlogs
+    getFeaturedBlogs,
+    getHomepageSections
 } from "@/lib/cms"
 
 export const revalidate = 60
@@ -133,6 +134,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
     const popularProducts = await getPopularProducts(category.id)
     const quoteFormImage = await getQuoteFormImage()
     const featuredBlogs = await getFeaturedBlogs()
+    const homepageSections = await getHomepageSections()
 
     // Cast sections to proper type
     let sections = (category.sections as unknown as Section[]) || []
@@ -189,6 +191,12 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
         ]
     }
 
+    // Inject Logo Loop from homepage if not present
+    const logoLoop = homepageSections.find((s: any) => s.type === 'logo_loop')
+    if (logoLoop && !sections.find((s: any) => s.type === 'logo_loop')) {
+        sections.splice(1, 0, logoLoop)
+    }
+
     const breadcrumbItems = [
         { label: "Services", href: "/services" },
         { label: category.name }
@@ -200,8 +208,9 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 data={{
                     "@context": "https://schema.org",
                     "@type": "CollectionPage",
+                    "@id": `https://packaginghippo.com/${slug}`,
                     "name": category.name,
-                    "description": category.seoDesc || category.description,
+                    "description": category.seoDesc || category.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
                     "url": `https://packaginghippo.com/${slug}`,
                     "mainEntity": {
                         "@type": "ItemList",
@@ -209,23 +218,9 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                         "itemListElement": category.products.map((product: any, index: number) => ({
                             "@type": "ListItem",
                             "position": index + 1,
-                            "item": {
-                                "@type": "Product",
-                                "name": product.name,
-                                "description": product.shortDesc,
-                                "url": `https://packaginghippo.com/${product.slug}`,
-                                "image": product.images?.[0],
-                                "brand": {
-                                    "@type": "Brand",
-                                    "name": "Packaging Hippo"
-                                },
-                                "offers": {
-                                    "@type": "Offer",
-                                    "availability": "https://schema.org/InStock",
-                                    "priceCurrency": "USD",
-                                    "price": product.price || "1.00"
-                                }
-                            }
+                            "url": `https://packaginghippo.com/${product.slug}`,
+                            "name": product.name,
+                            "image": product.images?.[0]
                         }))
                     }
                 }}
@@ -248,6 +243,8 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 categoryName={category.name}
                 breadcrumbs={<Breadcrumbs items={breadcrumbItems} />}
                 featuredBlogs={featuredBlogs}
+                homepageSections={homepageSections}
+                quoteFormImage={quoteFormImage}
             />
 
             <TestimonialsSection testimonials={testimonials} />
@@ -259,7 +256,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
             {/* Category Description (SEO Content) */}
             {category.description && (
                 <section className="py-16 bg-white border-t">
-                    <div className="container mx-auto px-4 prose max-w-4xl">
+                    <div className="container mx-auto px-4 prose max-w-none text-gray-700 leading-relaxed">
                         <h2 className="text-3xl font-bold mb-8">{category.name} Overview</h2>
                         <CollapsibleText content={category.description} collapsedHeight={category.descriptionCollapsedHeight || 300} />
                     </div>
@@ -273,9 +270,24 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
 // PRODUCT VIEW
 // ==========================================
 async function ProductView({ product, slug }: { product: any, slug: string }) {
+    const featuredBlogs = await getFeaturedBlogs()
+    const popularProducts = await getPopularProducts(product.categoryId)
+    const quoteFormImage = await getQuoteFormImage()
     const testimonials = await getTestimonials(product.id)
+    const homepageSections = await getHomepageSections()
 
-    const sections = (product.sections as unknown as Section[]) || []
+    let sections = (product.sections as unknown as Section[]) || []
+
+    // Inject Logo Loop from homepage if not present
+    const logoLoop = homepageSections.find((s: any) => s.type === 'logo_loop')
+    const featuresBar = homepageSections.find((s: any) => s.type === 'features_bar')
+
+    if (logoLoop && !sections.find((s: any) => s.type === 'logo_loop')) {
+        sections.push(logoLoop)
+    }
+    if (featuresBar && !sections.find((s: any) => s.type === 'features_bar')) {
+        sections.push(featuresBar)
+    }
 
     const breadcrumbItems = [
         { label: "Products", href: "/products" },
@@ -289,19 +301,44 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                 data={{
                     "@context": "https://schema.org",
                     "@type": "Product",
+                    "@id": `https://packaginghippo.com/${product.slug}`,
                     "name": product.name,
-                    "description": product.shortDesc || product.seoDesc,
+                    "description": product.shortDesc || product.seoDesc || product.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
                     "image": product.images,
+                    "sku": product.id.slice(-8).toUpperCase(),
+                    "mpn": product.id.slice(-8).toUpperCase(),
+                    "category": product.category?.name,
+                    "material": product.materials,
                     "brand": {
                         "@type": "Brand",
-                        "name": "Packaging Hippo"
+                        "name": "Packaging Hippo",
+                        "@id": "https://packaginghippo.com/#organization"
                     },
                     "offers": {
                         "@type": "AggregateOffer",
                         "availability": "https://schema.org/InStock",
                         "priceCurrency": "USD",
-                        "lowPrice": product.price || "1.00"
-                    }
+                        "lowPrice": product.price || "1.00",
+                        "offerCount": "1",
+                        "url": `https://packaginghippo.com/${product.slug}`,
+                        "seller": {
+                            "@type": "Organization",
+                            "name": "Packaging Hippo",
+                            "@id": "https://packaginghippo.com/#organization"
+                        }
+                    },
+                    "additionalProperty": [
+                        ...(product.materials ? [{
+                            "@type": "PropertyValue",
+                            "name": "Material",
+                            "value": product.materials
+                        }] : []),
+                        ...(product.dimensions ? [{
+                            "@type": "PropertyValue",
+                            "name": "Dimensions",
+                            "value": product.dimensions
+                        }] : [])
+                    ]
                 }}
             />
             <JsonLd
@@ -399,23 +436,35 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                 </div>
             </section>
 
-            {/* Custom Dynamic Sections */}
-            <SectionRenderer sections={sections} />
-
-
-            {/* Full Description if no text section exists */}
-            {!sections.find((s: any) => s.type === 'text') && product.description && (
-                <section className="py-16 bg-white border-t">
-                    <div className="container mx-auto px-4 prose max-w-4xl">
-                        <h2 className="text-3xl font-bold mb-8">Product Overview</h2>
-                        <CollapsibleText content={product.description} collapsedHeight={product.descriptionCollapsedHeight || 300} />
-                    </div>
-                </section>
+            {/* Dynamic Page Sections */}
+            {sections.length > 0 && (
+                <SectionRenderer
+                    sections={sections}
+                    featuredBlogs={featuredBlogs}
+                    popularProducts={popularProducts}
+                    quoteFormImage={quoteFormImage}
+                    homepageSections={homepageSections}
+                    breadcrumbs={<Breadcrumbs items={breadcrumbItems} />}
+                    categoryName={product.category?.name}
+                />
             )}
 
             <ProductTabs tabs={product.tabs as any} />
 
             <TestimonialsSection testimonials={testimonials} />
+
+            {/* Product Description (SEO Content) - Fallback or additional overview */}
+            {product.description && !sections.find(s => s.type === 'text') && (
+                <section className="py-24 bg-white border-t border-gray-100">
+                    <div className="container mx-auto px-4 prose max-w-none">
+                        <h2 className="text-3xl font-bold mb-8">Product Overview</h2>
+                        <CollapsibleText
+                            content={product.description}
+                            collapsedHeight={product.descriptionCollapsedHeight || 300}
+                        />
+                    </div>
+                </section>
+            )}
         </main>
     )
 }
@@ -465,7 +514,7 @@ async function PageView({ page, slug }: { page: any, slug: string }) {
 
             {/* Fallback if no sections: render generic content if available */}
             {sections.length === 0 && (
-                <div className="container mx-auto px-4 py-16 prose max-w-4xl">
+                <div className="container mx-auto px-4 py-16 prose max-w-none text-gray-700 leading-relaxed">
                     <h1>{page.title}</h1>
                     {/* Render raw content if possible, or just Show title */}
                     <div dangerouslySetInnerHTML={{ __html: JSON.stringify(page.content) }} />

@@ -12,7 +12,7 @@ export default function QuotePage() {
                 <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent" />
 
                 <div className="container mx-auto px-4 relative z-10">
-                    <div className="max-w-4xl mx-auto text-center space-y-6">
+                    <div className="container mx-auto text-center space-y-6">
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-500 text-black text-xs font-black uppercase tracking-widest mb-4">
                             Premium Packaging Solutions
                         </div>

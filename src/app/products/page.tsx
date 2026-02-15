@@ -119,7 +119,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     </div>
 
                     {/* Intro Content */}
-                    <div className="max-w-4xl mx-auto text-center mb-12">
+                    <div className="container mx-auto px-4 text-center mb-12">
                         <h2 className="text-3xl font-bold text-gray-900 mb-4">Custom Packaging Solutions for Every Business</h2>
                         <p className="text-gray-600 leading-relaxed">
                             At Packaging Hippo, we offer a comprehensive range of custom packaging products tailored to your specific needs.
