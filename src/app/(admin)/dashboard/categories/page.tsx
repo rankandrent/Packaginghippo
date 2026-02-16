@@ -19,6 +19,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Plus, Pencil, Trash2, Loader2, Search, Filter, Eye } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type Category = {
     id: string
@@ -39,7 +40,21 @@ export default function CategoriesPage() {
 
     useEffect(() => {
         fetchCategories()
+        fetchTemplates()
     }, [])
+
+    const [templates, setTemplates] = useState<{ id: string, name: string }[]>([])
+    const [selectedTemplateId, setSelectedTemplateId] = useState<string>("none")
+
+    async function fetchTemplates() {
+        try {
+            const res = await fetch('/api/cms/templates?type=category')
+            const data = await res.json()
+            setTemplates(data.templates || [])
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     async function fetchCategories() {
         try {
@@ -67,7 +82,7 @@ export default function CategoriesPage() {
             const res = await fetch('/api/cms/categories', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newName, slug }),
+                body: JSON.stringify({ name: newName, slug, templateId: selectedTemplateId === 'none' ? undefined : selectedTemplateId }),
             })
 
             if (!res.ok) throw new Error('Failed to create')
@@ -142,6 +157,20 @@ export default function CategoriesPage() {
                                     required
                                     autoFocus
                                 />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="template">Template (Optional)</Label>
+                                <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a template" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">Default Layout</SelectItem>
+                                        {templates.map(t => (
+                                            <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <DialogFooter>
                                 <Button type="submit" className="w-full sm:w-auto">Create & Edit</Button>

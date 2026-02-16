@@ -33,6 +33,14 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/cdn/image/:path*',
+        destination: 'https://res.cloudinary.com/da9culaxt/image/upload/:path*',
+      },
+    ]
+  },
 };
 
 export default nextConfig;

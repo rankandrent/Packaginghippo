@@ -21,6 +21,7 @@ const formSchema = z.object({
     turnaround: z.string().optional(),
     quantity: z.string().min(1, "Quantity is required"),
     message: z.string().optional(),
+    hp_field: z.string().optional(),
 })
 
 interface QuoteFormProps {
@@ -68,6 +69,7 @@ export function QuoteForm({
                     phone: values.phone,
                     type: 'quote',
                     message: values.message,
+                    hp_field: values.hp_field,
                     sourceUrl: currentUrl,
                     sourcePage: pageSource,
                     details: {
@@ -227,6 +229,11 @@ export function QuoteForm({
                     <div className="space-y-1.5">
                         <label className={labelClasses}>Any Additional Requirements?</label>
                         <textarea {...form.register("message")} rows={3} className={cn(inputClasses, "resize-none")} placeholder="Describe any special finishing, coatings, or design needs..." />
+                    </div>
+
+                    {/* Honeypot field (hidden) */}
+                    <div className="hidden" aria-hidden="true">
+                        <input {...form.register("hp_field")} type="text" tabIndex={-1} autoComplete="off" />
                     </div>
 
                     <div className="pt-4">

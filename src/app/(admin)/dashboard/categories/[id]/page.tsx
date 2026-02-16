@@ -13,6 +13,9 @@ import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
 import { Loader2, ArrowLeft, Save, Sparkles } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DEFAULT_CATEGORY_TEMPLATE } from "@/lib/cms/templates"
+
 
 type Category = {
     id: string
@@ -69,8 +72,12 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
         }
     }
 
+    // Initial fetch
     useEffect(() => {
-        fetchCategory()
+        const init = async () => {
+            await Promise.all([fetchCategory(), fetchTemplates()])
+        }
+        init()
     }, [])
 
     async function fetchCategory() {
@@ -81,8 +88,12 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
             if (data.error) throw new Error(data.error)
 
             setCategory(data.category)
-            if (data.category.sections && Array.isArray(data.category.sections)) {
+            if (data.category.sections && Array.isArray(data.category.sections) && data.category.sections.length > 0) {
                 setSections(data.category.sections)
+            } else {
+                // Load default template for new/empty categories
+                // Deep copy to avoid reference issues
+                setSections(JSON.parse(JSON.stringify(DEFAULT_CATEGORY_TEMPLATE)))
             }
         } catch (error) {
             console.error("Error fetching category:", error)
@@ -91,6 +102,33 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
             setLoading(false)
         }
     }
+
+    const [templates, setTemplates] = useState<{ id: string, name: string, sections: any }[]>([])
+
+    async function fetchTemplates() {
+        try {
+            const res = await fetch('/api/cms/templates?type=category')
+            const data = await res.json()
+            setTemplates(data.templates || [])
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    function applyTemplate(templateId: string) {
+        const template = templates.find(t => t.id === templateId)
+        if (template && confirm("This will replace current sections with the template. Continue?")) {
+            setSections(template.sections)
+        }
+    }
+
+    useEffect(() => {
+        const init = async () => {
+            // ... existing init
+            await Promise.all([fetchCategory(), fetchTemplates()])
+        }
+        init()
+    }, [])
 
     async function saveCategory(e?: React.FormEvent) {
         if (e) e.preventDefault()
@@ -240,6 +278,21 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                         <div className="mb-4">
                             <h3 className="font-semibold text-lg">Page Sections</h3>
                             <p className="text-sm text-muted-foreground">Add custom sections to the category page.</p>
+                        </div>
+
+                        <div className="mb-6 p-4 border rounded-md bg-muted/20">
+                            <Label className="mb-2 block">Load From Template</Label>
+                            <Select onValueChange={applyTemplate}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a template to apply..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {templates.map(t => (
+                                        <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground mt-2">Warning: Applying a template will replace all current sections.</p>
                         </div>
                         <SectionBuilder sections={sections} onChange={setSections} />
                     </div>

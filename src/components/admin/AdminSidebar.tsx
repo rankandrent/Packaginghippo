@@ -19,7 +19,8 @@ import {
     AlertTriangle,
     Star,
     Image,
-    Link as LinkIcon
+    Link as LinkIcon,
+    LayoutTemplate
 } from "lucide-react"
 
 const sidebarItems = [
@@ -37,6 +38,11 @@ const sidebarItems = [
         title: "Products",
         href: "/dashboard/products",
         icon: Package,
+    },
+    {
+        title: "Templates",
+        href: "/dashboard/templates",
+        icon: LayoutTemplate,
     },
     {
         title: "Categories",
@@ -95,6 +101,8 @@ export function AdminSidebar() {
     const router = useRouter()
     const [loggingOut, setLoggingOut] = useState(false)
     const [user, setUser] = useState<{ name?: string; email: string } | null>(null)
+    const [pendingInquiriesCount, setPendingInquiriesCount] = useState(0)
+    const [seoIssuesCount, setSeoIssuesCount] = useState(0)
 
     useEffect(() => {
         // Fetch current user session
@@ -106,6 +114,23 @@ export function AdminSidebar() {
                 }
             })
             .catch(() => { })
+
+        // Fetch counts
+        const fetchCounts = () => {
+            fetch('/api/cms/inquiries/count')
+                .then(res => res.json())
+                .then(data => setPendingInquiriesCount(data.count))
+                .catch(() => { })
+
+            fetch('/api/cms/seo-audit/count')
+                .then(res => res.json())
+                .then(data => setSeoIssuesCount(data.count))
+                .catch(() => { })
+        }
+
+        fetchCounts()
+        const interval = setInterval(fetchCounts, 30000) // Poll every 30 seconds
+        return () => clearInterval(interval)
     }, [])
 
     async function handleLogout() {
@@ -134,14 +159,26 @@ export function AdminSidebar() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
+                                "flex items-center justify-between rounded-lg px-3 py-2 transition-all hover:text-primary",
                                 pathname === item.href
                                     ? "bg-muted text-primary"
                                     : "text-muted-foreground"
                             )}
                         >
-                            <item.icon className="h-4 w-4" />
-                            {item.title}
+                            <div className="flex items-center gap-3">
+                                <item.icon className="h-4 w-4" />
+                                {item.title}
+                            </div>
+                            {item.title === "Inquiries" && pendingInquiriesCount > 0 && (
+                                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center animate-pulse">
+                                    {pendingInquiriesCount}
+                                </span>
+                            )}
+                            {item.title === "SEO Issues" && seoIssuesCount > 0 && (
+                                <span className="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                                    {seoIssuesCount}
+                                </span>
+                            )}
                         </Link>
                     ))}
                 </nav>

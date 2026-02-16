@@ -62,7 +62,21 @@ export default function ProductsPage() {
     // Fetch categories when component mounts (or when dialog opens)
     useEffect(() => {
         fetch("/api/cms/categories").then(res => res.json()).then(data => setCategories(data.categories || []))
+        fetchTemplates()
     }, [])
+
+    const [templates, setTemplates] = useState<{ id: string, name: string }[]>([])
+    const [selectedTemplateId, setSelectedTemplateId] = useState<string>("none")
+
+    async function fetchTemplates() {
+        try {
+            const res = await fetch('/api/cms/templates?type=product')
+            const data = await res.json()
+            setTemplates(data.templates || [])
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     async function createProduct(e: React.FormEvent) {
         e.preventDefault()
@@ -74,7 +88,7 @@ export default function ProductsPage() {
             const res = await fetch('/api/cms/products', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newName, slug, categoryId: newCategoryId }),
+                body: JSON.stringify({ name: newName, slug, categoryId: newCategoryId, templateId: selectedTemplateId === 'none' ? undefined : selectedTemplateId }),
             })
 
             if (!res.ok) {
@@ -167,6 +181,20 @@ export default function ProductsPage() {
                                     <SelectContent>
                                         {categories.map(cat => (
                                             <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Template (Optional)</Label>
+                                <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a template" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">Default Layout</SelectItem>
+                                        {templates.map(t => (
+                                            <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

@@ -12,6 +12,9 @@ import { ImageUploader } from "@/components/admin/ImageUploader"
 import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
 import { Loader2, ArrowLeft, Save, Plus, Trash2, Sparkles } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DEFAULT_PRODUCT_TEMPLATE } from "@/lib/cms/templates"
+
 
 type Category = {
     id: string
@@ -27,12 +30,6 @@ type Product = {
     price: number | null
     categoryId: string
     images: string[]
-    specifications: string | null // currently string in schema? No, checked schema: dimensions, materials, finishings are strings. 
-    // Wait, the schema has: dimensions, materials, finishings.
-    // The previous file had "specifications" JSON? No, previously supabase used JSON. Prisma has specific fields. 
-    // I need to map "specifications" UI to dimensions/materials/finishings OR add a specs JSON field?
-    // User asked for "jitne bhi sections hon... edit kar sakoon". SectionBuilder handles generic content.
-    // For specific specs, I will map the named fields. 
     dimensions: string | null
     materials: string | null
     finishings: string | null
@@ -42,11 +39,7 @@ type Product = {
     seoKeywords: string | null
     descriptionCollapsedHeight: number
     isActive: boolean
-    sections: any // Json
-
-    // Legacy fields from Supabase version if needed or just use sections?
-    // User wants "sections". SectionBuilder is enough for generic "benefits/features".
-    // I will stick to schema fields.
+    sections: any
 }
 
 export default function ProductEditor({ params }: { params: Promise<{ id: string }> }) {
@@ -95,9 +88,10 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
         }
     }
 
+    // Initial fetch
     useEffect(() => {
         const init = async () => {
-            await Promise.all([fetchProduct(), fetchCategories()])
+            await Promise.all([fetchProduct(), fetchCategories(), fetchTemplates()])
             setLoading(false)
         }
         init()
@@ -111,8 +105,11 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
 
             setProduct(data.product)
             // Parse sections if existing
-            if (data.product.sections && Array.isArray(data.product.sections)) {
+            if (data.product.sections && Array.isArray(data.product.sections) && data.product.sections.length > 0) {
                 setSections(data.product.sections)
+            } else {
+                // Load default template for new/empty products
+                setSections(JSON.parse(JSON.stringify(DEFAULT_PRODUCT_TEMPLATE)))
             }
         } catch (error) {
             console.error("Error fetching product:", error)
@@ -129,6 +126,34 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
             console.error(e)
         }
     }
+
+    const [templates, setTemplates] = useState<{ id: string, name: string, sections: any }[]>([])
+
+    async function fetchTemplates() {
+        try {
+            const res = await fetch('/api/cms/templates?type=product')
+            const data = await res.json()
+            setTemplates(data.templates || [])
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    function applyTemplate(templateId: string) {
+        const template = templates.find(t => t.id === templateId)
+        if (template && confirm("This will replace current sections with the template. Continue?")) {
+            setSections(template.sections)
+        }
+    }
+
+    useEffect(() => {
+        const init = async () => {
+            // ... existing init
+            await Promise.all([fetchProduct(), fetchCategories(), fetchTemplates()])
+            setLoading(false)
+        }
+        init()
+    }, [])
 
     async function saveProduct(e?: React.FormEvent) {
         if (e) e.preventDefault()
@@ -280,6 +305,21 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                         <div className="mb-4">
                             <h3 className="font-semibold text-lg">Page Sections</h3>
                             <p className="text-sm text-muted-foreground">Add custom sections to the product page (Benefits, Features, FAQ, etc.)</p>
+                        </div>
+
+                        <div className="mb-6 p-4 border rounded-md bg-muted/20">
+                            <Label className="mb-2 block">Load From Template</Label>
+                            <Select onValueChange={applyTemplate}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a template to apply..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {templates.map(t => (
+                                        <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground mt-2">Warning: Applying a template will replace all current sections.</p>
                         </div>
                         <SectionBuilder sections={sections} onChange={setSections} />
                     </div>

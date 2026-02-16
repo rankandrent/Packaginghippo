@@ -42,7 +42,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, description } = body
+        const { name, slug, description, templateId } = body
+
+        let initialSections: any[] = []
+
+        if (templateId) {
+            const template = await prisma.pageTemplate.findUnique({
+                where: { id: templateId }
+            })
+            if (template) {
+                initialSections = template.sections as any[]
+            }
+        }
 
         const category = await prisma.productCategory.create({
             data: {
@@ -50,6 +61,7 @@ export async function POST(request: NextRequest) {
                 slug,
                 description,
                 isActive: false,
+                sections: initialSections,
             },
         })
 

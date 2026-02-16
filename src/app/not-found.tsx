@@ -56,8 +56,8 @@ export default async function NotFound() {
                 </div>
 
                 <p className="text-gray-600">
-                    The packaging you're looking for seems to have been misplaced.
-                    Don't worry, we can help you find what you need.
+                    The packaging you&apos;re looking for seems to have been misplaced.
+                    Don&apos;t worry, we can help you find what you need.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4">

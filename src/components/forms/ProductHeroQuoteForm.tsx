@@ -19,6 +19,7 @@ const formSchema = z.object({
     stock: z.string().optional(),
     quantity: z.string().min(1, "Qty required"),
     message: z.string().optional(),
+    hp_field: z.string().optional(),
 })
 
 export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
@@ -46,6 +47,7 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                     phone: values.phone,
                     type: 'quote',
                     message: values.message,
+                    hp_field: values.hp_field,
                     sourceUrl: window.location.href,
                     sourcePage: `Product: ${productSlug}`,
                     details: {
@@ -163,6 +165,11 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                             <FileText className={iconClass} />
                             <input {...form.register("message")} placeholder="Any specific requirements?" className={inputClass} />
                         </div>
+                    </div>
+
+                    {/* Honeypot field (hidden) */}
+                    <div className="hidden" aria-hidden="true">
+                        <input {...form.register("hp_field")} type="text" tabIndex={-1} autoComplete="off" />
                     </div>
 
                     <Button

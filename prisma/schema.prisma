@@ -158,7 +158,9 @@ model Inquiry {
   sourceUrl  String?
   sourcePage String?
   
-  status     String   @default("PENDING") // PENDING, REPLIED, CLOSED
+  status     String   @default("PENDING") // PENDING, REPLIED, CLOSED, SPAM
+  isSpam     Boolean  @default(false)
+  spamScore  Float    @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -249,4 +251,13 @@ model Redirect {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model PageTemplate {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  type      String   // 'product' | 'category'
+  sections  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

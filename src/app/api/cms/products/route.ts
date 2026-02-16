@@ -44,10 +44,21 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, categoryId, sections } = body
+        const { name, slug, categoryId, templateId } = body
 
         if (!categoryId) {
             return NextResponse.json({ error: 'Category is required' }, { status: 400 })
+        }
+
+        let initialSections: any[] = []
+
+        if (templateId) {
+            const template = await prisma.pageTemplate.findUnique({
+                where: { id: templateId }
+            })
+            if (template) {
+                initialSections = template.sections as any[]
+            }
         }
 
         const product = await prisma.product.create({
@@ -55,7 +66,7 @@ export async function POST(request: NextRequest) {
                 name,
                 slug,
                 categoryId,
-                sections: sections || [], // Default to empty array
+                sections: initialSections,
                 images: [],
                 isActive: false,
                 isTopProduct: false,

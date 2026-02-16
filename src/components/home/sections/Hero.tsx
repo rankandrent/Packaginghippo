@@ -5,8 +5,16 @@ import { motion } from "framer-motion"
 import { ArrowRight, Box, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+import { getSeoImageUrl, getSeoAltText } from "@/lib/image-seo"
+
 export function Hero({ data }: { data: any }) {
     if (!data) return null
+
+    // SEO Data Preparation
+    const seoValues = {
+        imageUrl: getSeoImageUrl(data.hero_image),
+        altText: getSeoAltText(data, 'Custom Packaging Boxes on Yellow Background')
+    }
 
     return (
         <section className="relative bg-zinc-950 pt-12 pb-12 md:pt-20 md:pb-20 overflow-hidden">
@@ -48,9 +56,11 @@ export function Hero({ data }: { data: any }) {
                         <div className="relative z-10 w-full max-w-md aspect-square bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-3xl shadow-2xl shadow-yellow-500/20 transform rotate-[-5deg] flex items-center justify-center border-t border-white/20">
                             {data.hero_image ? (
                                 <img
-                                    src={data.hero_image}
-                                    alt="Hero"
+                                    src={seoValues.imageUrl}
+                                    alt={seoValues.altText}
+                                    title={seoValues.altText} // Good for tooltip/SEO
                                     className="w-full h-full object-cover rounded-3xl"
+                                    loading="eager" // Hero image should load fast
                                 />
                             ) : (
                                 <Box className="w-32 h-32 md:w-48 md:h-48 text-black opacity-50" />

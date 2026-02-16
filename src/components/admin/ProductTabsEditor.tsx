@@ -45,6 +45,16 @@ export function ProductTabsEditor({ value = {}, onChange }: ProductTabsEditorPro
         })
     }
 
+    const updateStructuredSpecs = (specs: { label: string, value: string }[]) => {
+        onChange({
+            ...value,
+            specification: {
+                ...value.specification,
+                structuredSpecs: specs
+            }
+        })
+    }
+
     const addImage = (tabKey: string, imageUrl: string) => {
         const currentTab = value[tabKey as keyof typeof value] || { content: '', images: [] }
         onChange({
@@ -69,22 +79,25 @@ export function ProductTabsEditor({ value = {}, onChange }: ProductTabsEditorPro
         })
     }
 
-    const currentTabData = value[activeTab as keyof typeof value] || { content: '', images: [] }
+    const currentTabData = value[activeTab as keyof typeof value] || { content: '', images: [], structuredSpecs: [] }
 
     return (
-        <div className="border rounded-lg p-6 bg-white">
-            <h3 className="text-lg font-bold mb-4">Product Tabs</h3>
+        <div className="border rounded-lg p-6 bg-white shadow-sm">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <span className="bg-blue-100 text-blue-900 p-1.5 rounded-lg"><Trash2 className="w-4 h-4" /></span>
+                Product Information Tabs
+            </h3>
 
             {/* Tab Navigation */}
-            <div className="flex flex-wrap gap-2 mb-6 border-b pb-4">
+            <div className="flex flex-wrap gap-1 mb-6 border-b pb-4">
                 {TAB_CONFIG.map(tab => (
                     <button
                         key={tab.key}
                         type="button"
                         onClick={() => setActiveTab(tab.key)}
-                        className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === tab.key
-                                ? 'bg-blue-900 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        className={`px-4 py-2 text-xs font-bold uppercase rounded-lg transition-all ${activeTab === tab.key
+                            ? 'bg-blue-900 text-white shadow-md'
+                            : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900'
                             }`}
                     >
                         {tab.label}
@@ -93,21 +106,119 @@ export function ProductTabsEditor({ value = {}, onChange }: ProductTabsEditorPro
             </div>
 
             {/* Tab Content Editor */}
-            <div className="space-y-6">
-                {/* Images Section */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">Images</label>
+            <div className="space-y-8">
+                {/* Specification Table Editor (Special UI) */}
+                {activeTab === 'specification' && (
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="text-sm font-bold uppercase tracking-wider text-gray-700">Detailed Specifications Table</label>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    const specs = [...(currentTabData.structuredSpecs || [])]
+                                    specs.push({ label: '', value: '' })
+                                    updateStructuredSpecs(specs)
+                                }}
+                            >
+                                <Plus className="w-4 h-4 mr-2" /> Add Row
+                            </Button>
+                        </div>
+
+                        <div className="border rounded-xl overflow-hidden shadow-sm">
+                            <table className="w-full text-sm">
+                                <thead className="bg-gray-50 border-b">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left font-bold text-gray-900 w-1/3">Label</th>
+                                        <th className="px-4 py-3 text-left font-bold text-gray-900">Value</th>
+                                        <th className="px-4 py-3 text-right w-16"></th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y">
+                                    {(currentTabData.structuredSpecs || []).length === 0 && (
+                                        <tr>
+                                            <td colSpan={3} className="px-4 py-8 text-center text-gray-400 italic">
+                                                No specifications added yet. Click "Add Row" to start.
+                                            </td>
+                                        </tr>
+                                    )}
+                                    {currentTabData.structuredSpecs?.map((spec: any, idx: number) => (
+                                        <tr key={idx} className="hover:bg-gray-50/50">
+                                            <td className="px-4 py-2">
+                                                <Input
+                                                    value={spec.label}
+                                                    placeholder="e.g. Dimensions"
+                                                    className="h-9 border-none focus-visible:ring-1"
+                                                    onChange={(e) => {
+                                                        const specs = [...currentTabData.structuredSpecs]
+                                                        specs[idx].label = e.target.value
+                                                        updateStructuredSpecs(specs)
+                                                    }}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                <Input
+                                                    value={spec.value}
+                                                    placeholder="e.g. 10x10x5"
+                                                    className="h-9 border-none focus-visible:ring-1"
+                                                    onChange={(e) => {
+                                                        const specs = [...currentTabData.structuredSpecs]
+                                                        specs[idx].value = e.target.value
+                                                        updateStructuredSpecs(specs)
+                                                    }}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-2 text-right">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const specs = currentTabData.structuredSpecs.filter((_: any, i: number) => i !== idx)
+                                                        updateStructuredSpecs(specs)
+                                                    }}
+                                                    className="text-gray-400 hover:text-red-500 transition-colors"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* Content Editor (Always shown for other tabs, or as fallback for specification) */}
+                {activeTab !== 'specification' && (
+                    <div>
+                        <label className="block text-sm font-bold uppercase tracking-wider text-gray-700 mb-3">
+                            {TAB_CONFIG.find(t => t.key === activeTab)?.label} Content
+                        </label>
+                        <RichTextEditor
+                            content={currentTabData.content || ''}
+                            onChange={(html) => updateTabContent(activeTab, html)}
+                        />
+                        <p className="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
+                            Use the editor above to add detailed content for this tab.
+                        </p>
+                    </div>
+                )}
+
+                {/* Shared Images Section */}
+                <div className="pt-6 border-t">
+                    <label className="block text-sm font-bold uppercase tracking-wider text-gray-700 mb-4">Related Images for {TAB_CONFIG.find(t => t.key === activeTab)?.label}</label>
 
                     {/* Image Grid */}
                     {currentTabData.images && currentTabData.images.length > 0 && (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
                             {currentTabData.images.map((image, index) => (
-                                <div key={index} className="relative aspect-square group">
+                                <div key={index} className="relative aspect-square group rounded-xl overflow-hidden border">
                                     <Image
                                         src={image}
                                         alt={`${activeTab} image ${index + 1}`}
                                         fill
-                                        className="object-cover rounded-lg"
+                                        className="object-cover"
                                     />
                                     <button
                                         type="button"
@@ -122,51 +233,37 @@ export function ProductTabsEditor({ value = {}, onChange }: ProductTabsEditorPro
                     )}
 
                     {/* Add Image Input */}
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            placeholder="Paste image URL"
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <div className="flex gap-2 max-w-xl">
+                        <Input
+                            placeholder="Paste image URL..."
+                            className="bg-gray-50 border-gray-200"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     e.preventDefault()
-                                    const input = e.currentTarget
-                                    if (input.value.trim()) {
-                                        addImage(activeTab, input.value.trim())
-                                        input.value = ''
+                                    const val = e.currentTarget.value.trim()
+                                    if (val) {
+                                        addImage(activeTab, val)
+                                        e.currentTarget.value = ''
                                     }
                                 }
                             }}
                         />
-                        <button
+                        <Button
                             type="button"
-                            className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 flex items-center gap-2"
+                            variant="secondary"
                             onClick={(e) => {
-                                const input = e.currentTarget.previousElementSibling as HTMLInputElement
-                                if (input.value.trim()) {
-                                    addImage(activeTab, input.value.trim())
+                                const input = (e.currentTarget.previousElementSibling as HTMLInputElement)
+                                const val = input.value.trim()
+                                if (val) {
+                                    addImage(activeTab, val)
                                     input.value = ''
                                 }
                             }}
                         >
-                            <Upload className="w-4 h-4" />
+                            <Upload className="w-4 h-4 mr-2" />
                             Add
-                        </button>
+                        </Button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Press Enter or click Add to upload image URL</p>
-                </div>
-
-                {/* Content Editor */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">Content</label>
-                    <textarea
-                        value={currentTabData.content || ''}
-                        onChange={(e) => updateTabContent(activeTab, e.target.value)}
-                        placeholder={`Enter content for ${TAB_CONFIG.find(t => t.key === activeTab)?.label}...`}
-                        rows={15}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Supports HTML formatting</p>
                 </div>
             </div>
         </div>

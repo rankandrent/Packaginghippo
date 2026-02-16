@@ -23,6 +23,7 @@ export function CustomQuoteFormSection({ image }: CustomQuoteFormSectionProps) {
         depth: "",
         unit: "inch",
         message: "",
+        hp_field: "",
         captcha: ""
     })
 
@@ -60,6 +61,7 @@ Color: ${formData.color}
 Size: ${formData.length} x ${formData.width} x ${formData.depth} ${formData.unit}
 
 Message: ${formData.message}`,
+                    hp_field: formData.hp_field,
                     source: 'Homepage Custom Quote'
                 })
             })
@@ -80,6 +82,7 @@ Message: ${formData.message}`,
                     depth: "",
                     unit: "inch",
                     message: "",
+                    hp_field: "",
                     captcha: ""
                 })
             } else {
@@ -266,6 +269,18 @@ Message: ${formData.message}`,
                                         onChange={handleChange}
                                         className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm resize-none"
                                     />
+
+                                    {/* Honeypot field (hidden) */}
+                                    <div className="hidden" aria-hidden="true">
+                                        <input
+                                            type="text"
+                                            name="hp_field"
+                                            tabIndex={-1}
+                                            autoComplete="off"
+                                            value={formData.hp_field}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
 
                                     {/* Captcha */}
                                     <div className="flex items-center gap-3">
