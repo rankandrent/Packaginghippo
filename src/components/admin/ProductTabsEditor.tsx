@@ -1,12 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { Trash2, Upload, X } from "lucide-react"
+import { Trash2, Upload, X, Plus } from "lucide-react"
 import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { RichTextEditor } from "./RichTextEditor"
 
 interface TabContent {
     content: string
     images?: string[]
+    structuredSpecs?: { label: string, value: string }[]
 }
 
 interface ProductTabsEditorProps {
@@ -143,7 +147,7 @@ export function ProductTabsEditor({ value = {}, onChange }: ProductTabsEditorPro
                                             </td>
                                         </tr>
                                     )}
-                                    {currentTabData.structuredSpecs?.map((spec: any, idx: number) => (
+                                    {(currentTabData.structuredSpecs || []).map((spec: any, idx: number) => (
                                         <tr key={idx} className="hover:bg-gray-50/50">
                                             <td className="px-4 py-2">
                                                 <Input
@@ -151,7 +155,7 @@ export function ProductTabsEditor({ value = {}, onChange }: ProductTabsEditorPro
                                                     placeholder="e.g. Dimensions"
                                                     className="h-9 border-none focus-visible:ring-1"
                                                     onChange={(e) => {
-                                                        const specs = [...currentTabData.structuredSpecs]
+                                                        const specs = [...(currentTabData.structuredSpecs || [])]
                                                         specs[idx].label = e.target.value
                                                         updateStructuredSpecs(specs)
                                                     }}
@@ -163,7 +167,7 @@ export function ProductTabsEditor({ value = {}, onChange }: ProductTabsEditorPro
                                                     placeholder="e.g. 10x10x5"
                                                     className="h-9 border-none focus-visible:ring-1"
                                                     onChange={(e) => {
-                                                        const specs = [...currentTabData.structuredSpecs]
+                                                        const specs = [...(currentTabData.structuredSpecs || [])]
                                                         specs[idx].value = e.target.value
                                                         updateStructuredSpecs(specs)
                                                     }}
@@ -173,7 +177,7 @@ export function ProductTabsEditor({ value = {}, onChange }: ProductTabsEditorPro
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        const specs = currentTabData.structuredSpecs.filter((_: any, i: number) => i !== idx)
+                                                        const specs = (currentTabData.structuredSpecs || []).filter((_: any, i: number) => i !== idx)
                                                         updateStructuredSpecs(specs)
                                                     }}
                                                     className="text-gray-400 hover:text-red-500 transition-colors"

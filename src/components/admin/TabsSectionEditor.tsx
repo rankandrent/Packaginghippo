@@ -129,8 +129,8 @@ export function TabsSectionEditor({ content, onChange }: TabsSectionEditorProps)
                                     tab={tab}
                                     isActive={activeTabId === tab.id}
                                     onClick={() => setActiveTabId(tab.id)}
-                                    onLabelChange={(val) => updateTab(tab.id, 'label', val)}
-                                    onRemove={(e) => removeTab(tab.id, e)}
+                                    onLabelChange={(val: string) => updateTab(tab.id, 'label', val)}
+                                    onRemove={(e: React.MouseEvent) => removeTab(tab.id, e)}
                                 />
                             ))}
                         </div>
