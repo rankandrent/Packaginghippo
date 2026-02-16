@@ -45,6 +45,7 @@ import {
     useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { TabsSectionEditor } from "./TabsSectionEditor";
 
 export type Section = {
     id: string
@@ -73,6 +74,7 @@ export type Section = {
     | 'quote_form'
     | 'custom_quote_form'
     | 'featured_blogs'
+    | 'tabs'
     title?: string
     content: any
 }
@@ -163,6 +165,7 @@ export function SectionBuilder({ sections = [], onChange }: SectionBuilderProps)
                         <SectionButton icon={LayoutTemplate} label="CTA" onClick={() => addSection('cta')} />
                         <SectionButton icon={LayoutTemplate} label="Features Bar" onClick={() => addSection('features_bar')} />
                         <SectionButton icon={LayoutTemplate} label="Logo Loop" onClick={() => addSection('logo_loop')} />
+                        <SectionButton icon={List} label="Tabs" onClick={() => addSection('tabs')} />
                     </div>
                 </div>
             </div>
@@ -304,6 +307,7 @@ function getDefaultContent(type: string) {
         case 'quote_form': return { heading: 'Get a Quote', subheading: 'Fill the form below' }
         case 'custom_quote_form': return { image: '' }
         case 'featured_blogs': return { heading: 'Latest Insights' }
+        case 'tabs': return { heading: 'Product Details', tabs: [{ id: '1', label: 'Specification', content: '', specs: [] }, { id: '2', label: 'Description', content: '' }] }
         default: return {}
     }
 }
@@ -611,6 +615,9 @@ function renderEditor(type: string, content: any, onChange: (key: string, value:
                     </div>
                 )
             }
+
+        case 'tabs':
+            return <TabsSectionEditor content={content} onChange={(key, val) => onChange(key, val)} />
 
         default:
             return (

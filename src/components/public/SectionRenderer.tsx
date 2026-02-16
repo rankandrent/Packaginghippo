@@ -39,6 +39,7 @@ export type Section = {
     | 'quote_form'
     | 'custom_quote_form'
     | 'featured_blogs'
+    | 'tabs'
     title?: string
     content: any
 }
@@ -95,6 +96,7 @@ import { VideoSection } from "@/components/home/sections/VideoSection"
 import { QuoteSection } from "@/components/home/sections/QuoteSection"
 import { CustomQuoteFormSection } from "@/components/home/CustomQuoteFormSection"
 import { FeaturedBlogs } from "@/components/home/sections/FeaturedBlogs"
+import TabsSection from "@/components/home/sections/TabsSection"
 import { CTA } from "@/components/home/sections/CTA"
 
 function RenderSection({
@@ -160,8 +162,10 @@ function RenderSection({
         case 'video_section': return <VideoSection data={getSharedContent()} />
         case 'quote_form': return <QuoteSection data={getSharedContent()} />
         case 'custom_quote_form': return <CustomQuoteFormSection image={quoteFormImage || section.content.image} />
-        case 'featured_blogs': return <FeaturedBlogs posts={featuredBlogs || []} />
-
+        case 'featured_blogs':
+            return <FeaturedBlogs key={section.id} posts={featuredBlogs || []} />
+        case 'tabs':
+            return <TabsSection key={section.id} data={section.content} />
         default:
             return null
     }
