@@ -90,6 +90,7 @@ model ProductCategory {
   seoKeywords String?
   descriptionCollapsedHeight Int @default(300)
   sections    Json?    // List of dynamic sections
+  layout      Json?    // Custom order: ['content', 'related_categories', 'quote_form', 'testimonials']
   order       Int       @default(0)
   isActive    Boolean   @default(false)
   products    Product[]

@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
+import { LayoutSorter } from "@/components/admin/LayoutSorter"
 import { Loader2, ArrowLeft, Save, Sparkles } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -29,6 +30,7 @@ type Category = {
     descriptionCollapsedHeight: number
     isActive: boolean
     sections: any
+    layout: string[] | null
 }
 
 export default function CategoryEditor({ params }: { params: Promise<{ id: string }> }) {
@@ -37,6 +39,7 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [sections, setSections] = useState<Section[]>([])
+    const [layout, setLayout] = useState<string[]>(['content', 'related_categories', 'quote_form', 'testimonials'])
     const router = useRouter()
 
     const [scrapeUrl, setScrapeUrl] = useState("")
@@ -95,6 +98,9 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                 // Deep copy to avoid reference issues
                 setSections(JSON.parse(JSON.stringify(DEFAULT_CATEGORY_TEMPLATE)))
             }
+            if (data.category.layout && Array.isArray(data.category.layout) && data.category.layout.length > 0) {
+                setLayout(data.category.layout)
+            }
         } catch (error) {
             console.error("Error fetching category:", error)
             router.push('/dashboard/categories')
@@ -141,7 +147,8 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...category,
-                    sections: sections
+                    sections: sections,
+                    layout: layout
                 }),
             })
 
@@ -301,6 +308,12 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                 <div className="space-y-6">
                     <div className="rounded-lg border bg-card p-6 space-y-4 shadow-sm">
                         <h3 className="font-semibold text-lg">Visibility</h3>
+                        <div className="rounded-lg border bg-card p-6 space-y-4 shadow-sm">
+                            <h3 className="font-semibold text-lg">Section Layout</h3>
+                            <p className="text-sm text-muted-foreground">Drag to reorder standard sections.</p>
+                            <LayoutSorter items={layout} onChange={setLayout} />
+                        </div>
+
                         <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/20">
                             <div className="space-y-0.5">
                                 <Label htmlFor="isActive" className="text-base">Published Status</Label>

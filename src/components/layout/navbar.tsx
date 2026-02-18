@@ -3,7 +3,7 @@
 
 import Link from "next/link"
 import { useState, FormEvent, useEffect } from "react"
-import { Menu, X, Phone, Search, ShoppingCart, ChevronDown } from "lucide-react"
+import { Menu, X, Phone, Search, ShoppingCart, ChevronDown, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -130,8 +130,8 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                 <div className="container mx-auto px-4 h-24 flex items-center justify-between gap-8">
                     {/* Logo */}
                     <Link href="/" className="flex-shrink-0 flex items-center gap-2">
-                        <div className="w-10 h-10 bg-primary flex items-center justify-center rounded text-white font-bold text-xl">
-                            PH
+                        <div className="w-10 h-10 bg-primary flex items-center justify-center rounded text-white">
+                            <Package className="w-6 h-6" />
                         </div>
                         <div className="flex flex-col">
                             <span className="text-2xl font-black text-primary tracking-tighter uppercase leading-none">

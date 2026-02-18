@@ -82,6 +82,7 @@ export function SectionRenderer({
 }
 
 // --- HOMEPAGE COMPONENTS ---
+import { LogoLoop } from "@/components/home/sections/LogoLoop"
 import { Intro } from "@/components/home/sections/Intro"
 import { ServicesList } from "@/components/home/sections/ServicesList"
 import { Benefits } from "@/components/home/sections/Benefits"
@@ -147,7 +148,7 @@ function RenderSection({
         case 'features_bar':
             return <FeaturesBarSection content={getSharedContent()} />
         case 'logo_loop':
-            return <LogoLoopSection content={getSharedContent()} />
+            return <LogoLoop data={getSharedContent()} />
 
         // NEW SECTIONS
         case 'intro': return <Intro data={section.content} />
@@ -587,38 +588,4 @@ function FeaturesBarSection({ content }: { content: any }) {
     )
 }
 
-function LogoLoopSection({ content }: { content: any }) {
-    const logos = Array.isArray(content.items) ? content.items : []
-    return (
-        <section className="py-16 bg-white overflow-hidden border-b border-gray-50">
-            <div className="container mx-auto px-4 mb-10 text-center">
-                {content.heading && <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">{content.heading}</h3>}
-            </div>
-            <div className="flex overflow-hidden relative group">
-                <div className="flex gap-16 animate-marquee whitespace-nowrap py-4">
-                    {[...logos, ...logos, ...logos].map((logo, i) => (
-                        <div key={i} className="flex-shrink-0 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 flex items-center justify-center h-12 w-32">
-                            {logo.startsWith('http') ? (
-                                <img src={logo} alt={`Client ${i}`} className="max-h-full max-w-full object-contain" />
-                            ) : (
-                                <span className="text-lg font-black text-gray-300">{logo}</span>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </div>
-            <style jsx>{`
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .animate-marquee {
-                    animation: marquee 30s linear infinite;
-                }
-                .animate-marquee:hover {
-                    animation-play-state: paused;
-                }
-            `}</style>
-        </section>
-    )
-}
+// LogoLoopSection removed in favor of shared component

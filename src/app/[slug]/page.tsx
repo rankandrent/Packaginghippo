@@ -157,7 +157,11 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
     const featuredBlogs = await getFeaturedBlogs()
     const homepageSections = await getHomepageSections()
     const layoutSettings = await getLayoutSettings()
-    const layoutOrder = layoutSettings.category
+    let layoutOrder = layoutSettings.category
+
+    if (category.layout && Array.isArray(category.layout) && category.layout.length > 0) {
+        layoutOrder = category.layout
+    }
 
     // Cast sections to proper type
     let dynamicSections = (category.sections as unknown as Section[]) || []
@@ -230,9 +234,11 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
             case 'content':
                 return category.description && (
                     <section key="content" className="py-16 bg-white border-t">
-                        <div className="container mx-auto px-4 prose max-w-none text-gray-700 leading-relaxed">
-                            <h2 className="text-3xl font-bold mb-8">{category.name} Overview</h2>
-                            <CollapsibleText content={category.description} collapsedHeight={category.descriptionCollapsedHeight || 300} />
+                        <div className="container mx-auto px-4">
+                            <div className="prose max-w-none text-gray-700 leading-relaxed">
+                                <h2 className="text-3xl font-bold mb-8">{category.name} Overview</h2>
+                                <CollapsibleText content={category.description} collapsedHeight={category.descriptionCollapsedHeight || 300} />
+                            </div>
                         </div>
                     </section>
                 )
@@ -335,12 +341,14 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
             case 'content':
                 return product.description && !sections.find(s => s.type === 'text') && (
                     <section key="content" className="py-24 bg-white border-t border-gray-100">
-                        <div className="container mx-auto px-4 prose max-w-none">
-                            <h2 className="text-3xl font-bold mb-8">Product Overview</h2>
-                            <CollapsibleText
-                                content={product.description}
-                                collapsedHeight={product.descriptionCollapsedHeight || 300}
-                            />
+                        <div className="container mx-auto px-4">
+                            <div className="prose max-w-none text-gray-700 leading-relaxed">
+                                <h2 className="text-3xl font-bold mb-8">Product Overview</h2>
+                                <CollapsibleText
+                                    content={product.description}
+                                    collapsedHeight={product.descriptionCollapsedHeight || 300}
+                                />
+                            </div>
                         </div>
                     </section>
                 )

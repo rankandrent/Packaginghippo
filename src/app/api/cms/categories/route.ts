@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, description, templateId } = body
+        const { name, slug, description, templateId, layout } = body
 
         let initialSections: any[] = []
 
@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
                 description,
                 isActive: false,
                 sections: initialSections,
+                layout: layout || null,
             },
         })
 
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json()
-        const { id, name, slug, description, imageUrl, seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, order, isActive, sections } = body
+        const { id, name, slug, description, imageUrl, seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, order, isActive, sections, layout } = body
 
         const updated = await prisma.productCategory.update({
             where: { id },
@@ -92,6 +93,7 @@ export async function PUT(request: NextRequest) {
                 order,
                 isActive,
                 sections,
+                layout,
                 updatedAt: new Date(),
             },
         })
