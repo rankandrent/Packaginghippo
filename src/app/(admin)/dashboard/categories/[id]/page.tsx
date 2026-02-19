@@ -39,7 +39,7 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [sections, setSections] = useState<Section[]>([])
-    const [layout, setLayout] = useState<string[]>(['content', 'related_categories', 'quote_form', 'testimonials'])
+    const [layout, setLayout] = useState<string[]>(['testimonials', 'quote_form', 'content', 'faqs', 'related_categories'])
     const router = useRouter()
 
     const [scrapeUrl, setScrapeUrl] = useState("")

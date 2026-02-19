@@ -135,13 +135,13 @@ async function getLayoutSettings() {
             }
         })
         return {
-            product: settings.find(s => s.key === 'layout_product')?.value as string[] || ['content', 'related_categories', 'quote_form', 'testimonials'],
-            category: settings.find(s => s.key === 'layout_category')?.value as string[] || ['content', 'related_categories', 'quote_form', 'testimonials']
+            product: ['content', 'related_categories', 'quote_form', 'testimonials'],
+            category: ['testimonials', 'quote_form', 'content', 'faqs', 'related_categories']
         }
     } catch (error) {
         return {
             product: ['content', 'related_categories', 'quote_form', 'testimonials'],
-            category: ['content', 'related_categories', 'quote_form', 'testimonials']
+            category: ['testimonials', 'quote_form', 'content', 'faqs', 'related_categories']
         }
     }
 }
@@ -229,6 +229,10 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
         { label: category.name }
     ]
 
+    // SEPARATE FAQs from other dynamic sections if 'faqs' is in the layout order
+    const faqSections = dynamicSections.filter((s: any) => s.type === 'faq')
+    const otherSections = dynamicSections.filter((s: any) => s.type !== 'faq')
+
     const renderSection = (id: string) => {
         switch (id) {
             case 'content':
@@ -248,6 +252,16 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 return <CustomQuoteFormSection key="quote" image={quoteFormImage} />
             case 'testimonials':
                 return <TestimonialsSection key="testimonials" testimonials={testimonials} />
+            case 'faqs':
+                return faqSections.length > 0 && (
+                    <SectionRenderer
+                        key="faqs"
+                        sections={faqSections}
+                        popularProducts={popularProducts}
+                        categoryName={category.name}
+                        quoteFormImage={quoteFormImage}
+                    />
+                )
             default:
                 return null
         }
@@ -289,7 +303,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 }}
             />
             <SectionRenderer
-                sections={dynamicSections}
+                sections={otherSections}
                 popularProducts={popularProducts}
                 categoryName={category.name}
                 breadcrumbs={<Breadcrumbs items={breadcrumbItems} />}

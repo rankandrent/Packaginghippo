@@ -29,7 +29,8 @@ const SECTION_LABELS: Record<string, string> = {
     'content': 'Category Content (Description)',
     'related_categories': 'Related Categories',
     'quote_form': 'Quote Form',
-    'testimonials': 'Testimonials'
+    'testimonials': 'Testimonials',
+    'faqs': 'FAQ Sections'
 }
 
 export function LayoutSorter({ items, onChange }: LayoutSorterProps) {
