@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import prisma from "@/lib/db"
+import { constructMetadataTitle } from "@/lib/utils"
 import { QuoteForm } from "@/components/forms/QuoteForm"
 import { JsonLd } from "@/components/seo/JsonLd"
 
@@ -17,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const page = await getServicesPage()
 
     return {
-        title: page?.seoTitle || "All Packaging Categories | Packaging Hippo",
+        title: constructMetadataTitle(page?.seoTitle || "All Packaging Categories | Packaging Hippo"),
         description: page?.seoDesc || "Browse our complete range of custom packaging categories. From corrugated boxes to luxury rigid packaging.",
         keywords: page?.seoKeywords || undefined,
     }
@@ -83,8 +84,7 @@ export default async function ServicesPage() {
                     "@context": "https://schema.org",
                     "@type": "BreadcrumbList",
                     "itemListElement": [
-                        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://packaginghippo.com" },
-                        { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://packaginghippo.com/services" }
+                        { "@type": "ListItem", "position": 1, "name": "Services", "item": "https://packaginghippo.com/services" }
                     ]
                 }}
             />

@@ -1,6 +1,7 @@
 import prisma from "@/lib/db"
 import { GallerySection } from "@/components/home/sections/GallerySection"
 import { Metadata } from "next"
+import { constructMetadataTitle } from "@/lib/utils"
 
 // Revalidate every 60 seconds
 export const revalidate = 60
@@ -25,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const data = await getGalleryData() as any
 
     return {
-        title: data?.heading || 'Our Gallery | Packaging Hippo',
+        title: constructMetadataTitle(data?.heading || 'Our Gallery | Packaging Hippo'),
         description: data?.subheading || 'Explore our custom packaging designs and recent work.',
         openGraph: {
             title: data?.heading || 'Our Gallery | Packaging Hippo',

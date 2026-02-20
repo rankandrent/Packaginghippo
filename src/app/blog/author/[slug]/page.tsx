@@ -4,6 +4,7 @@ import { Calendar, ArrowRight, User, GraduationCap, MapPin, ExternalLink } from 
 import { Badge } from "@/components/ui/badge"
 import { notFound } from "next/navigation"
 import prisma from "@/lib/db"
+import { constructMetadataTitle } from "@/lib/utils"
 
 async function getAuthor(slug: string) {
     return prisma.author.findUnique({
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     if (!author) return { title: 'Author Not Found' }
 
     return {
-        title: author.seoTitle || `${author.name} | Packaging Expert Profile`,
+        title: constructMetadataTitle(author.seoTitle || `${author.name} | Packaging Expert Profile`),
         description: author.seoDesc || author.bio || `Read articles and professional insights from ${author.name}, a featured packaging expert at Packaging Hippo.`,
     }
 }

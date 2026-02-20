@@ -1,4 +1,5 @@
 import prisma from "@/lib/db"
+import { constructMetadataTitle } from "@/lib/utils"
 import HomePageClient from "@/components/home/HomePageClient"
 
 // Revalidate data every 60 seconds (ISR)
@@ -66,7 +67,7 @@ export async function generateMetadata() {
   const seo = settings.seo || {}
 
   return {
-    title: seo.defaultTitle || 'Packaging Hippo | Custom Boxes & Packaging Solutions',
+    title: constructMetadataTitle(seo.defaultTitle || 'Packaging Hippo | Custom Boxes & Packaging Solutions'),
     description: seo.defaultDescription || 'Premium custom packaging boxes with your logo.',
     keywords: seo.defaultKeywords,
     alternates: {

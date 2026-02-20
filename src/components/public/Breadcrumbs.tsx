@@ -33,7 +33,7 @@ export function Breadcrumbs({ items, theme = 'dark' }: BreadcrumbsProps) {
         : "text-gray-500 group-hover:text-yellow-600"
 
     return (
-        <nav className="flex mb-4 overflow-x-auto whitespace-nowrap pb-1" aria-label="Breadcrumb">
+        <nav className="flex overflow-x-auto whitespace-nowrap pb-1" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
                 <li className="inline-flex items-center">
                     <Link

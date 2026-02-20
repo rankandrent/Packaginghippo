@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Metadata } from "next"
 import { Calendar, User, ArrowRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { cn, constructMetadataTitle } from "@/lib/utils"
 
 import prisma from "@/lib/db"
 
@@ -31,7 +31,7 @@ async function getCategories() {
 
 export async function generateMetadata(): Promise<Metadata> {
     return {
-        title: "Packaging Insights Blog | Trends & Packaging Solutions",
+        title: constructMetadataTitle("Packaging Insights Blog | Trends & Packaging Solutions"),
         description: "Explore the latest packaging trends, industry insights, and expert advice for custom branded boxes and shipping solutions.",
         alternates: {
             canonical: '/blog',

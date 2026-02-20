@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Calendar, User, ChevronRight, Clock } from "lucide-react"
 import { notFound } from "next/navigation"
 import prisma from "@/lib/db"
+import { constructMetadataTitle } from "@/lib/utils"
 import { DynamicTOC } from "@/components/blog/DynamicTOC"
 import { ShareButtons } from "@/components/blog/ShareButtons"
 import { QuoteForm } from "@/components/forms/QuoteForm"
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     if (!post) return { title: 'Post Not Found' }
 
     return {
-        title: post.seoTitle || post.title,
+        title: constructMetadataTitle(post.seoTitle || post.title),
         description: post.seoDesc || post.excerpt,
         alternates: {
             canonical: `/blog/${slug}`,

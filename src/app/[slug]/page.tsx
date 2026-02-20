@@ -15,7 +15,7 @@ import { CustomQuoteFormSection } from "@/components/home/CustomQuoteFormSection
 import { ProductHeroQuoteForm } from "@/components/forms/ProductHeroQuoteForm"
 import { ProductTabs } from "@/components/product/ProductTabs"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn, constructMetadataTitle } from "@/lib/utils"
 import prisma from "@/lib/db"
 
 import {
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const category = await getCategory(slug)
     if (category) {
         return {
-            title: category.seoTitle || category.name,
+            title: constructMetadataTitle(category.seoTitle || category.name),
             description: (category.seoDesc || category.description) || undefined,
             keywords: category.seoKeywords || undefined,
             alternates: {
@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const product = await getProduct(slug)
     if (product) {
         return {
-            title: product.seoTitle || product.name,
+            title: constructMetadataTitle(product.seoTitle || product.name),
             description: (product.seoDesc || product.shortDesc) || undefined,
             keywords: product.seoKeywords || undefined,
             alternates: {
@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const page = await getPage(slug)
     if (page) {
         return {
-            title: page.seoTitle || page.title,
+            title: constructMetadataTitle(page.seoTitle || page.title),
             description: page.seoDesc || undefined,
             keywords: page.seoKeywords || undefined,
             alternates: {
@@ -269,27 +269,97 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
 
     return (
         <main className="min-h-screen">
+            {/* 1. Collection Page Schema */}
             <JsonLd
                 data={{
                     "@context": "https://schema.org",
                     "@type": "CollectionPage",
-                    "@id": `https://packaginghippo.com/${slug}`,
                     "name": category.name,
-                    "description": category.seoDesc || category.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
                     "url": `https://packaginghippo.com/${slug}`,
-                    "mainEntity": {
-                        "@type": "ItemList",
-                        "numberOfItems": category.products.length,
-                        "itemListElement": category.products.map((product: any, index: number) => ({
-                            "@type": "ListItem",
-                            "position": index + 1,
-                            "url": `https://packaginghippo.com/${product.slug}`,
-                            "name": product.name,
-                            "image": product.images?.[0]
-                        }))
+                    "description": category.seoDesc || category.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
+                    "isPartOf": {
+                        "@type": "WebSite",
+                        "name": "Packaging Hippo",
+                        "url": "https://packaginghippo.com/"
+                    },
+                    "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": "4.9",
+                        "reviewCount": "190",
+                        "bestRating": "5"
                     }
                 }}
             />
+            {/* 2. Organization Schema */}
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "Organization",
+                    "name": "Packaging Hippo",
+                    "url": "https://packaginghippo.com/",
+                    "logo": "https://packaginghippo.com/assets/images/logo.png",
+                    "contactPoint": {
+                        "@type": "ContactPoint",
+                        "telephone": "+1-800-475-4704", // Can be customized later in db
+                        "contactType": "customer service"
+                    }
+                }}
+            />
+            {/* 3. WebSite Search Schema */}
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "name": "Packaging Hippo",
+                    "url": "https://packaginghippo.com/",
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": "https://packaginghippo.com/search?query={search_term_string}",
+                        "query-input": "required name=search_term_string"
+                    }
+                }}
+            />
+            {/* 4. ItemList (Category Products) */}
+            {category.products && category.products.length > 0 && (
+                <JsonLd
+                    data={{
+                        "@context": "https://schema.org",
+                        "@type": "ItemList",
+                        "name": category.name,
+                        "itemListElement": category.products.map((product: any, index: number) => ({
+                            "@type": "ListItem",
+                            "position": index + 1,
+                            "item": {
+                                "@type": "Product",
+                                "name": product.name,
+                                "url": `https://packaginghippo.com/${product.slug}`
+                            }
+                        }))
+                    }}
+                />
+            )}
+            {/* 5. Dynamic FAQ Schema */}
+            {faqSections.map((faqSec: any, idx: number) => {
+                const items = faqSec.content?.items || []
+                if (items.length === 0) return null
+                return (
+                    <JsonLd
+                        key={`schema-faq-${idx}`}
+                        data={{
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            "mainEntity": items.map((f: any) => ({
+                                "@type": "Question",
+                                "name": f.q,
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": f.a
+                                }
+                            }))
+                        }}
+                    />
+                )
+            })}
             <JsonLd
                 data={{
                     "@context": "https://schema.org",
@@ -402,22 +472,40 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
 
     return (
         <main className="min-h-screen bg-white">
+            {/* 1. Breadcrumb Schema */}
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": breadcrumbItems.map((item, index) => ({
+                        "@type": "ListItem",
+                        "position": index + 1,
+                        "name": item.label,
+                        "item": item.href ? `https://packaginghippo.com${item.href}` : undefined
+                    }))
+                }}
+            />
+            {/* 2. Product Schema */}
             <JsonLd
                 data={{
                     "@context": "https://schema.org",
                     "@type": "Product",
                     "@id": `https://packaginghippo.com/${product.slug}`,
                     "name": product.name,
+                    "image": product.images || [],
                     "description": product.shortDesc || product.seoDesc || product.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
-                    "image": product.images,
-                    "sku": product.id.slice(-8).toUpperCase(),
-                    "mpn": product.id.slice(-8).toUpperCase(),
-                    "category": product.category?.name,
-                    "material": product.materials,
+                    "sku": product.id.substring(0, 8).toUpperCase(),
+                    "mpn": product.id.substring(0, 8).toUpperCase(),
                     "brand": {
                         "@type": "Brand",
                         "name": "Packaging Hippo",
                         "@id": "https://packaginghippo.com/#organization"
+                    },
+                    "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": "4.9",
+                        "reviewCount": "210",
+                        "bestRating": "5"
                     },
                     "offers": {
                         "@type": "AggregateOffer",
@@ -446,16 +534,47 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     ]
                 }}
             />
+            {/* 3. WebPage Schema */}
             <JsonLd
                 data={{
                     "@context": "https://schema.org",
-                    "@type": "BreadcrumbList",
-                    "itemListElement": breadcrumbItems.map((item, index) => ({
-                        "@type": "ListItem",
-                        "position": index + 1,
-                        "name": item.label,
-                        "item": item.href ? `https://packaginghippo.com${item.href}` : undefined
-                    }))
+                    "@type": "WebPage",
+                    "name": product.name,
+                    "description": product.seoDesc || product.shortDesc || product.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
+                    "url": `https://packaginghippo.com/${product.slug}`
+                }}
+            />
+            {/* 4. LocalBusiness Schema */}
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "LocalBusiness",
+                    "name": "Packaging Hippo",
+                    "url": "https://packaginghippo.com/",
+                    "telephone": "+1-800-475-4704",
+                    "image": "https://packaginghippo.com/assets/images/logo.png",
+                    "address": {
+                        "@type": "PostalAddress",
+                        "streetAddress": "FULL ADDRESS",
+                        "addressLocality": "CITY",
+                        "addressRegion": "STATE",
+                        "postalCode": "ZIP",
+                        "addressCountry": "US"
+                    }
+                }}
+            />
+            {/* 5. WebSite Schema */}
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "url": "https://packaginghippo.com/",
+                    "name": "Packaging Hippo",
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": "https://packaginghippo.com/search?query={search_term_string}",
+                        "query-input": "required name=search_term_string"
+                    }
                 }}
             />
             <section className="pt-6 pb-12 bg-white">
@@ -567,29 +686,20 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
 // PAGE VIEW
 // ==========================================
 async function PageView({ page, slug }: { page: any, slug: string }) {
-    // If content is array, it's sections. If it's string or object with 'html', it might be different.
-    // Based on schema, 'content' is Json?
-
-    // Check if it has 'sections' structure or just generic content
     let sections: Section[] = []
 
     if (Array.isArray(page.content)) {
         sections = page.content as Section[]
-    } else {
-        // Create a default text section if it's just raw content/html field inside json
-        // Or if 'content' is the JSON object itself.
-        // TODO: Adapt based on actual data structure. 
-        // For now, assuming content might be { html: "..." } or similar if not array.
     }
 
-    // Default breadcrumb
+    const htmlContent = page?.content ? (typeof page.content === 'string' ? page.content : (page.content as any).html || '') : null
+
     const breadcrumbItems = [
-        { label: "Home", href: "/" },
         { label: page.title }
     ]
 
     return (
-        <main className="min-h-screen">
+        <main className="min-h-screen bg-gray-50 pt-24 pb-12 md:pt-32">
             <JsonLd
                 data={{
                     "@context": "https://schema.org",
@@ -599,19 +709,32 @@ async function PageView({ page, slug }: { page: any, slug: string }) {
                     "url": `https://packaginghippo.com/${slug}`
                 }}
             />
+
+            {/* Header Area */}
+            <div className="bg-gray-50 border-b pb-12">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
+                        <div className="mb-4">
+                            <Breadcrumbs items={breadcrumbItems} theme="light" />
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-black text-blue-900 uppercase tracking-tight">
+                            {page.title}
+                        </h1>
+                    </div>
+                </div>
+            </div>
+
             <SectionRenderer
                 sections={sections}
-                // popularProducts={popularProducts} // Optional
-                // categoryName={category.name} // Optional
-                breadcrumbs={<Breadcrumbs items={breadcrumbItems} />}
             />
 
-            {/* Fallback if no sections: render generic content if available */}
-            {sections.length === 0 && (
-                <div className="container mx-auto px-4 py-16 prose max-w-none text-gray-700 leading-relaxed">
-                    <h1>{page.title}</h1>
-                    {/* Render raw content if possible, or just Show title */}
-                    <div dangerouslySetInnerHTML={{ __html: JSON.stringify(page.content) }} />
+            {sections.length === 0 && htmlContent && (
+                <div className="bg-white py-16 border-t border-gray-100">
+                    <div className="container mx-auto px-4">
+                        <div className="max-w-4xl mx-auto prose prose-lg prose-blue max-w-none text-gray-700 leading-relaxed rich-text">
+                            <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                        </div>
+                    </div>
                 </div>
             )}
         </main>

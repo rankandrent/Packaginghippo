@@ -24,10 +24,23 @@ import {
     Pilcrow,
     Type,
     Palette,
+    Table as TableIcon,
+    ArrowDownToLine,
+    ArrowUpFromLine,
+    ArrowLeftToLine,
+    ArrowRightFromLine,
+    Trash2,
+    Columns,
+    Rows,
+    Combine
 } from "lucide-react"
 import { Color } from '@tiptap/extension-color'
 import { TextStyle } from '@tiptap/extension-text-style'
 import { Extension } from '@tiptap/core'
+import { Table } from '@tiptap/extension-table'
+import { TableRow } from '@tiptap/extension-table-row'
+import { TableCell } from '@tiptap/extension-table-cell'
+import { TableHeader } from '@tiptap/extension-table-header'
 
 declare module '@tiptap/core' {
     interface Commands<ReturnType> {
@@ -101,6 +114,27 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
             TextStyle,
             Color,
             FontSize,
+            Table.configure({
+                resizable: true,
+                HTMLAttributes: {
+                    class: 'min-w-full border-collapse border border-gray-300 my-4 table-auto',
+                },
+            }),
+            TableRow.configure({
+                HTMLAttributes: {
+                    class: 'border-b border-gray-300',
+                },
+            }),
+            TableHeader.configure({
+                HTMLAttributes: {
+                    class: 'border border-gray-300 bg-gray-100 px-4 py-2 font-bold text-left',
+                },
+            }),
+            TableCell.configure({
+                HTMLAttributes: {
+                    class: 'border border-gray-300 px-4 py-2',
+                },
+            }),
         ],
         content: content || "",
         editorProps: {
@@ -312,6 +346,103 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
                         </select>
                     </div>
                 </div>
+
+                {/* Table Controls */}
+                <div className="flex flex-wrap items-center gap-1 border-r pr-2 mr-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+                        title="Insert Table"
+                        type="button"
+                    >
+                        <TableIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().addColumnBefore().run()}
+                        disabled={!editor.can().addColumnBefore()}
+                        title="Add Column Before"
+                        type="button"
+                    >
+                        <ArrowLeftToLine className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().addColumnAfter().run()}
+                        disabled={!editor.can().addColumnAfter()}
+                        title="Add Column After"
+                        type="button"
+                    >
+                        <ArrowRightFromLine className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().deleteColumn().run()}
+                        disabled={!editor.can().deleteColumn()}
+                        title="Delete Column"
+                        className="text-red-500 hover:text-red-600"
+                        type="button"
+                    >
+                        <Columns className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().addRowBefore().run()}
+                        disabled={!editor.can().addRowBefore()}
+                        title="Add Row Before"
+                        type="button"
+                    >
+                        <ArrowUpFromLine className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().addRowAfter().run()}
+                        disabled={!editor.can().addRowAfter()}
+                        title="Add Row After"
+                        type="button"
+                    >
+                        <ArrowDownToLine className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().deleteRow().run()}
+                        disabled={!editor.can().deleteRow()}
+                        title="Delete Row"
+                        className="text-red-500 hover:text-red-600"
+                        type="button"
+                    >
+                        <Rows className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().mergeCells().run()}
+                        disabled={!editor.can().mergeCells()}
+                        title="Merge Cells"
+                        type="button"
+                    >
+                        <Combine className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().deleteTable().run()}
+                        disabled={!editor.can().deleteTable()}
+                        title="Delete Table"
+                        className="text-red-500 hover:text-red-600"
+                        type="button"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </div>
+
                 <div className="ml-auto flex gap-1">
                     <Button
                         variant="ghost"
