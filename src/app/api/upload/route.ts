@@ -19,6 +19,24 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "No file uploaded" }, { status: 400 })
         }
 
+        // 1. Extract original filename and extension
+        const originalName = file.name || "image"
+        const lastDotIndex = originalName.lastIndexOf('.')
+        // Handle cases where there is no extension
+        const rawName = lastDotIndex !== -1 ? originalName.substring(0, lastDotIndex) : originalName
+
+        // 2. Slugify the filename: lowercase, replace non-alphanumerics with hyphens, trim extra hyphens
+        const slugifiedName = rawName
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)+/g, '') || "upload"
+
+        // 3. Generate a tiny random string to prevent accidental overwrites
+        const uniqueSuffix = Math.random().toString(36).substring(2, 6)
+
+        // 4. Final SEO-friendly public ID
+        const finalPublicId = `${slugifiedName}-${uniqueSuffix}`
+
         // Convert file to buffer
         const arrayBuffer = await file.arrayBuffer()
         const buffer = Buffer.from(arrayBuffer)
@@ -33,6 +51,7 @@ export async function POST(request: NextRequest) {
             const uploadStream = cloudinary.uploader.upload_stream(
                 {
                     folder: "products",
+                    public_id: finalPublicId,
                     // Auto-optimize: compress size and convert to best format (standard web practice)
                     transformation: [
                         { quality: "auto", fetch_format: "auto" }
