@@ -11,6 +11,7 @@ import { CollapsibleText } from "@/components/public/CollapsibleText"
 import { JsonLd } from "@/components/seo/JsonLd"
 import TestimonialsSection from "@/components/home/TestimonialsSection"
 import { RelatedCategories } from "@/components/category/RelatedCategories"
+import { PopularProducts } from "@/components/category/PopularProducts"
 import { CustomQuoteFormSection } from "@/components/home/CustomQuoteFormSection"
 import { ProductHeroQuoteForm } from "@/components/forms/ProductHeroQuoteForm"
 import { ProductTabs } from "@/components/product/ProductTabs"
@@ -394,12 +395,26 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
 // ==========================================
 async function ProductView({ product, slug }: { product: any, slug: string }) {
     const featuredBlogs = await getFeaturedBlogs()
-    const popularProducts = await getPopularProducts(product.categoryId)
-    const quoteFormImage = await getQuoteFormImage()
     const testimonials = await getTestimonials(product.id)
     const homepageSections = await getHomepageSections()
     const layoutSettings = await getLayoutSettings()
     const layoutOrder = layoutSettings.product
+
+    // Check if the product has manually curated related products
+    let popularProducts: any[] = []
+    if (product.relatedProductIds && product.relatedProductIds.length > 0) {
+        popularProducts = await prisma.product.findMany({
+            where: { id: { in: product.relatedProductIds } },
+            select: { id: true, name: true, slug: true, images: true, price: true },
+            take: 12
+        })
+    }
+
+    // If no manual related products exist, fallback to category popular products
+    if (popularProducts.length === 0) {
+        popularProducts = await getPopularProducts(product.categoryId)
+    }
+    const quoteFormImage = await getQuoteFormImage()
 
     let sections = (product.sections as unknown as Section[]) || []
 
@@ -672,6 +687,14 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
 
             {/* Re-orderable Sections */}
             {layoutOrder.map(id => renderSection(id))}
+
+            {/* Always securely display Related / Popular Products */}
+            {popularProducts && popularProducts.length > 0 && (
+                <PopularProducts
+                    categoryName={product.relatedProductIds?.length > 0 ? "Related Products" : (product.category?.name || "Packaging")}
+                    products={popularProducts}
+                />
+            )}
 
         </main>
     )

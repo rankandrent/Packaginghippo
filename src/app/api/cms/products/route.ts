@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
                 images: [],
                 isActive: false,
                 isTopProduct: false,
+                relatedProductIds: [],
             },
         })
 
@@ -91,7 +92,7 @@ export async function PUT(request: NextRequest) {
             id, name, slug, description, shortDesc,
             images, minOrder, price, categoryId,
             dimensions, materials, finishings,
-            seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, isActive, isTopProduct, sections, tabs
+            seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, isActive, isTopProduct, sections, tabs, relatedProductIds
         } = body
 
         const updated = await prisma.product.update({
@@ -116,6 +117,7 @@ export async function PUT(request: NextRequest) {
                 isTopProduct,
                 sections, // Save dynamic sections
                 tabs, // Save product tabs
+                relatedProductIds: relatedProductIds || [],
                 updatedAt: new Date(),
             },
         })

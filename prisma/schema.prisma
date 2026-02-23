@@ -110,6 +110,7 @@ model Product {
   price       Float?
   categoryId  String          @db.ObjectId
   category    ProductCategory @relation(fields: [categoryId], references: [id])
+  relatedProductIds String[]  @db.ObjectId // Manually curated related products
   
   // Specifications
   dimensions  String?

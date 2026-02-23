@@ -40,12 +40,14 @@ type Product = {
     descriptionCollapsedHeight: number
     isActive: boolean
     sections: any
+    relatedProductIds: string[]
 }
 
 export default function ProductEditor({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
     const [product, setProduct] = useState<Product | null>(null)
     const [categories, setCategories] = useState<Category[]>([])
+    const [allProducts, setAllProducts] = useState<{ id: string, name: string }[]>([])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const router = useRouter()
@@ -91,7 +93,7 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
     // Initial fetch
     useEffect(() => {
         const init = async () => {
-            await Promise.all([fetchProduct(), fetchCategories(), fetchTemplates()])
+            await Promise.all([fetchProduct(), fetchCategories(), fetchTemplates(), fetchAllProducts()])
             setLoading(false)
         }
         init()
@@ -139,6 +141,16 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
         }
     }
 
+    async function fetchAllProducts() {
+        try {
+            const res = await fetch('/api/cms/products')
+            const data = await res.json()
+            setAllProducts((data.products || []).map((p: any) => ({ id: p.id, name: p.name })))
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     function applyTemplate(templateId: string) {
         const template = templates.find(t => t.id === templateId)
         if (template && confirm("This will replace current sections with the template. Continue?")) {
@@ -149,7 +161,7 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
     useEffect(() => {
         const init = async () => {
             // ... existing init
-            await Promise.all([fetchProduct(), fetchCategories(), fetchTemplates()])
+            await Promise.all([fetchProduct(), fetchCategories(), fetchTemplates(), fetchAllProducts()])
             setLoading(false)
         }
         init()
@@ -373,6 +385,38 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                             />
                             <Label htmlFor="isActive">Published</Label>
+                        </div>
+                        <div className="pt-4 mt-4 border-t space-y-3">
+                            <Label className="font-semibold block">Related Products (Manual Selection)</Label>
+                            <div className="max-h-48 overflow-y-auto border rounded-md p-2 space-y-2 bg-white text-sm">
+                                {allProducts.length === 0 ? (
+                                    <div className="text-muted-foreground p-2">No products available.</div>
+                                ) : (
+                                    allProducts.filter(p => p.id !== product.id).map(p => (
+                                        <div key={p.id} className="flex items-center space-x-2 p-1 hover:bg-gray-50 rounded">
+                                            <input
+                                                type="checkbox"
+                                                id={`related-${p.id}`}
+                                                checked={product.relatedProductIds?.includes(p.id) || false}
+                                                onChange={(e) => {
+                                                    const current = product.relatedProductIds || []
+                                                    const updated = e.target.checked
+                                                        ? [...current, p.id]
+                                                        : current.filter(id => id !== p.id)
+                                                    setProduct({ ...product, relatedProductIds: updated })
+                                                }}
+                                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                            />
+                                            <Label htmlFor={`related-${p.id}`} className="font-normal cursor-pointer flex-1">
+                                                {p.name}
+                                            </Label>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <p className="text-xs text-muted-foreground leading-tight">
+                                These selected products will be displayed in the equivalent "Popular Products" module for this specific product.
+                            </p>
                         </div>
                     </div>
 
