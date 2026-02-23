@@ -40,6 +40,7 @@ export type Section = {
     | 'custom_quote_form'
     | 'featured_blogs'
     | 'tabs'
+    | 'material_finishing'
     title?: string
     content: any
 }
@@ -99,6 +100,7 @@ import { CustomQuoteFormSection } from "@/components/home/CustomQuoteFormSection
 import { FeaturedBlogs } from "@/components/home/sections/FeaturedBlogs"
 import TabsSection from "@/components/home/sections/TabsSection"
 import { CTA } from "@/components/home/sections/CTA"
+import { MaterialFinishing } from "@/components/home/sections/MaterialFinishing"
 
 function RenderSection({
     section,
@@ -167,6 +169,8 @@ function RenderSection({
             return <FeaturedBlogs key={section.id} posts={featuredBlogs || []} />
         case 'tabs':
             return <TabsSection key={section.id} data={section.content} />
+        case 'material_finishing':
+            return <MaterialFinishing key={section.id} data={getSharedContent()} />
         default:
             return null
     }

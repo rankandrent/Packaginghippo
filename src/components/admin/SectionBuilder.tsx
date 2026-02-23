@@ -75,6 +75,7 @@ export type Section = {
     | 'custom_quote_form'
     | 'featured_blogs'
     | 'tabs'
+    | 'material_finishing'
     title?: string
     content: any
 }
@@ -166,6 +167,7 @@ export function SectionBuilder({ sections = [], onChange }: SectionBuilderProps)
                         <SectionButton icon={LayoutTemplate} label="Features Bar" onClick={() => addSection('features_bar')} />
                         <SectionButton icon={LayoutTemplate} label="Logo Loop" onClick={() => addSection('logo_loop')} />
                         <SectionButton icon={List} label="Tabs" onClick={() => addSection('tabs')} />
+                        <SectionButton icon={LayoutTemplate} label="Material & Finish" onClick={() => addSection('material_finishing')} />
                     </div>
                 </div>
             </div>
@@ -308,6 +310,7 @@ function getDefaultContent(type: string) {
         case 'custom_quote_form': return { image: '' }
         case 'featured_blogs': return { heading: 'Latest Insights' }
         case 'tabs': return { heading: 'Product Details', tabs: [{ id: '1', label: 'Specification', content: '', specs: [] }, { id: '2', label: 'Description', content: '' }] }
+        case 'material_finishing': return { heading: 'Material & Finishing Options', stockHeading: 'Stock Type & Thickness', finishingHeading: 'Finishing Assortment', stockTypes: [], finishing: [] }
         default: return {}
     }
 }
@@ -618,6 +621,86 @@ function renderEditor(type: string, content: any, onChange: (key: string, value:
 
         case 'tabs':
             return <TabsSectionEditor content={content} onChange={(key, val) => onChange(key, val)} />
+
+        case 'material_finishing':
+            const stockTypes = Array.isArray(content.stockTypes) ? content.stockTypes : []
+            const finishing = Array.isArray(content.finishing) ? content.finishing : []
+
+            return (
+                <div className="space-y-6">
+                    <HeadingField />
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <Label>Stock Section Heading</Label>
+                            <Input value={content.stockHeading || 'Stock Type & Thickness'} onChange={e => onChange('stockHeading', e.target.value)} />
+                        </div>
+                        <div>
+                            <Label>Finishing Section Heading</Label>
+                            <Input value={content.finishingHeading || 'Finishing Assortment'} onChange={e => onChange('finishingHeading', e.target.value)} />
+                        </div>
+                    </div>
+
+                    {/* Stock Types */}
+                    <div className="space-y-3 p-4 border rounded-md bg-gray-50/50">
+                        <Label className="text-base font-semibold">Stock Types</Label>
+                        {stockTypes.map((item: any, idx: number) => (
+                            <div key={`stock-${idx}`} className="flex gap-4 p-4 border rounded bg-white">
+                                <div className="w-24 flex-shrink-0">
+                                    <ImageUploader value={item.image ? [item.image] : []} onChange={urls => {
+                                        const newArr = [...stockTypes]; newArr[idx].image = urls[0]; onChange('stockTypes', newArr)
+                                    }} maxFiles={1} />
+                                </div>
+                                <div className="flex-1 space-y-2">
+                                    <Input value={item.title || ''} placeholder="Ex: Cardboard" onChange={e => {
+                                        const newArr = [...stockTypes]; newArr[idx].title = e.target.value; onChange('stockTypes', newArr)
+                                    }} />
+                                    <Textarea value={item.desc || ''} placeholder="Description..." rows={2} onChange={e => {
+                                        const newArr = [...stockTypes]; newArr[idx].desc = e.target.value; onChange('stockTypes', newArr)
+                                    }} />
+                                </div>
+                                <Button variant="ghost" size="icon" className="text-red-500" onClick={() => {
+                                    onChange('stockTypes', stockTypes.filter((_: any, i: number) => i !== idx))
+                                }}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                        <Button type="button" variant="outline" size="sm" onClick={() => onChange('stockTypes', [...stockTypes, { title: '', desc: '', image: '' }])}>
+                            <Plus className="mr-2 h-4 w-4" /> Add Stock Type
+                        </Button>
+                    </div>
+
+                    {/* Finishing Assortment */}
+                    <div className="space-y-3 p-4 border rounded-md bg-gray-50/50">
+                        <Label className="text-base font-semibold">Finishing Assortment</Label>
+                        {finishing.map((item: any, idx: number) => (
+                            <div key={`finish-${idx}`} className="flex gap-4 p-4 border rounded bg-white">
+                                <div className="w-24 flex-shrink-0">
+                                    <ImageUploader value={item.image ? [item.image] : []} onChange={urls => {
+                                        const newArr = [...finishing]; newArr[idx].image = urls[0]; onChange('finishing', newArr)
+                                    }} maxFiles={1} />
+                                </div>
+                                <div className="flex-1 space-y-2">
+                                    <Input value={item.title || ''} placeholder="Ex: Spot UV" onChange={e => {
+                                        const newArr = [...finishing]; newArr[idx].title = e.target.value; onChange('finishing', newArr)
+                                    }} />
+                                    <Textarea value={item.desc || ''} placeholder="Description..." rows={2} onChange={e => {
+                                        const newArr = [...finishing]; newArr[idx].desc = e.target.value; onChange('finishing', newArr)
+                                    }} />
+                                </div>
+                                <Button variant="ghost" size="icon" className="text-red-500" onClick={() => {
+                                    onChange('finishing', finishing.filter((_: any, i: number) => i !== idx))
+                                }}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                        <Button type="button" variant="outline" size="sm" onClick={() => onChange('finishing', [...finishing, { title: '', desc: '', image: '' }])}>
+                            <Plus className="mr-2 h-4 w-4" /> Add Finishing Option
+                        </Button>
+                    </div>
+                </div>
+            )
 
         default:
             return (
