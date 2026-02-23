@@ -1,5 +1,5 @@
 
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
@@ -123,7 +123,16 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         return <PageView page={page} slug={slug} />
     }
 
-    // 4. Not Found
+    // 4. Try Blog Post (Redirect to canonical /blog/[slug])
+    const blogPost = await prisma.blogPost.findUnique({
+        where: { slug },
+        select: { id: true }
+    })
+    if (blogPost) {
+        redirect(`/blog/${slug}`)
+    }
+
+    // 5. Not Found
     notFound()
 }
 
