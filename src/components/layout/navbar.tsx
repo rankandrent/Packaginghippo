@@ -244,13 +244,13 @@ export function Navbar({ settings, menuData }: NavbarProps) {
 
                     {/* Right Actions */}
                     <div className="hidden lg:flex items-center gap-8">
-                        <div className="flex items-center gap-3">
+                        <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
                             <Phone className="w-8 h-8 text-primary fill-primary/10" />
                             <div className="flex flex-col">
                                 <span className="text-xs text-gray-500 font-medium">Call Us 24/7</span>
                                 <span className="text-sm font-bold text-gray-900">{phone}</span>
                             </div>
-                        </div>
+                        </a>
                         <div className="relative">
                             <ShoppingCart className="w-8 h-8 text-primary" />
                             <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
@@ -299,10 +299,10 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                     </nav>
 
                     <div className="pt-2 flex flex-col gap-3">
-                        <div className="flex items-center gap-3">
+                        <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                             <Phone className="w-5 h-5 text-primary" />
                             <span className="text-sm font-bold">{phone}</span>
-                        </div>
+                        </a>
                         <Button asChild className="w-full bg-primary hover:bg-primary/90">
                             <Link href="/quote" onClick={() => setIsOpen(false)}>Request A Quote</Link>
                         </Button>
