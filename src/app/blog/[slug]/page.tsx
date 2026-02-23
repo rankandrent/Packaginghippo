@@ -151,12 +151,14 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                 <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-12">
 
                     {/* Left Sidebar - Table of Contents */}
-                    <div className="hidden lg:block">
-                        <div className="sticky top-32 space-y-8">
-                            <DynamicTOC selector=".rich-text" />
+                    <div className="hidden lg:block relative">
+                        <div className="sticky top-32 flex flex-col max-h-[calc(100vh-10rem)]">
+                            <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar pb-6">
+                                <DynamicTOC selector=".rich-text" />
+                            </div>
 
-                            <div className="pt-8 space-y-4 border-t">
-                                <h3 className="font-bold text-blue-900 uppercase tracking-wider text-xs border-b pb-2 text-center md:text-left">Share This Post</h3>
+                            <div className="pt-6 mt-2 border-t shrink-0">
+                                <h3 className="font-bold text-blue-900 uppercase tracking-wider text-xs border-b pb-2 mb-4 text-center md:text-left">Share This Post</h3>
                                 <ShareButtons title={post.title} slug={post.slug} />
                             </div>
                         </div>

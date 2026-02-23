@@ -69,24 +69,34 @@ export default function MediaLibraryPage() {
     async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
         if (!e.target.files || e.target.files.length === 0) return
 
-        const file = e.target.files[0]
+        const files = Array.from(e.target.files)
         setUploading(true)
-        const formData = new FormData()
-        formData.append("file", file)
 
         try {
-            const res = await fetch("/api/upload", {
-                method: "POST",
-                body: formData,
-            })
-            const data = await res.json()
+            const uploadPromises = files.map(async (file) => {
+                const formData = new FormData()
+                formData.append("file", file)
 
-            if (data.url) {
-                // Refresh list to show new image
-                await fetchImages()
-            } else {
-                alert("Upload failed: " + (data.error || "Unknown error"))
+                const res = await fetch("/api/upload", {
+                    method: "POST",
+                    body: formData,
+                })
+
+                const data = await res.json()
+                if (!res.ok) throw new Error(data.error || `Upload failed for ${file.name}`)
+                return data.url
+            })
+
+            const results = await Promise.allSettled(uploadPromises)
+
+            const failures = results.filter(r => r.status === 'rejected')
+            if (failures.length > 0) {
+                alert(`Successfully uploaded ${results.length - failures.length} images. Failed to upload ${failures.length} images.`)
             }
+
+            // Refresh list to show new image(s)
+            await fetchImages()
+
         } catch (error) {
             console.error("Upload error", error)
             alert("Upload error")
@@ -184,6 +194,7 @@ export default function MediaLibraryPage() {
                         <input
                             type="file"
                             accept="image/*"
+                            multiple
                             onChange={handleFileUpload}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                             disabled={uploading}
@@ -212,6 +223,7 @@ export default function MediaLibraryPage() {
                         <input
                             type="file"
                             accept="image/*"
+                            multiple
                             onChange={handleFileUpload}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         />
