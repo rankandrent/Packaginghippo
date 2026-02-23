@@ -38,7 +38,20 @@ export default function PagesListPage() {
             setLoading(true)
             const res = await fetch('/api/cms/pages')
             const data = await res.json()
-            setPages(data.pages || [])
+
+            // Inject hardcoded App Router pages to increase visibility
+            const fetchedPages = data.pages || []
+            const hardcodedPages: Page[] = [
+                {
+                    id: 'hardcoded-contact',
+                    title: 'Contact Us',
+                    slug: 'contact-us',
+                    isPublished: true,
+                    updatedAt: new Date().toISOString()
+                }
+            ]
+
+            setPages([...hardcodedPages, ...fetchedPages])
         } catch (error) {
             console.error("Error fetching pages:", error)
         } finally {
@@ -143,7 +156,14 @@ export default function PagesListPage() {
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            onClick={() => router.push(`/dashboard/pages/${page.id}`)}
+                                            onClick={() => {
+                                                if (page.slug === 'contact-us') {
+                                                    router.push('/dashboard/settings')
+                                                } else {
+                                                    router.push(`/dashboard/pages/${page.id}`)
+                                                }
+                                            }}
+                                            title={page.slug === 'contact-us' ? 'Edit in Settings' : 'Edit Page'}
                                         >
                                             <Pencil className="h-4 w-4" />
                                         </Button>
@@ -151,6 +171,8 @@ export default function PagesListPage() {
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => deletePage(page.id)}
+                                            disabled={page.id === 'hardcoded-contact'}
+                                            title={page.id === 'hardcoded-contact' ? 'Cannot delete hardcoded page' : 'Delete Page'}
                                         >
                                             <Trash2 className="h-4 w-4 text-red-500" />
                                         </Button>
