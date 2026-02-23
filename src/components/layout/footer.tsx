@@ -96,7 +96,7 @@ export async function Footer() {
                         <h4 className="font-bold text-lg mb-6 text-yellow-500">{companyTitle}</h4>
                         <ul className="space-y-3 text-sm text-gray-400">
                             <li><Link href="/about-us" className="hover:text-white">About Us</Link></li>
-                            <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
+                            <li><Link href="/contact-us" className="hover:text-white">Contact Us</Link></li>
                             <li><Link href="/terms-and-conditions" className="hover:text-white">Terms & Conditions</Link></li>
                             <li><Link href="/privacy-policy" className="hover:text-white">Privacy Policy</Link></li>
                         </ul>

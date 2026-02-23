@@ -403,13 +403,8 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
 
     let sections = (product.sections as unknown as Section[]) || []
 
-    // Inject Logo Loop from homepage if not present
-    const logoLoop = homepageSections.find((s: any) => s.type === 'logo_loop')
+    // Inject Features Bar from homepage if not present
     const featuresBar = homepageSections.find((s: any) => s.type === 'features_bar')
-
-    if (logoLoop && !sections.find((s: any) => s.type === 'logo_loop')) {
-        sections.push(logoLoop)
-    }
     if (featuresBar && !sections.find((s: any) => s.type === 'features_bar')) {
         sections.push(featuresBar)
     }

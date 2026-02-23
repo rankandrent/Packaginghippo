@@ -16,7 +16,7 @@ export function CTA({ data }: { data: any }) {
                         <Link href="/quote">Start Your Project</Link>
                     </Button>
                     <Button variant="outline" size="lg" className="border-2 border-black bg-transparent text-black hover:bg-black hover:text-white text-lg px-10 h-14 rounded-full font-bold" asChild>
-                        <Link href="/contact">Contact Support</Link>
+                        <Link href="/contact-us">Contact Support</Link>
                     </Button>
                 </div>
             </div>

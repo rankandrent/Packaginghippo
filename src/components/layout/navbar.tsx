@@ -22,7 +22,7 @@ const DEFAULT_MENU = [
     { id: "home", label: "Home", href: "/" },
     { id: "products", label: "Custom Packaging", href: "/products", hasChildren: true },
     { id: "quote", label: "Request A Quote", href: "/quote" },
-    { id: "contact", label: "Contact Us", href: "/contact" }
+    { id: "contact", label: "Contact Us", href: "/contact-us" }
 ]
 
 export function Navbar({ settings, menuData }: NavbarProps) {

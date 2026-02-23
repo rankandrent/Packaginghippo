@@ -243,7 +243,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                     <p className="text-blue-100 mb-10 max-w-2xl mx-auto">Get a personalized quote for your business today. Our experts are ready to help.</p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4 text-gray-900">
                         <Link href="/quote" className="px-10 py-4 bg-yellow-500 hover:bg-yellow-400 font-black uppercase rounded-lg transition-all shadow-lg shadow-yellow-500/10">Get A Quote</Link>
-                        <Link href="/contact" className="px-10 py-4 bg-white hover:bg-gray-100 font-black uppercase rounded-lg transition-all">Contact Us</Link>
+                        <Link href="/contact-us" className="px-10 py-4 bg-white hover:bg-gray-100 font-black uppercase rounded-lg transition-all">Contact Us</Link>
                     </div>
                 </div>
             </div>
