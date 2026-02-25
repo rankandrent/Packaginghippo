@@ -11,6 +11,7 @@ import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
 import { ProductTabsEditor } from "@/components/admin/ProductTabsEditor"
+import { LayoutSorter } from "@/components/admin/LayoutSorter"
 import { Loader2, ArrowLeft, Save, Plus, Trash2 } from "lucide-react"
 
 type Category = {
@@ -45,7 +46,8 @@ type Product = {
     isTopProduct: boolean
     isFeaturedInCategory: boolean
     sections: any // Json
-    tabs: any // Json for product tabs
+    tabs: any // Json
+    layout: string[] | null
 
     // Legacy fields from Supabase version if needed or just use sections?
     // User wants "sections". SectionBuilder is enough for generic "benefits/features".
@@ -69,6 +71,7 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
     // Helper for SectionBuilder type
     const [sections, setSections] = useState<Section[]>([])
     const [tabs, setTabs] = useState<any>({})
+    const [layout, setLayout] = useState<string[]>(['product_tabs', 'quote_form', 'content', 'faqs', 'related_products'])
 
     useEffect(() => {
         const init = async () => {
@@ -92,6 +95,9 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
             // Parse tabs if existing
             if (data.product.tabs) {
                 setTabs(data.product.tabs)
+            }
+            if (data.product.layout && Array.isArray(data.product.layout) && data.product.layout.length > 0) {
+                setLayout(data.product.layout)
             }
         } catch (error) {
             console.error("Error fetching product:", error)
@@ -121,7 +127,8 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                 body: JSON.stringify({
                     ...product,
                     sections: sections, // Save the sections from state
-                    tabs: tabs // Save the tabs from state
+                    tabs: tabs, // Save the tabs from state
+                    layout: layout // Save the layout from state
                 }),
             })
 
@@ -247,6 +254,16 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                             onChange={(urls) => setProduct({ ...product, images: urls })}
                             maxFiles={10}
                         />
+                    </div>
+
+                    {/* Visibility & Layout */}
+                    <div className="rounded-lg border bg-card p-6 space-y-4 shadow-sm">
+                        <h3 className="font-semibold text-lg">Visibility</h3>
+                        <div className="rounded-lg border bg-card p-6 space-y-4 shadow-sm">
+                            <h3 className="font-semibold text-lg">Section Layout</h3>
+                            <p className="text-sm text-muted-foreground">Drag to reorder standard sections.</p>
+                            <LayoutSorter items={layout} onChange={setLayout} />
+                        </div>
                     </div>
 
                     {/* Settings */}

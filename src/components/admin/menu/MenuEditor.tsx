@@ -201,7 +201,7 @@ export function MenuEditor({ initialData, onChange }: MenuEditorProps) {
                     }
                 }
 
-                let validParentId = ancestor ? ancestor.id : null
+                const validParentId = ancestor ? ancestor.id : null
 
                 // Verify cycle for ancestor too
                 let isCycle = false

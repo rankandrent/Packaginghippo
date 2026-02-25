@@ -145,12 +145,12 @@ async function getLayoutSettings() {
             }
         })
         return {
-            product: ['content', 'related_categories', 'quote_form', 'testimonials'],
+            product: ['product_tabs', 'quote_form', 'content', 'faqs', 'related_products'],
             category: ['testimonials', 'quote_form', 'content', 'faqs', 'related_categories']
         }
     } catch (error) {
         return {
-            product: ['content', 'related_categories', 'quote_form', 'testimonials'],
+            product: ['product_tabs', 'quote_form', 'content', 'faqs', 'related_products'],
             category: ['testimonials', 'quote_form', 'content', 'faqs', 'related_categories']
         }
     }
@@ -300,36 +300,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     }
                 }}
             />
-            {/* 2. Organization Schema */}
-            <JsonLd
-                data={{
-                    "@context": "https://schema.org",
-                    "@type": "Organization",
-                    "name": "Packaging Hippo",
-                    "url": "https://packaginghippo.com/",
-                    "logo": "https://packaginghippo.com/assets/images/logo.png",
-                    "contactPoint": {
-                        "@type": "ContactPoint",
-                        "telephone": "+1-800-475-4704", // Can be customized later in db
-                        "contactType": "customer service"
-                    }
-                }}
-            />
-            {/* 3. WebSite Search Schema */}
-            <JsonLd
-                data={{
-                    "@context": "https://schema.org",
-                    "@type": "WebSite",
-                    "name": "Packaging Hippo",
-                    "url": "https://packaginghippo.com/",
-                    "potentialAction": {
-                        "@type": "SearchAction",
-                        "target": "https://packaginghippo.com/search?query={search_term_string}",
-                        "query-input": "required name=search_term_string"
-                    }
-                }}
-            />
-            {/* 4. ItemList (Category Products) */}
+            {/* 2. ItemList (Category Products) */}
             {category.products && category.products.length > 0 && (
                 <JsonLd
                     data={{
@@ -348,7 +319,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     }}
                 />
             )}
-            {/* 5. Dynamic FAQ Schema */}
+            {/* 3. Dynamic FAQ Schema */}
             {faqSections.map((faqSec: any, idx: number) => {
                 const items = faqSec.content?.items || []
                 if (items.length === 0) return null
@@ -407,7 +378,9 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
     const testimonials = await getTestimonials(product.id)
     const homepageSections = await getHomepageSections()
     const layoutSettings = await getLayoutSettings()
-    const layoutOrder = layoutSettings.product
+    const layoutOrder = product.layout && Array.isArray(product.layout) && product.layout.length > 0
+        ? product.layout
+        : layoutSettings.product
 
     // Check if the product has manually curated related products
     let popularProducts: any[] = []
@@ -425,13 +398,24 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
     }
     const quoteFormImage = await getQuoteFormImage()
 
-    let sections = (product.sections as unknown as Section[]) || []
+    const sections = (product.sections as unknown as Section[]) || []
 
     // Inject Features Bar from homepage if not present
     const featuresBar = homepageSections.find((s: any) => s.type === 'features_bar')
     if (featuresBar && !sections.find((s: any) => s.type === 'features_bar')) {
         sections.push(featuresBar)
     }
+
+    // Extract specific dynamic sections to allow manual sorting
+    const faqSections = sections.filter((s: any) => s.type === 'faq')
+    const materialFinishingSections = sections.filter((s: any) => s.type === 'material_finishing')
+
+    if (materialFinishingSections.length === 0) {
+        const homepageMF = homepageSections.find((s: any) => s.type === 'material_finishing')
+        if (homepageMF) materialFinishingSections.push(homepageMF)
+    }
+
+    const otherSections = sections.filter((s: any) => s.type !== 'faq' && s.type !== 'material_finishing')
 
     const breadcrumbItems = [
         { label: "Products", href: "/products" },
@@ -474,16 +458,23 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
             // Let's add it. Ideally `getRelatedCategories` works with product slug? No, with category slug.
             // We have `product.category.slug`.
             case 'quote_form':
-                // The quote form section in product view was NOT the bottom one, it was `ProductHeroQuoteForm` (top) and `CustomQuoteFormSection` (not present in old code?).
-                // Old code had NO `CustomQuoteFormSection` at bottom of Product, only `ProductHeroQuoteForm` and `QuoteForm` inside sections?
-                // Wait, looking at lines 450-470 of original file:
-                // TestimonialsSection was there. ProductTabs was there. Product Description was there.
-                // `CustomQuoteFormSection` was NOT there.
-                // If user wants to reorder "Get Custom Quote" section, they probably mean the one at the bottom found on Category pages.
-                // I will Add `CustomQuoteFormSection` to Product page as well to satisfy the request.
                 return <CustomQuoteFormSection key="quote" image={quoteFormImage} />
             case 'testimonials':
                 return <TestimonialsSection key="testimonials" testimonials={testimonials} />
+            case 'faqs':
+                return faqSections.length > 0 ? <SectionRenderer key="faqs" sections={faqSections} /> : null
+            case 'material_finishing':
+                return materialFinishingSections.length > 0 ? <SectionRenderer key="mf" sections={materialFinishingSections} /> : null
+            case 'product_tabs':
+                return <ProductTabs key="product_tabs" tabs={product.tabs as any} />
+            case 'related_products':
+                return popularProducts && popularProducts.length > 0 ? (
+                    <PopularProducts
+                        key="related_products"
+                        categoryName={product.relatedProductIds?.length > 0 ? "Related Products" : (product.category?.name || "Packaging")}
+                        products={popularProducts}
+                    />
+                ) : null
             default:
                 return null
         }
@@ -563,39 +554,6 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     "url": `https://packaginghippo.com/${product.slug}`
                 }}
             />
-            {/* 4. LocalBusiness Schema */}
-            <JsonLd
-                data={{
-                    "@context": "https://schema.org",
-                    "@type": "LocalBusiness",
-                    "name": "Packaging Hippo",
-                    "url": "https://packaginghippo.com/",
-                    "telephone": "+1-800-475-4704",
-                    "image": "https://packaginghippo.com/assets/images/logo.png",
-                    "address": {
-                        "@type": "PostalAddress",
-                        "streetAddress": "FULL ADDRESS",
-                        "addressLocality": "CITY",
-                        "addressRegion": "STATE",
-                        "postalCode": "ZIP",
-                        "addressCountry": "US"
-                    }
-                }}
-            />
-            {/* 5. WebSite Schema */}
-            <JsonLd
-                data={{
-                    "@context": "https://schema.org",
-                    "@type": "WebSite",
-                    "url": "https://packaginghippo.com/",
-                    "name": "Packaging Hippo",
-                    "potentialAction": {
-                        "@type": "SearchAction",
-                        "target": "https://packaginghippo.com/search?query={search_term_string}",
-                        "query-input": "required name=search_term_string"
-                    }
-                }}
-            />
             <section className="pt-6 pb-12 bg-white">
                 <div className="container mx-auto px-4">
                     <div className="mb-4">
@@ -671,7 +629,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
 
                                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 italic text-xs text-gray-500 flex items-center gap-2">
                                     <Info className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                                    Price starts from ${product.price || "3"}. Final cost depends on quantity, material and shipping.
+                                    Final cost depends on quantity, material, dimensions, and shipping.
                                 </div>
                             </div>
                         </div>
@@ -680,9 +638,9 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
             </section>
 
             {/* Dynamic Page Sections */}
-            {sections.length > 0 && (
+            {otherSections.length > 0 && (
                 <SectionRenderer
-                    sections={sections}
+                    sections={otherSections}
                     featuredBlogs={featuredBlogs}
                     popularProducts={popularProducts}
                     quoteFormImage={quoteFormImage}
@@ -692,18 +650,8 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                 />
             )}
 
-            <ProductTabs tabs={product.tabs as any} />
-
             {/* Re-orderable Sections */}
-            {layoutOrder.map(id => renderSection(id))}
-
-            {/* Always securely display Related / Popular Products */}
-            {popularProducts && popularProducts.length > 0 && (
-                <PopularProducts
-                    categoryName={product.relatedProductIds?.length > 0 ? "Related Products" : (product.category?.name || "Packaging")}
-                    products={popularProducts}
-                />
-            )}
+            {layoutOrder.map((id: string) => renderSection(id))}
 
         </main>
     )

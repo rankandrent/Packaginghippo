@@ -115,7 +115,7 @@ export default async function ServicesPage() {
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {categories.map((item, i) => (
-                            <Link href={`/services/${item.slug}`} key={item.id}>
+                            <Link href={`/${item.slug}`} key={item.id}>
                                 <Card className="group cursor-pointer hover:shadow-2xl transition-all border-none shadow-sm h-full rounded-2xl overflow-hidden bg-gray-50/50 hover:bg-white border border-gray-100">
                                     <div className="relative aspect-[16/10] overflow-hidden">
                                         {item.imageUrl ? (

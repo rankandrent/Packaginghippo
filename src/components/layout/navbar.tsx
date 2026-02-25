@@ -171,7 +171,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                             {suggestions.products.map(p => (
                                                 <Link
                                                     key={p.id}
-                                                    href={`/services/${p.category.slug}/${p.slug}`}
+                                                    href={`/${p.slug}`}
                                                     onClick={() => setShowSuggestions(false)}
                                                     className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg group transition-colors"
                                                 >
@@ -191,7 +191,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                             {suggestions.categories.map(c => (
                                                 <Link
                                                     key={c.id}
-                                                    href={`/services/${c.slug}`}
+                                                    href={`/${c.slug}`}
                                                     onClick={() => setShowSuggestions(false)}
                                                     className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg group transition-colors"
                                                 >

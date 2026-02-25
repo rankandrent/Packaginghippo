@@ -139,7 +139,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                         <h2 className="text-2xl font-bold text-gray-900 mb-8">Matching Products</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {products.map((product) => (
-                                <Link href={`/services/${product.category.slug}/${product.slug}`} key={product.id} className="group">
+                                <Link href={`/${product.slug}`} key={product.id} className="group">
                                     <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
                                         <div className="aspect-square bg-gray-100 relative flex items-center justify-center overflow-hidden">
                                             {product.images && product.images[0] ? (
@@ -169,7 +169,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                         <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">{isSearching ? "Matching Categories" : "Browse Categories"}</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {categories.map((cat) => (
-                                <Link href={`/services/${cat.slug}`} key={cat.id} className="group">
+                                <Link href={`/${cat.slug}`} key={cat.id} className="group">
                                     <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
                                         <div className="aspect-square bg-white relative flex items-center justify-center p-8 group-hover:bg-yellow-50 transition-colors">
                                             {cat.imageUrl ? (

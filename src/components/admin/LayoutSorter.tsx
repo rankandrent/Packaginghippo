@@ -26,11 +26,14 @@ interface LayoutSorterProps {
 }
 
 const SECTION_LABELS: Record<string, string> = {
-    'content': 'Category Content (Description)',
+    'content': 'Category/Product Content (Description)',
     'related_categories': 'Related Categories',
     'quote_form': 'Quote Form',
     'testimonials': 'Testimonials',
-    'faqs': 'FAQ Sections'
+    'faqs': 'FAQ Sections',
+    'related_products': 'Related / Popular Products',
+    'material_finishing': 'Material & Finishing Options',
+    'product_tabs': 'Product Tabs'
 }
 
 export function LayoutSorter({ items, onChange }: LayoutSorterProps) {

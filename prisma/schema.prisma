@@ -119,6 +119,7 @@ model Product {
   
   content     Json?    // Generic content
   sections    Json?    // List of dynamic sections
+  layout      Json?    // Custom section layout order
   
   // SEO
   seoTitle    String?

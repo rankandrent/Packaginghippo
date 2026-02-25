@@ -25,14 +25,9 @@ export async function POST(request: NextRequest) {
         // Handle cases where there is no extension
         const rawName = lastDotIndex !== -1 ? originalName.substring(0, lastDotIndex) : originalName
 
-        // 2. Slugify the filename: lowercase, replace non-alphanumerics with hyphens, trim extra hyphens
-        const slugifiedName = rawName
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)+/g, '') || "upload"
-
-        // 3. Final SEO-friendly public ID (exact match to input)
-        const finalPublicId = slugifiedName
+        // 2. Use the exact original filename (without modification) to preserve the exact name in the URL uploaded by the user
+        // Note: we still fallback to "upload" if the parsed name is completely empty
+        const finalPublicId = rawName || "upload"
 
         // Convert file to buffer
         const arrayBuffer = await file.arrayBuffer()
@@ -56,7 +51,6 @@ export async function POST(request: NextRequest) {
                     transformation: [
                         { quality: "auto", fetch_format: "auto" }
                     ],
-                    // @ts-ignore - Cloudinary types might not include agent but the underlying request supports it
                     agent: agent
                 },
                 (error, result) => {

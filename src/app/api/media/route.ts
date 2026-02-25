@@ -27,7 +27,6 @@ export async function GET(request: NextRequest) {
             next_cursor: cursor,
             direction: 'desc', // Newest first
             context: true, // Fetch context (metadata)
-            // @ts-ignore
             agent: agent
         })
 
@@ -55,7 +54,6 @@ export async function PUT(request: NextRequest) {
             context: {
                 alt: alt
             },
-            // @ts-ignore
             agent: agent
         })
 
@@ -80,7 +78,6 @@ export async function DELETE(request: NextRequest) {
         }
 
         const result = await cloudinary.api.delete_resources([public_id], {
-            // @ts-ignore
             agent: agent
         })
 

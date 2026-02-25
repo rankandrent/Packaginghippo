@@ -26,6 +26,7 @@ export function DynamicTOC({ selector = ".prose" }: { selector?: string }) {
                 level: el.tagName === "H2" ? 2 : 3
             }
         })
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setHeadings(tocItems)
 
         // Intersection Observer for active state

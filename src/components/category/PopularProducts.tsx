@@ -62,13 +62,7 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                                     </Link>
                                 </h3>
 
-                                <div className="flex items-center justify-between mt-auto">
-                                    <div className="flex flex-col">
-                                        <span className="text-xs text-gray-400 uppercase font-semibold">Starting at</span>
-                                        <span className="text-lg font-bold text-blue-900">
-                                            ${product.price ? product.price.toFixed(2) : '0.50'} <span className="text-xs text-gray-500 font-normal">/ unit</span>
-                                        </span>
-                                    </div>
+                                <div className="flex items-center justify-end mt-auto">
                                     <Link
                                         href={`/${product.slug}`}
                                         className="bg-blue-600 text-white p-2 rounded-full hover:bg-yellow-500 hover:text-blue-900 transition-colors shadow-md group-hover:scale-110 transform duration-300"
