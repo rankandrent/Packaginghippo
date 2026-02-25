@@ -38,6 +38,29 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
+    // --- Dynamic Redirect Logic (SEO) ---
+    // Only check for redirects on page requests (not static, api, or internal)
+    const isStaticPath = pathname.includes('.') || pathname.startsWith('/_next') || pathname.startsWith('/api')
+
+    if (!isStaticPath) {
+        try {
+            // Check for custom redirects in the database
+            const redirectCheckUrl = new URL(`/api/redirect-lookup?sourceUrl=${encodeURIComponent(pathname)}`, request.url)
+            const redirectRes = await fetch(redirectCheckUrl)
+
+            if (redirectRes.ok) {
+                const redirectData = await redirectRes.json()
+                if (redirectData.found && redirectData.targetUrl) {
+                    // Use the status code from the database (default 301)
+                    const statusCode = redirectData.type === 302 ? 302 : 301
+                    return NextResponse.redirect(new URL(redirectData.targetUrl, request.url), statusCode)
+                }
+            }
+        } catch (error) {
+            console.error('Middleware redirect error:', error)
+        }
+    }
+
     const response = NextResponse.next();
     response.headers.set('x-invoke-path', pathname);
     return response;
