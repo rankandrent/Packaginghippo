@@ -203,31 +203,35 @@ export default function ChatDashboard() {
             <div className={`w-[360px] border-r bg-white flex flex-col flex-shrink-0 ${selectedConvo ? 'hidden md:flex' : 'flex'}`}>
                 {/* Header */}
                 <div className="p-4 border-b">
-                    <div className="flex items-center justify-between mb-3">
-                        <h1 className="text-xl font-bold text-gray-900">
-                            Live Chat
-                            {totalUnread > 0 && (
-                                <span className="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                                    {totalUnread}
-                                </span>
-                            )}
-                        </h1>
-                        <div className="flex gap-1">
-                            {['all', 'active', 'ai_closed', 'closed', 'loss'].map(s => (
-                                <button
-                                    key={s}
-                                    onClick={() => setFilterStatus(s)}
-                                    className={`px-2.5 py-1 text-xs font-medium rounded-full capitalize transition-colors ${filterStatus === s
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    {s}
-                                </button>
-                            ))}
-                        </div>
+                    <h1 className="text-xl font-bold text-gray-900 mb-3">
+                        Live Chat
+                        {totalUnread > 0 && (
+                            <span className="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                {totalUnread}
+                            </span>
+                        )}
+                    </h1>
+                    <div className="flex gap-1.5 flex-wrap">
+                        {[
+                            { key: 'all', label: 'All' },
+                            { key: 'active', label: 'Active' },
+                            { key: 'ai_closed', label: 'AI Closed' },
+                            { key: 'closed', label: 'Closed' },
+                            { key: 'loss', label: 'Loss' },
+                        ].map(s => (
+                            <button
+                                key={s.key}
+                                onClick={() => setFilterStatus(s.key)}
+                                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${filterStatus === s.key
+                                    ? s.key === 'ai_closed' ? 'bg-purple-600 text-white' : 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                            >
+                                {s.key === 'ai_closed' && '🤖 '}{s.label}
+                            </button>
+                        ))}
                     </div>
-                    <div className="relative">
+                    <div className="relative mt-3">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                             type="text"
