@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
             max_results: 50,
             next_cursor: cursor,
             direction: 'desc', // Newest first
-            context: true, // Fetch context (metadata)
+            context: true, // Fetch context (metadata including alt, caption/name)
             agent: agent
         })
 
@@ -42,22 +42,61 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
     try {
-        const { public_id, alt } = await request.json()
+        const { public_id, alt, caption, new_slug } = await request.json()
 
         if (!public_id) {
             return NextResponse.json({ error: "Missing public_id" }, { status: 400 })
         }
 
-        // Update Cloudinary context (where we store alt text)
-        // We use the key 'alt' in the context object
-        const result = await cloudinary.api.update(public_id, {
-            context: {
-                alt: alt
-            },
-            agent: agent
-        })
+        // 1. Update context metadata (alt text + display name/caption)
+        const contextData: Record<string, string> = {}
+        if (alt !== undefined) contextData.alt = alt
+        if (caption !== undefined) contextData.caption = caption
 
-        return NextResponse.json({ success: true, result })
+        if (Object.keys(contextData).length > 0) {
+            await cloudinary.api.update(public_id, {
+                context: contextData,
+                agent: agent
+            })
+        }
+
+        // 2. Rename the image if a new slug is provided (changes the URL)
+        let newPublicId = public_id
+        let newSecureUrl = ''
+        if (new_slug && new_slug.trim()) {
+            // Build the new public_id: keep the folder, change the filename
+            const parts = public_id.split('/')
+            const folder = parts.slice(0, -1).join('/')
+            const slugified = new_slug
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '')
+
+            newPublicId = folder ? `${folder}/${slugified}` : slugified
+
+            if (newPublicId !== public_id) {
+                const renameResult = await cloudinary.uploader.rename(public_id, newPublicId, {
+                    overwrite: true,
+                }) as any
+                newSecureUrl = renameResult.secure_url
+
+                // Re-apply context to renamed image (context is preserved but let's be safe)
+                if (Object.keys(contextData).length > 0) {
+                    await cloudinary.api.update(newPublicId, {
+                        context: contextData,
+                        agent: agent
+                    })
+                }
+            }
+        }
+
+        return NextResponse.json({
+            success: true,
+            new_public_id: newPublicId,
+            new_secure_url: newSecureUrl || undefined
+        })
     } catch (error: any) {
         console.error("Media Update Error:", error)
         return NextResponse.json(
@@ -66,7 +105,6 @@ export async function PUT(request: NextRequest) {
         )
     }
 }
-// ... existing imports and code ...
 
 export async function DELETE(request: NextRequest) {
     try {

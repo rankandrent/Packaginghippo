@@ -18,6 +18,7 @@ type CloudinaryResource = {
     context?: {
         custom?: {
             alt?: string
+            caption?: string
         }
     }
 }
@@ -29,10 +30,12 @@ export default function MediaLibraryPage() {
     const [nextCursor, setNextCursor] = useState<string | null>(null)
     const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
 
-    // Alt Text Editing State
+    // Edit State
     const [editingImage, setEditingImage] = useState<CloudinaryResource | null>(null)
-    const [newAltText, setNewAltText] = useState("")
-    const [updatingAlt, setUpdatingAlt] = useState(false)
+    const [editSlug, setEditSlug] = useState("")
+    const [editName, setEditName] = useState("")
+    const [editAlt, setEditAlt] = useState("")
+    const [saving, setSaving] = useState(false)
 
     // Delete State
     const [deletingImage, setDeletingImage] = useState<CloudinaryResource | null>(null)
@@ -113,41 +116,69 @@ export default function MediaLibraryPage() {
         setTimeout(() => setCopiedUrl(null), 2000)
     }
 
-    const startEditing = (image: CloudinaryResource) => {
-        setEditingImage(image)
-        setNewAltText(image.context?.custom?.alt || "")
+    // Extract just the filename (slug) from a public_id like "products/my-image"
+    const getSlugFromPublicId = (pid: string) => {
+        const parts = pid.split('/')
+        return parts[parts.length - 1] || pid
     }
 
-    const saveAltText = async () => {
+    const startEditing = (image: CloudinaryResource) => {
+        setEditingImage(image)
+        setEditSlug(getSlugFromPublicId(image.public_id))
+        setEditName(image.context?.custom?.caption || '')
+        setEditAlt(image.context?.custom?.alt || '')
+    }
+
+    const handleSave = async () => {
         if (!editingImage) return
 
-        setUpdatingAlt(true)
+        setSaving(true)
         try {
+            const currentSlug = getSlugFromPublicId(editingImage.public_id)
+            const slugChanged = editSlug.trim() && editSlug.trim() !== currentSlug
+
             const res = await fetch("/api/media", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     public_id: editingImage.public_id,
-                    alt: newAltText
+                    alt: editAlt,
+                    caption: editName,
+                    new_slug: slugChanged ? editSlug.trim() : undefined,
                 })
             })
 
+            const data = await res.json()
+
             if (res.ok) {
-                // Update local state
-                setImages(prev => prev.map(img =>
-                    img.public_id === editingImage.public_id
-                        ? { ...img, context: { custom: { alt: newAltText } } }
-                        : img
-                ))
+                if (slugChanged && data.new_public_id) {
+                    // Slug changed — refresh to get updated URLs
+                    await fetchImages()
+                } else {
+                    // Only metadata changed — update locally
+                    setImages(prev => prev.map(img =>
+                        img.public_id === editingImage.public_id
+                            ? {
+                                ...img,
+                                context: {
+                                    custom: {
+                                        alt: editAlt,
+                                        caption: editName
+                                    }
+                                }
+                            }
+                            : img
+                    ))
+                }
                 setEditingImage(null)
             } else {
-                alert("Failed to update alt text")
+                alert("Failed to save: " + (data.error || "Unknown error"))
             }
         } catch (error) {
-            console.error("Failed to update alt text", error)
-            alert("Error updating alt text")
+            console.error("Failed to save", error)
+            alert("Error saving changes")
         } finally {
-            setUpdatingAlt(false)
+            setSaving(false)
         }
     }
 
@@ -176,13 +207,19 @@ export default function MediaLibraryPage() {
         }
     }
 
+    // Build the SEO-friendly URL for display
+    const getSeoUrl = (image: CloudinaryResource) => {
+        const slug = getSlugFromPublicId(image.public_id)
+        return `/images/products/${slug}.${image.format}`
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Media Library</h2>
                     <p className="text-muted-foreground">
-                        Upload and manage images for your website.
+                        Upload and manage images. Edit slug, name, and alt text for SEO.
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -261,7 +298,7 @@ export default function MediaLibraryPage() {
                                             variant="secondary"
                                             className="h-8 w-8 p-0"
                                             onClick={() => startEditing(image)}
-                                            title="Edit Alt Text"
+                                            title="Edit Image Details"
                                         >
                                             <Pencil className="h-3 w-3" />
                                         </Button>
@@ -285,10 +322,15 @@ export default function MediaLibraryPage() {
                                     </Button>
                                 </div>
                             </div>
-                            <CardContent className="p-2 text-xs border-t bg-white">
-                                <div className="font-medium truncate mb-1">{image.public_id.split('/').pop()}</div>
+                            <CardContent className="p-2 text-xs border-t bg-white space-y-0.5">
+                                <div className="font-medium truncate">{getSlugFromPublicId(image.public_id)}.{image.format}</div>
+                                {image.context?.custom?.caption && (
+                                    <div className="text-blue-600 truncate text-[10px]" title={image.context.custom.caption}>
+                                        {image.context.custom.caption}
+                                    </div>
+                                )}
                                 {image.context?.custom?.alt && (
-                                    <div className="text-gray-500 truncate italic" title={image.context.custom.alt}>
+                                    <div className="text-gray-500 truncate italic text-[10px]" title={image.context.custom.alt}>
                                         Alt: {image.context.custom.alt}
                                     </div>
                                 )}
@@ -307,29 +349,72 @@ export default function MediaLibraryPage() {
                 </div>
             )}
 
-            {/* Edit Alt Text Dialog */}
+            {/* Edit Image Dialog — Slug, Name, Alt Text */}
             <Dialog open={!!editingImage} onOpenChange={(open) => !open && setEditingImage(null)}>
-                <DialogContent>
+                <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>Edit Image Alt Text</DialogTitle>
+                        <DialogTitle>Edit Image Details</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label>Alt Text</Label>
-                            <Input
-                                value={newAltText}
-                                onChange={(e) => setNewAltText(e.target.value)}
-                                placeholder="Describe this image for SEO..."
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                Detailed alt text helps search engines understand your image content.
-                            </p>
+                    {editingImage && (
+                        <div className="space-y-5 py-2">
+                            {/* Preview */}
+                            <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border">
+                                <div className="relative w-20 h-20 bg-white rounded shrink-0 border">
+                                    <img src={editingImage.secure_url} alt="Preview" className="object-contain w-full h-full p-1" />
+                                </div>
+                                <div className="text-xs space-y-1 min-w-0">
+                                    <p className="font-medium truncate">{editingImage.public_id}</p>
+                                    <p className="text-muted-foreground">{editingImage.width}×{editingImage.height} • {editingImage.format.toUpperCase()}</p>
+                                    <p className="text-blue-600 truncate text-[10px]">{getSeoUrl(editingImage)}</p>
+                                </div>
+                            </div>
+
+                            {/* Image Slug */}
+                            <div className="space-y-2">
+                                <Label className="text-sm font-semibold">Image Slug (URL filename)</Label>
+                                <Input
+                                    value={editSlug}
+                                    onChange={(e) => setEditSlug(e.target.value)}
+                                    placeholder="what-are-bagged-packaged-goods"
+                                />
+                                <p className="text-[11px] text-muted-foreground">
+                                    This changes the actual image URL. Use lowercase, hyphens, no spaces.
+                                    <br />
+                                    <span className="text-blue-600 font-medium">URL: packaginghippo.com/images/products/{editSlug || 'slug'}.{editingImage.format}</span>
+                                </p>
+                            </div>
+
+                            {/* Image Name */}
+                            <div className="space-y-2">
+                                <Label className="text-sm font-semibold">Image Name / Title</Label>
+                                <Input
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    placeholder="What Are Bagged Packaged Goods"
+                                />
+                                <p className="text-[11px] text-muted-foreground">
+                                    Display name for organizing in the media library. Also used for SEO captions.
+                                </p>
+                            </div>
+
+                            {/* Alt Text */}
+                            <div className="space-y-2">
+                                <Label className="text-sm font-semibold">Alt Text</Label>
+                                <Input
+                                    value={editAlt}
+                                    onChange={(e) => setEditAlt(e.target.value)}
+                                    placeholder="Bagged packaged goods on store shelf"
+                                />
+                                <p className="text-[11px] text-muted-foreground">
+                                    Describes the image for screen readers and search engines. Be specific and descriptive.
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setEditingImage(null)}>Cancel</Button>
-                        <Button onClick={saveAltText} disabled={updatingAlt}>
-                            {updatingAlt && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Button onClick={handleSave} disabled={saving}>
+                            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Save Changes
                         </Button>
                     </DialogFooter>
