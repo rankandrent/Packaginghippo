@@ -27,6 +27,7 @@ interface Conversation {
 
 const STATUS_CONFIG: Record<string, { label: string, color: string, bg: string }> = {
     active: { label: 'Active', color: 'text-green-600', bg: 'bg-green-50' },
+    ai_closed: { label: 'AI Closed', color: 'text-purple-600', bg: 'bg-purple-50' },
     closed: { label: 'Closed', color: 'text-gray-600', bg: 'bg-gray-50' },
     loss: { label: 'Loss', color: 'text-red-600', bg: 'bg-red-50' },
 }
@@ -212,7 +213,7 @@ export default function ChatDashboard() {
                             )}
                         </h1>
                         <div className="flex gap-1">
-                            {['all', 'active', 'closed', 'loss'].map(s => (
+                            {['all', 'active', 'ai_closed', 'closed', 'loss'].map(s => (
                                 <button
                                     key={s}
                                     onClick={() => setFilterStatus(s)}
@@ -285,6 +286,9 @@ export default function ChatDashboard() {
                                         <span className={`text-[10px] font-medium ${sc.color}`}>
                                             {sc.label}
                                         </span>
+                                        {(convo as any).handledBy === 'ai' && (
+                                            <span className="text-[10px] bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full font-medium">🤖 AI</span>
+                                        )}
                                         {convo.assignedAgent && (
                                             <span className="text-[10px] text-gray-400">→ {convo.assignedAgent}</span>
                                         )}
@@ -338,6 +342,23 @@ export default function ChatDashboard() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
+                                {/* Take Over from AI */}
+                                {convoDetails?.handledBy === 'ai' && currentStatus === 'active' && (
+                                    <button
+                                        onClick={async () => {
+                                            await fetch('/api/chat/conversations', {
+                                                method: 'PATCH',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ id: selectedConvo, status: 'active', handledBy: 'human' })
+                                            })
+                                            fetchConversations()
+                                            fetchMessages()
+                                        }}
+                                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-purple-50 text-purple-600 border border-purple-200 hover:bg-purple-100 transition-colors"
+                                    >
+                                        🤖 Take Over
+                                    </button>
+                                )}
                                 {/* End Chat Button — only when active */}
                                 {currentStatus === 'active' && (
                                     <button
@@ -391,12 +412,13 @@ export default function ChatDashboard() {
                                                 </span>
                                             </div>
                                         )}
-                                        <div className={`flex ${msg.sender === 'agent' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`flex ${msg.sender === 'agent' ? 'justify-end' : msg.sender === 'ai' ? 'justify-end' : 'justify-start'}`}>
                                             <div className={`max-w-[70%] px-3.5 py-2 rounded-2xl text-sm shadow-sm ${msg.sender === 'agent'
                                                 ? 'bg-blue-600 text-white rounded-br-md'
-                                                : 'bg-white text-gray-800 rounded-bl-md'
+                                                : msg.sender === 'ai' ? 'bg-purple-600 text-white rounded-br-md'
+                                                    : 'bg-white text-gray-800 rounded-bl-md'
                                                 }`}>
-                                                {msg.sender === 'agent' && msg.agentName && (
+                                                {(msg.sender === 'agent' || msg.sender === 'ai') && msg.agentName && (
                                                     <p className="text-[10px] font-semibold text-blue-200 mb-0.5">{msg.agentName}</p>
                                                 )}
                                                 <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>

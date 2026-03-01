@@ -245,7 +245,7 @@ export function LiveChatWidget() {
         return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
-    const isChatEnded = chatStatus === 'closed' || chatStatus === 'loss'
+    const isChatEnded = chatStatus === 'closed' || chatStatus === 'loss' || chatStatus === 'ai_closed'
 
     return (
         <>
@@ -338,10 +338,11 @@ export function LiveChatWidget() {
                                     <div key={msg.id} className={`flex ${msg.sender === 'visitor' ? 'justify-end' : 'justify-start'}`}>
                                         <div className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${msg.sender === 'visitor'
                                             ? 'bg-blue-600 text-white rounded-br-md'
-                                            : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-md'
+                                            : msg.sender === 'ai' ? 'bg-purple-50 text-gray-800 shadow-sm border border-purple-200 rounded-bl-md'
+                                                : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-md'
                                             }`}>
-                                            {msg.sender === 'agent' && msg.agentName && (
-                                                <p className="text-[10px] font-semibold text-blue-600 mb-0.5">{msg.agentName}</p>
+                                            {(msg.sender === 'agent' || msg.sender === 'ai') && msg.agentName && (
+                                                <p className="text-[10px] font-semibold text-blue-600 mb-0.5">{msg.sender === 'ai' ? '🤖 ' : ''}{msg.agentName}</p>
                                             )}
                                             <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                                             <p className={`text-[10px] mt-1 ${msg.sender === 'visitor' ? 'text-blue-200' : 'text-gray-400'}`}>

@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
 // GET — Get messages for a conversation by visitorId (for the widget)
+// Also auto-triggers AI reply if no agent replied within 1 minute
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const visitorId = searchParams.get('visitorId')
-    const after = searchParams.get('after') // ISO timestamp to get only new messages
 
     if (!visitorId) {
         return NextResponse.json({ error: 'visitorId is required' }, { status: 400 })
@@ -20,21 +22,38 @@ export async function GET(request: Request) {
             return NextResponse.json({ messages: [], conversationId: null, status: null })
         }
 
-        const where: any = { conversationId: conversation.id }
-        if (after) {
-            where.createdAt = { gt: new Date(after) }
-        }
-
         const messages = await prisma.chatMessage.findMany({
-            where,
+            where: { conversationId: conversation.id },
             orderBy: { createdAt: 'asc' }
         })
+
+        // --- AUTO AI REPLY CHECK ---
+        // If the conversation is active and the last message is from visitor,
+        // and it's been more than 60 seconds, and no human has taken over → trigger AI
+        if (
+            conversation.status === 'active' &&
+            (conversation as any).handledBy !== 'human' &&
+            messages.length > 0
+        ) {
+            const lastMsg = messages[messages.length - 1]
+            const timeSince = Date.now() - new Date(lastMsg.createdAt).getTime()
+
+            if (lastMsg.sender === 'visitor' && timeSince > 60_000) {
+                // Trigger AI reply in the background (don't await — keep response fast)
+                fetch(`${SITE_URL}/api/chat/ai-reply`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ conversationId: conversation.id })
+                }).catch(err => console.error('AI trigger failed:', err))
+            }
+        }
 
         return NextResponse.json({
             messages,
             conversationId: conversation.id,
             status: conversation.status,
             assignedAgent: conversation.assignedAgent,
+            handledBy: (conversation as any).handledBy || null,
             rating: (conversation as any).rating || null,
         })
     } catch (error: any) {

@@ -42,6 +42,7 @@ export async function GET(
                 visitorEmail: conversation.visitorEmail,
                 status: conversation.status,
                 assignedAgent: conversation.assignedAgent,
+                handledBy: (conversation as any).handledBy || null,
                 rating: (conversation as any).rating || null,
                 createdAt: conversation.createdAt,
             } : null

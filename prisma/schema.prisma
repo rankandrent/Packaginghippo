@@ -275,7 +275,8 @@ model ChatConversation {
   visitorName   String
   visitorEmail  String?
   assignedAgent String?       // Randomly assigned support agent name
-  status        String        @default("active") // active, closed, loss
+  status        String        @default("active") // active, closed, loss, ai_closed
+  handledBy     String?       // "ai" | "human" — who is currently handling
   unreadCount   Int           @default(0) // Unread messages from visitor (for agent dashboard)
   lastMessageAt DateTime      @default(now())
   visitorTyping DateTime?     // Last time visitor was typing

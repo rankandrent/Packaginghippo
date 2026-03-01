@@ -34,11 +34,15 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
     try {
         const body = await request.json()
-        const { id, status } = body
+        const { id, status, handledBy } = body
+
+        const updateData: any = {}
+        if (status) updateData.status = status
+        if (handledBy) updateData.handledBy = handledBy
 
         const conversation = await prisma.chatConversation.update({
             where: { id },
-            data: { status }
+            data: updateData
         })
 
         return NextResponse.json({ conversation })

@@ -73,12 +73,14 @@ export async function POST(request: Request) {
             // Fetch the assigned agent name for this conversation
             const convo = await prisma.chatConversation.findUnique({ where: { id: convoId } })
 
-            // Update lastMessageAt & clear agent typing
+            // Update lastMessageAt, set handledBy to 'human' (agent takeover), clear typing
             await prisma.chatConversation.update({
                 where: { id: convoId },
                 data: {
                     lastMessageAt: new Date(),
-                    agentTyping: null, // Clear typing indicator on send
+                    agentTyping: null,
+                    handledBy: 'human', // Agent takes over from AI
+                    status: 'active', // Reopen if AI had closed it
                 }
             })
         }
