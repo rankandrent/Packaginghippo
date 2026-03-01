@@ -18,6 +18,7 @@ import { ProductTabs } from "@/components/product/ProductTabs"
 import { ProductImageGallery } from "@/components/product/ProductImageGallery"
 import { Button } from "@/components/ui/button"
 import { cn, constructMetadataTitle } from "@/lib/utils"
+import { getSeoImageUrl } from "@/lib/image-seo"
 import prisma from "@/lib/db"
 
 import {
@@ -75,14 +76,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             openGraph: {
                 title: product.seoTitle || product.name,
                 description: (product.seoDesc || product.shortDesc) || undefined,
-                images: product.images ? product.images.map(img => ({ url: img })) : [],
+                images: product.images ? product.images.map((img: string) => ({ url: getSeoImageUrl(img) })) : [],
                 type: 'website',
             },
             twitter: {
                 card: 'summary_large_image',
                 title: product.seoTitle || product.name,
                 description: (product.seoDesc || product.shortDesc) || undefined,
-                images: product.images || [],
+                images: product.images ? product.images.map((img: string) => getSeoImageUrl(img)) : [],
             }
         }
     }
@@ -503,7 +504,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     "@type": "Product",
                     "@id": `https://packaginghippo.com/${product.slug}`,
                     "name": product.name,
-                    "image": product.images || [],
+                    "image": product.images ? product.images.map((img: string) => getSeoImageUrl(img)) : [],
                     "description": product.shortDesc || product.seoDesc || product.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
                     "sku": product.id.substring(0, 8).toUpperCase(),
                     "mpn": product.id.substring(0, 8).toUpperCase(),
@@ -564,7 +565,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     <div className="grid lg:grid-cols-12 gap-10 items-start">
                         {/* Left Column - Images & Trust (Order 1) */}
                         <div className="lg:col-span-5 space-y-6">
-                            <ProductImageGallery images={product.images || []} name={product.name} />
+                            <ProductImageGallery images={(product.images || []).map((img: string) => getSeoImageUrl(img))} name={product.name} />
 
                             {/* Trust Badges */}
                             <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-100">
