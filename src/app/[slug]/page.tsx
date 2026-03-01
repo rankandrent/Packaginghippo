@@ -15,6 +15,7 @@ import { PopularProducts } from "@/components/category/PopularProducts"
 import { CustomQuoteFormSection } from "@/components/home/CustomQuoteFormSection"
 import { ProductHeroQuoteForm } from "@/components/forms/ProductHeroQuoteForm"
 import { ProductTabs } from "@/components/product/ProductTabs"
+import { ProductImageGallery } from "@/components/product/ProductImageGallery"
 import { Button } from "@/components/ui/button"
 import { cn, constructMetadataTitle } from "@/lib/utils"
 import prisma from "@/lib/db"
@@ -563,25 +564,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     <div className="grid lg:grid-cols-12 gap-10 items-start">
                         {/* Left Column - Images & Trust (Order 1) */}
                         <div className="lg:col-span-5 space-y-6">
-                            <div className="relative aspect-[1/1] rounded-2xl overflow-hidden bg-gray-50 border shadow-sm">
-                                {product.images?.[0] ? (
-                                    <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
-                                ) : (
-                                    <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
-                                )}
-                            </div>
-
-                            {/* Thumbnails */}
-                            <div className="grid grid-cols-5 gap-2">
-                                {product.images?.slice(0, 5).map((img: string, i: number) => (
-                                    <div key={i} className={cn(
-                                        "relative aspect-square rounded-lg overflow-hidden border cursor-pointer hover:border-yellow-500 transition-all",
-                                        i === 0 ? "border-yellow-500 ring-2 ring-yellow-500/20" : "border-gray-100"
-                                    )}>
-                                        <Image src={img} alt={`${product.name} ${i}`} fill className="object-cover" />
-                                    </div>
-                                ))}
-                            </div>
+                            <ProductImageGallery images={product.images || []} name={product.name} />
 
                             {/* Trust Badges */}
                             <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-100">
