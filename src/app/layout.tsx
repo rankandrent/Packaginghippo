@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/footer";
 import prisma from "@/lib/db";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { LiveChatWidget } from "@/components/chat/LiveChatWidget";
 
 export const dynamic = 'force-dynamic';
 
@@ -141,6 +142,7 @@ export default async function RootLayout({
         <main>{children}</main>
         <Footer />
         <WhatsAppButton />
+        <LiveChatWidget />
       </body>
     </html>
   );

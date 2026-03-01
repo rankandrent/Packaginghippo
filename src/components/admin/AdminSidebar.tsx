@@ -16,6 +16,7 @@ import {
     Menu,
     BookOpen,
     MessageSquare,
+    MessageCircle,
     AlertTriangle,
     Star,
     Image,
@@ -90,6 +91,11 @@ const sidebarItems = [
         icon: AlertTriangle,
     },
     {
+        title: "Live Chat",
+        href: "/dashboard/chat",
+        icon: MessageCircle,
+    },
+    {
         title: "Inquiries",
         href: "/dashboard/inquiries",
         icon: MessageSquare,
@@ -103,6 +109,7 @@ export function AdminSidebar() {
     const [user, setUser] = useState<{ name?: string; email: string } | null>(null)
     const [pendingInquiriesCount, setPendingInquiriesCount] = useState(0)
     const [seoIssuesCount, setSeoIssuesCount] = useState(0)
+    const [unreadChatCount, setUnreadChatCount] = useState(0)
 
     useEffect(() => {
         // Fetch current user session
@@ -125,6 +132,11 @@ export function AdminSidebar() {
             fetch('/api/cms/seo-audit/count')
                 .then(res => res.json())
                 .then(data => setSeoIssuesCount(data.count))
+                .catch(() => { })
+
+            fetch('/api/chat/unread')
+                .then(res => res.json())
+                .then(data => setUnreadChatCount(data.count))
                 .catch(() => { })
         }
 
@@ -172,6 +184,11 @@ export function AdminSidebar() {
                             {item.title === "Inquiries" && pendingInquiriesCount > 0 && (
                                 <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center animate-pulse">
                                     {pendingInquiriesCount}
+                                </span>
+                            )}
+                            {item.title === "Live Chat" && unreadChatCount > 0 && (
+                                <span className="bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center animate-pulse">
+                                    {unreadChatCount}
                                 </span>
                             )}
                             {item.title === "SEO Issues" && seoIssuesCount > 0 && (

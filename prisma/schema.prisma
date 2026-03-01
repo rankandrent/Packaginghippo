@@ -264,3 +264,31 @@ model PageTemplate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ============================================
+// LIVE CHAT SYSTEM
+// ============================================
+
+model ChatConversation {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  visitorId     String        @unique // Browser-generated UUID stored in localStorage
+  visitorName   String
+  visitorEmail  String?
+  status        String        @default("active") // active, closed
+  unreadCount   Int           @default(0) // Unread messages from visitor (for agent dashboard)
+  lastMessageAt DateTime      @default(now())
+  messages      ChatMessage[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model ChatMessage {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId  String           @db.ObjectId
+  conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  content         String
+  sender          String           // "visitor" or "agent"
+  agentName       String?          // Name of agent who replied
+  isRead          Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+}
