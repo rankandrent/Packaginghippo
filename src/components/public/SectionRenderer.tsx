@@ -121,8 +121,22 @@ function RenderSection({
 }) {
     // Helper to get content from home if current section is a placeholder or has no items
     const getSharedContent = () => {
+        // First check if the section's own content has meaningful data
+        const ownContent = section.content
+        const hasOwnData = ownContent && (
+            // Check for arrays with data (material_finishing, benefits, etc.)
+            (Array.isArray(ownContent.stockTypes) && ownContent.stockTypes.length > 0) ||
+            (Array.isArray(ownContent.finishing) && ownContent.finishing.length > 0) ||
+            (Array.isArray(ownContent.items) && ownContent.items.length > 0) ||
+            (Array.isArray(ownContent.benefits) && ownContent.benefits.length > 0) ||
+            (ownContent.heading && ownContent.heading.trim() !== '')
+        )
+
+        // If this section has its own data, use it; otherwise try homepage fallback
+        if (hasOwnData) return ownContent
+
         const shared = homepageSections.find(s => s.type === section.type)
-        return shared ? shared.content : section.content
+        return shared ? shared.content : ownContent
     }
 
     switch (section.type) {

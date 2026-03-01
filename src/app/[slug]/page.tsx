@@ -650,6 +650,11 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                 />
             )}
 
+            {/* Material & Finishing — render if the product has it and it's not in layoutOrder */}
+            {materialFinishingSections.length > 0 && !layoutOrder.includes('material_finishing') && (
+                <SectionRenderer key="mf-auto" sections={materialFinishingSections} />
+            )}
+
             {/* Re-orderable Sections */}
             {layoutOrder.map((id: string) => renderSection(id))}
 
