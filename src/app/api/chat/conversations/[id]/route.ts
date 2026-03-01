@@ -30,12 +30,22 @@ export async function GET(
             orderBy: { createdAt: 'asc' }
         })
 
+        // Fetch full conversation (no select — avoids issues with missing fields)
         const conversation = await prisma.chatConversation.findUnique({
-            where: { id },
-            select: { visitorName: true, visitorEmail: true, status: true, assignedAgent: true, rating: true, createdAt: true }
+            where: { id }
         })
 
-        return NextResponse.json({ messages, conversation })
+        return NextResponse.json({
+            messages,
+            conversation: conversation ? {
+                visitorName: conversation.visitorName,
+                visitorEmail: conversation.visitorEmail,
+                status: conversation.status,
+                assignedAgent: conversation.assignedAgent,
+                rating: (conversation as any).rating || null,
+                createdAt: conversation.createdAt,
+            } : null
+        })
     } catch (error: any) {
         console.error('Error fetching messages:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })

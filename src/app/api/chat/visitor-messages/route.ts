@@ -35,7 +35,7 @@ export async function GET(request: Request) {
             conversationId: conversation.id,
             status: conversation.status,
             assignedAgent: conversation.assignedAgent,
-            rating: conversation.rating,
+            rating: (conversation as any).rating || null,
         })
     } catch (error: any) {
         console.error('Error fetching visitor messages:', error)
