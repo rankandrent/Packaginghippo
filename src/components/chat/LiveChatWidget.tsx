@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { MessageCircle, X, Send, User } from "lucide-react"
+import { MessageCircle, X, Send, User, Star, RotateCcw } from "lucide-react"
 
 function generateVisitorId() {
     return 'visitor_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36)
@@ -28,6 +28,13 @@ export function LiveChatWidget() {
     const [unreadFromAgent, setUnreadFromAgent] = useState(0)
     const [agentIsTyping, setAgentIsTyping] = useState(false)
     const [assignedAgentName, setAssignedAgentName] = useState("Support")
+    const [chatStatus, setChatStatus] = useState("active")
+    const [showRating, setShowRating] = useState(false)
+    const [selectedRating, setSelectedRating] = useState(0)
+    const [hoverRating, setHoverRating] = useState(0)
+    const [ratingFeedback, setRatingFeedback] = useState("")
+    const [ratingSubmitted, setRatingSubmitted] = useState(false)
+    const [existingRating, setExistingRating] = useState<number | null>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -54,7 +61,7 @@ export function LiveChatWidget() {
         }
     }, [])
 
-    // Poll for new messages + typing status
+    // Poll for new messages + typing status + chat status
     useEffect(() => {
         if (!hasStarted || !visitorId) return
 
@@ -67,6 +74,23 @@ export function LiveChatWidget() {
                     if (data.conversationId && !conversationId) {
                         setConversationId(data.conversationId)
                         localStorage.setItem('chat_conversation_id', data.conversationId)
+                    }
+                    // Update chat status from server
+                    if (data.status) {
+                        const prevStatus = chatStatus
+                        setChatStatus(data.status)
+                        // If agent just ended the chat, show rating
+                        if (data.status === 'closed' && prevStatus === 'active' && !data.rating) {
+                            setShowRating(true)
+                        }
+                    }
+                    if (data.rating) {
+                        setExistingRating(data.rating)
+                        setRatingSubmitted(true)
+                    }
+                    if (data.assignedAgent) {
+                        setAssignedAgentName(data.assignedAgent)
+                        localStorage.setItem('chat_assigned_agent', data.assignedAgent)
                     }
                     if (!isOpen) {
                         const agentMsgs = data.messages.filter((m: Message) => m.sender === 'agent')
@@ -106,7 +130,7 @@ export function LiveChatWidget() {
     // Scroll to bottom on new messages or typing status change
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages, agentIsTyping])
+    }, [messages, agentIsTyping, showRating])
 
     // Mark as seen when opened
     useEffect(() => {
@@ -176,10 +200,52 @@ export function LiveChatWidget() {
         }
     }
 
+    // Start a brand new chat — clear everything and generate new visitor ID
+    const handleNewChat = () => {
+        const newId = generateVisitorId()
+        setVisitorId(newId)
+        localStorage.setItem('chat_visitor_id', newId)
+        localStorage.removeItem('chat_conversation_id')
+        localStorage.removeItem('chat_assigned_agent')
+        localStorage.removeItem('chat_last_seen_count')
+        setConversationId(null)
+        setMessages([])
+        setChatStatus('active')
+        setShowRating(false)
+        setRatingSubmitted(false)
+        setExistingRating(null)
+        setSelectedRating(0)
+        setRatingFeedback("")
+        setAssignedAgentName("Support")
+        setHasStarted(true) // keep them in the chat, don't ask for name again 
+    }
+
+    // Submit star rating
+    const handleSubmitRating = async () => {
+        if (selectedRating < 1) return
+        try {
+            await fetch('/api/chat/rating', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    visitorId,
+                    rating: selectedRating,
+                    feedback: ratingFeedback || undefined
+                })
+            })
+            setRatingSubmitted(true)
+            setExistingRating(selectedRating)
+        } catch (e) {
+            console.error('Failed to submit rating:', e)
+        }
+    }
+
     const formatTime = (dateStr: string) => {
         const d = new Date(dateStr)
         return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
+
+    const isChatEnded = chatStatus === 'closed' || chatStatus === 'loss'
 
     return (
         <>
@@ -214,8 +280,12 @@ export function LiveChatWidget() {
                             <div>
                                 <h3 className="text-white font-semibold text-sm">{assignedAgentName}</h3>
                                 <p className="text-blue-100 text-xs flex items-center gap-1">
-                                    <span className="w-2 h-2 bg-green-400 rounded-full inline-block"></span>
-                                    {agentIsTyping ? 'Typing...' : 'Online — We reply instantly'}
+                                    {isChatEnded ? (
+                                        <><span className="w-2 h-2 bg-gray-400 rounded-full inline-block"></span> Chat ended</>
+                                    ) : (
+                                        <><span className="w-2 h-2 bg-green-400 rounded-full inline-block"></span>
+                                            {agentIsTyping ? 'Typing...' : 'Online — We reply instantly'}</>
+                                    )}
                                 </p>
                             </div>
                         </div>
@@ -267,8 +337,8 @@ export function LiveChatWidget() {
                                 {messages.map((msg) => (
                                     <div key={msg.id} className={`flex ${msg.sender === 'visitor' ? 'justify-end' : 'justify-start'}`}>
                                         <div className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${msg.sender === 'visitor'
-                                                ? 'bg-blue-600 text-white rounded-br-md'
-                                                : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-md'
+                                            ? 'bg-blue-600 text-white rounded-br-md'
+                                            : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-md'
                                             }`}>
                                             {msg.sender === 'agent' && msg.agentName && (
                                                 <p className="text-[10px] font-semibold text-blue-600 mb-0.5">{msg.agentName}</p>
@@ -293,29 +363,110 @@ export function LiveChatWidget() {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* Chat Ended Notice */}
+                                {isChatEnded && (
+                                    <div className="text-center py-2">
+                                        <span className="bg-gray-200 text-gray-600 text-xs font-medium px-4 py-1.5 rounded-full">
+                                            Chat has ended
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* 5-Star Rating UI — shown when chat is ended */}
+                                {isChatEnded && !ratingSubmitted && (showRating || true) && (
+                                    <div className="bg-white border border-gray-200 rounded-2xl p-4 text-center space-y-3 shadow-sm">
+                                        <p className="text-sm font-semibold text-gray-800">How was your experience?</p>
+                                        <p className="text-xs text-gray-500">Rate your chat with {assignedAgentName}</p>
+                                        <div className="flex justify-center gap-1">
+                                            {[1, 2, 3, 4, 5].map(star => (
+                                                <button
+                                                    key={star}
+                                                    onClick={() => setSelectedRating(star)}
+                                                    onMouseEnter={() => setHoverRating(star)}
+                                                    onMouseLeave={() => setHoverRating(0)}
+                                                    className="p-1 transition-transform hover:scale-125"
+                                                >
+                                                    <Star
+                                                        className={`w-8 h-8 transition-colors ${(hoverRating || selectedRating) >= star
+                                                            ? 'text-yellow-400 fill-yellow-400'
+                                                            : 'text-gray-300'
+                                                            }`}
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {selectedRating > 0 && (
+                                            <>
+                                                <textarea
+                                                    placeholder="Tell us more (optional)..."
+                                                    value={ratingFeedback}
+                                                    onChange={e => setRatingFeedback(e.target.value)}
+                                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                                    rows={2}
+                                                />
+                                                <button
+                                                    onClick={handleSubmitRating}
+                                                    className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                                                >
+                                                    Submit Rating
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Rating Submitted Thanks */}
+                                {ratingSubmitted && (
+                                    <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-center space-y-2">
+                                        <div className="flex justify-center gap-0.5">
+                                            {[1, 2, 3, 4, 5].map(star => (
+                                                <Star
+                                                    key={star}
+                                                    className={`w-5 h-5 ${(existingRating || 0) >= star
+                                                        ? 'text-yellow-400 fill-yellow-400'
+                                                        : 'text-gray-300'
+                                                        }`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <p className="text-sm font-semibold text-green-700">Thank you for your feedback! 🎉</p>
+                                    </div>
+                                )}
+
                                 <div ref={messagesEndRef} />
                             </div>
 
-                            {/* Input Area */}
+                            {/* Input Area / End Chat / New Chat */}
                             <div className="border-t bg-white p-3 flex-shrink-0">
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder="Type a message..."
-                                        value={inputValue}
-                                        onChange={e => handleInputChange(e.target.value)}
-                                        onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                                        className="flex-1 px-3 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-                                        autoFocus
-                                    />
+                                {isChatEnded ? (
                                     <button
-                                        onClick={handleSend}
-                                        disabled={!inputValue.trim() || sending}
-                                        className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                                        onClick={handleNewChat}
+                                        className="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors text-sm flex items-center justify-center gap-2"
                                     >
-                                        <Send className="w-4 h-4 text-white" />
+                                        <RotateCcw className="w-4 h-4" />
+                                        Start New Chat
                                     </button>
-                                </div>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Type a message..."
+                                            value={inputValue}
+                                            onChange={e => handleInputChange(e.target.value)}
+                                            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                                            className="flex-1 px-3 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+                                            autoFocus
+                                        />
+                                        <button
+                                            onClick={handleSend}
+                                            disabled={!inputValue.trim() || sending}
+                                            className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                                        >
+                                            <Send className="w-4 h-4 text-white" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </>
                     )}

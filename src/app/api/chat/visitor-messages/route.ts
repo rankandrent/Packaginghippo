@@ -17,7 +17,7 @@ export async function GET(request: Request) {
         })
 
         if (!conversation) {
-            return NextResponse.json({ messages: [], conversationId: null })
+            return NextResponse.json({ messages: [], conversationId: null, status: null })
         }
 
         const where: any = { conversationId: conversation.id }
@@ -30,7 +30,13 @@ export async function GET(request: Request) {
             orderBy: { createdAt: 'asc' }
         })
 
-        return NextResponse.json({ messages, conversationId: conversation.id })
+        return NextResponse.json({
+            messages,
+            conversationId: conversation.id,
+            status: conversation.status,
+            assignedAgent: conversation.assignedAgent,
+            rating: conversation.rating,
+        })
     } catch (error: any) {
         console.error('Error fetching visitor messages:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })

@@ -306,7 +306,6 @@ export default function ChatDashboard() {
                     </div>
                 ) : (
                     <>
-                        {/* Chat Header */}
                         <div className="bg-white px-4 py-3 border-b flex items-center justify-between flex-shrink-0">
                             <div className="flex items-center gap-3">
                                 <button
@@ -332,31 +331,45 @@ export default function ChatDashboard() {
                                         {convoDetails?.assignedAgent && (
                                             <span className="ml-2">• Agent: {convoDetails.assignedAgent}</span>
                                         )}
+                                        {convoDetails?.rating && (
+                                            <span className="ml-2">• {'⭐'.repeat(convoDetails.rating)}</span>
+                                        )}
                                     </p>
                                 </div>
                             </div>
-                            {/* Status Dropdown */}
-                            <div className="relative">
-                                <button
-                                    onClick={() => setShowStatusMenu(!showStatusMenu)}
-                                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${statusConfig.bg} ${statusConfig.color} border border-current/10 hover:opacity-80`}
-                                >
-                                    {statusConfig.label} ▾
-                                </button>
-                                {showStatusMenu && (
-                                    <div className="absolute right-0 top-full mt-1 bg-white border rounded-xl shadow-lg z-10 py-1 min-w-[140px]">
-                                        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-                                            <button
-                                                key={key}
-                                                onClick={() => handleStatusChange(selectedConvo, key)}
-                                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 ${currentStatus === key ? 'font-semibold' : ''}`}
-                                            >
-                                                <span className={`w-2 h-2 rounded-full ${key === 'active' ? 'bg-green-500' : key === 'closed' ? 'bg-gray-400' : 'bg-red-500'}`}></span>
-                                                {cfg.label}
-                                            </button>
-                                        ))}
-                                    </div>
+                            <div className="flex items-center gap-2">
+                                {/* End Chat Button — only when active */}
+                                {currentStatus === 'active' && (
+                                    <button
+                                        onClick={() => handleStatusChange(selectedConvo!, 'closed')}
+                                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors"
+                                    >
+                                        End Chat
+                                    </button>
                                 )}
+                                {/* Status Dropdown */}
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowStatusMenu(!showStatusMenu)}
+                                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${statusConfig.bg} ${statusConfig.color} border border-current/10 hover:opacity-80`}
+                                    >
+                                        {statusConfig.label} ▾
+                                    </button>
+                                    {showStatusMenu && (
+                                        <div className="absolute right-0 top-full mt-1 bg-white border rounded-xl shadow-lg z-10 py-1 min-w-[140px]">
+                                            {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+                                                <button
+                                                    key={key}
+                                                    onClick={() => handleStatusChange(selectedConvo!, key)}
+                                                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 ${currentStatus === key ? 'font-semibold' : ''}`}
+                                                >
+                                                    <span className={`w-2 h-2 rounded-full ${key === 'active' ? 'bg-green-500' : key === 'closed' ? 'bg-gray-400' : 'bg-red-500'}`}></span>
+                                                    {cfg.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 

@@ -280,6 +280,8 @@ model ChatConversation {
   lastMessageAt DateTime      @default(now())
   visitorTyping DateTime?     // Last time visitor was typing
   agentTyping   DateTime?     // Last time agent was typing
+  rating        Int?          // 1-5 star rating from visitor after chat ends
+  ratingFeedback String?      // Optional feedback text from visitor
   messages      ChatMessage[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt

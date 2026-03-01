@@ -32,7 +32,7 @@ export async function GET(
 
         const conversation = await prisma.chatConversation.findUnique({
             where: { id },
-            select: { visitorName: true, visitorEmail: true, status: true, createdAt: true }
+            select: { visitorName: true, visitorEmail: true, status: true, assignedAgent: true, rating: true, createdAt: true }
         })
 
         return NextResponse.json({ messages, conversation })
