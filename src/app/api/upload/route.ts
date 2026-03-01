@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { v2 as cloudinary } from 'cloudinary'
 import https from 'https'
 import crypto from 'crypto'
+import { slugifyFilename } from '@/lib/image-seo'
 
 // Configure Cloudinary
 cloudinary.config({
@@ -22,12 +23,12 @@ export async function POST(request: NextRequest) {
         // 1. Extract original filename and extension
         const originalName = file.name || "image"
         const lastDotIndex = originalName.lastIndexOf('.')
-        // Handle cases where there is no extension
         const rawName = lastDotIndex !== -1 ? originalName.substring(0, lastDotIndex) : originalName
 
-        // 2. Use the exact original filename (without modification) to preserve the exact name in the URL uploaded by the user
-        // Note: we still fallback to "upload" if the parsed name is completely empty
-        const finalPublicId = rawName || "upload"
+        // 2. Slugify the filename for SEO-friendly URLs
+        // e.g. "What Are Bagged Packaged Goods" -> "what-are-bagged-packaged-goods"
+        // The final URL will be: packaginghippo.com/images/products/what-are-bagged-packaged-goods.jpg
+        const finalPublicId = slugifyFilename(rawName)
 
         // Convert file to buffer
         const arrayBuffer = await file.arrayBuffer()

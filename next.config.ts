@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/cdn/image/:path*',
+        source: '/images/:path*',
         destination: 'https://res.cloudinary.com/da9culaxt/image/upload/:path*',
       },
     ]
