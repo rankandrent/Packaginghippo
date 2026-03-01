@@ -1,6 +1,24 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 
+// Support team member names — each visitor gets assigned one randomly
+const SUPPORT_AGENTS = [
+    'Sarah',
+    'Michael',
+    'Emma',
+    'James',
+    'Olivia',
+    'Daniel',
+    'Sophia',
+    'David',
+    'Ava',
+    'Ryan',
+]
+
+function getRandomAgent(): string {
+    return SUPPORT_AGENTS[Math.floor(Math.random() * SUPPORT_AGENTS.length)]
+}
+
 // POST — Send a message (from visitor or agent)
 export async function POST(request: Request) {
     try {
@@ -24,24 +42,27 @@ export async function POST(request: Request) {
             })
 
             if (!conversation) {
+                // Assign a random support agent name to this conversation
                 conversation = await prisma.chatConversation.create({
                     data: {
                         visitorId,
                         visitorName,
                         visitorEmail: visitorEmail || null,
+                        assignedAgent: getRandomAgent(),
                     }
                 })
             }
 
             convoId = conversation.id
 
-            // Increment unread count for agents
+            // Increment unread count for agents & clear visitor typing
             await prisma.chatConversation.update({
                 where: { id: convoId },
                 data: {
                     unreadCount: { increment: 1 },
                     lastMessageAt: new Date(),
                     status: 'active', // Reopen if closed
+                    visitorTyping: null, // Clear typing indicator on send
                 }
             })
         } else if (sender === 'agent') {
@@ -49,20 +70,37 @@ export async function POST(request: Request) {
                 return NextResponse.json({ error: 'conversationId is required for agent messages' }, { status: 400 })
             }
 
-            // Update lastMessageAt
+            // Fetch the assigned agent name for this conversation
+            const convo = await prisma.chatConversation.findUnique({ where: { id: convoId } })
+
+            // Update lastMessageAt & clear agent typing
             await prisma.chatConversation.update({
                 where: { id: convoId },
-                data: { lastMessageAt: new Date() }
+                data: {
+                    lastMessageAt: new Date(),
+                    agentTyping: null, // Clear typing indicator on send
+                }
             })
         }
 
-        // Create the message
+        // Create the message — use the conversation's assigned agent name
+        let finalAgentName = agentName || 'Support'
+        if (sender === 'agent' && convoId) {
+            const convo = await prisma.chatConversation.findUnique({
+                where: { id: convoId },
+                select: { assignedAgent: true }
+            })
+            if (convo?.assignedAgent) {
+                finalAgentName = convo.assignedAgent
+            }
+        }
+
         const message = await prisma.chatMessage.create({
             data: {
                 conversationId: convoId,
                 content,
                 sender,
-                agentName: sender === 'agent' ? (agentName || 'Support') : null,
+                agentName: sender === 'agent' ? finalAgentName : null,
             }
         })
 

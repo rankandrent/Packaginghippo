@@ -17,11 +17,18 @@ interface Conversation {
     visitorId: string
     visitorName: string
     visitorEmail?: string
+    assignedAgent?: string
     status: string
     unreadCount: number
     lastMessageAt: string
     createdAt: string
     messages: Message[]
+}
+
+const STATUS_CONFIG: Record<string, { label: string, color: string, bg: string }> = {
+    active: { label: 'Active', color: 'text-green-600', bg: 'bg-green-50' },
+    closed: { label: 'Closed', color: 'text-gray-600', bg: 'bg-gray-50' },
+    loss: { label: 'Loss', color: 'text-red-600', bg: 'bg-red-50' },
 }
 
 export default function ChatDashboard() {
@@ -34,8 +41,11 @@ export default function ChatDashboard() {
     const [searchQuery, setSearchQuery] = useState("")
     const [filterStatus, setFilterStatus] = useState("all")
     const [agentName, setAgentName] = useState("Support")
+    const [visitorIsTyping, setVisitorIsTyping] = useState(false)
+    const [showStatusMenu, setShowStatusMenu] = useState(false)
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     // Fetch current agent name from session
     useEffect(() => {
@@ -62,7 +72,7 @@ export default function ChatDashboard() {
         return () => clearInterval(interval)
     }, [fetchConversations])
 
-    // Poll messages for selected conversation
+    // Poll messages + typing status for selected conversation
     const fetchMessages = useCallback(async () => {
         if (!selectedConvo) return
         try {
@@ -73,21 +83,49 @@ export default function ChatDashboard() {
         } catch (e) { /* silently fail */ }
     }, [selectedConvo])
 
+    const checkTyping = useCallback(async () => {
+        if (!selectedConvo) return
+        try {
+            const res = await fetch(`/api/chat/typing?conversationId=${selectedConvo}&who=agent`)
+            const data = await res.json()
+            setVisitorIsTyping(data.isTyping)
+        } catch { /* silently fail */ }
+    }, [selectedConvo])
+
     useEffect(() => {
         fetchMessages()
-        const interval = setInterval(fetchMessages, 3000)
+        checkTyping()
+        const interval = setInterval(() => {
+            fetchMessages()
+            checkTyping()
+        }, 3000)
         return () => clearInterval(interval)
-    }, [fetchMessages])
+    }, [fetchMessages, checkTyping])
 
     // Scroll to bottom
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages])
+    }, [messages, visitorIsTyping])
 
     // Focus input when conversation selected
     useEffect(() => {
         if (selectedConvo) inputRef.current?.focus()
     }, [selectedConvo])
+
+    // Send agent typing indicator
+    const handleInputChange = (value: string) => {
+        setInputValue(value)
+        if (value.trim() && selectedConvo) {
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+            typingTimeoutRef.current = setTimeout(() => {
+                fetch('/api/chat/typing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ conversationId: selectedConvo, who: 'agent' })
+                }).catch(() => { })
+            }, 300)
+        }
+    }
 
     const handleSend = async () => {
         if (!inputValue.trim() || !selectedConvo || sending) return
@@ -124,22 +162,15 @@ export default function ChatDashboard() {
         }
     }
 
-    const handleCloseConvo = async (id: string) => {
+    const handleStatusChange = async (id: string, newStatus: string) => {
         await fetch('/api/chat/conversations', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, status: 'closed' })
+            body: JSON.stringify({ id, status: newStatus })
         })
         fetchConversations()
-    }
-
-    const handleReopenConvo = async (id: string) => {
-        await fetch('/api/chat/conversations', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, status: 'active' })
-        })
-        fetchConversations()
+        fetchMessages()
+        setShowStatusMenu(false)
     }
 
     const formatTime = (d: string) => new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -162,6 +193,8 @@ export default function ChatDashboard() {
     })
 
     const totalUnread = conversations.reduce((sum, c) => sum + c.unreadCount, 0)
+    const currentStatus = convoDetails?.status || 'active'
+    const statusConfig = STATUS_CONFIG[currentStatus] || STATUS_CONFIG.active
 
     return (
         <div className="h-[calc(100vh-4rem)] -m-8 flex">
@@ -179,13 +212,13 @@ export default function ChatDashboard() {
                             )}
                         </h1>
                         <div className="flex gap-1">
-                            {['all', 'active', 'closed'].map(s => (
+                            {['all', 'active', 'closed', 'loss'].map(s => (
                                 <button
                                     key={s}
                                     onClick={() => setFilterStatus(s)}
                                     className={`px-2.5 py-1 text-xs font-medium rounded-full capitalize transition-colors ${filterStatus === s
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                 >
                                     {s}
@@ -213,45 +246,53 @@ export default function ChatDashboard() {
                             <p className="text-gray-400 text-sm">No conversations yet</p>
                         </div>
                     )}
-                    {filteredConvos.map(convo => (
-                        <button
-                            key={convo.id}
-                            onClick={() => setSelectedConvo(convo.id)}
-                            className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors flex items-start gap-3 ${selectedConvo === convo.id ? 'bg-blue-50 border-l-2 border-l-blue-600' : ''
-                                }`}
-                        >
-                            {/* Avatar */}
-                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <span className="text-blue-600 font-bold text-sm">
-                                    {convo.visitorName.charAt(0).toUpperCase()}
-                                </span>
-                            </div>
-                            {/* Details */}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between">
-                                    <span className="font-semibold text-sm text-gray-900 truncate">
-                                        {convo.visitorName}
-                                    </span>
-                                    <span className="text-[10px] text-gray-400 flex-shrink-0 ml-2">
-                                        {formatDate(convo.lastMessageAt)}
+                    {filteredConvos.map(convo => {
+                        const sc = STATUS_CONFIG[convo.status] || STATUS_CONFIG.active
+                        return (
+                            <button
+                                key={convo.id}
+                                onClick={() => { setSelectedConvo(convo.id); setShowStatusMenu(false) }}
+                                className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors flex items-start gap-3 ${selectedConvo === convo.id ? 'bg-blue-50 border-l-2 border-l-blue-600' : ''
+                                    }`}
+                            >
+                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span className="text-blue-600 font-bold text-sm">
+                                        {convo.visitorName.charAt(0).toUpperCase()}
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between mt-0.5">
-                                    <p className="text-xs text-gray-500 truncate">
-                                        {convo.messages[0]?.content || 'No messages yet'}
-                                    </p>
-                                    {convo.unreadCount > 0 && (
-                                        <span className="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full flex-shrink-0 ml-2">
-                                            {convo.unreadCount}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-semibold text-sm text-gray-900 truncate">
+                                            {convo.visitorName}
                                         </span>
-                                    )}
+                                        <span className="text-[10px] text-gray-400 flex-shrink-0 ml-2">
+                                            {formatDate(convo.lastMessageAt)}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-0.5">
+                                        <p className="text-xs text-gray-500 truncate">
+                                            {convo.messages[0]?.content || 'No messages yet'}
+                                        </p>
+                                        <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                                            {convo.unreadCount > 0 && (
+                                                <span className="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                                                    {convo.unreadCount}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                        <span className={`text-[10px] font-medium ${sc.color}`}>
+                                            {sc.label}
+                                        </span>
+                                        {convo.assignedAgent && (
+                                            <span className="text-[10px] text-gray-400">→ {convo.assignedAgent}</span>
+                                        )}
+                                    </div>
                                 </div>
-                                {convo.status === 'closed' && (
-                                    <span className="text-[10px] text-red-500 font-medium">Closed</span>
-                                )}
-                            </div>
-                        </button>
-                    ))}
+                            </button>
+                        )
+                    })}
                 </div>
             </div>
 
@@ -280,30 +321,41 @@ export default function ChatDashboard() {
                                     </span>
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-sm text-gray-900">{convoDetails?.visitorName || 'Loading...'}</h3>
+                                    <h3 className="font-semibold text-sm text-gray-900">
+                                        {convoDetails?.visitorName || 'Loading...'}
+                                        {visitorIsTyping && (
+                                            <span className="ml-2 text-xs font-normal text-green-500 animate-pulse">typing...</span>
+                                        )}
+                                    </h3>
                                     <p className="text-[11px] text-gray-400">
                                         {convoDetails?.visitorEmail || 'No email provided'}
-                                        {convoDetails?.status === 'active' && (
-                                            <span className="ml-2 text-green-500">● Active</span>
+                                        {convoDetails?.assignedAgent && (
+                                            <span className="ml-2">• Agent: {convoDetails.assignedAgent}</span>
                                         )}
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
-                                {convoDetails?.status === 'active' ? (
-                                    <button
-                                        onClick={() => handleCloseConvo(selectedConvo)}
-                                        className="px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-                                    >
-                                        Close Chat
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() => handleReopenConvo(selectedConvo)}
-                                        className="px-3 py-1.5 text-xs font-medium bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors"
-                                    >
-                                        Reopen
-                                    </button>
+                            {/* Status Dropdown */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowStatusMenu(!showStatusMenu)}
+                                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${statusConfig.bg} ${statusConfig.color} border border-current/10 hover:opacity-80`}
+                                >
+                                    {statusConfig.label} ▾
+                                </button>
+                                {showStatusMenu && (
+                                    <div className="absolute right-0 top-full mt-1 bg-white border rounded-xl shadow-lg z-10 py-1 min-w-[140px]">
+                                        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+                                            <button
+                                                key={key}
+                                                onClick={() => handleStatusChange(selectedConvo, key)}
+                                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 ${currentStatus === key ? 'font-semibold' : ''}`}
+                                            >
+                                                <span className={`w-2 h-2 rounded-full ${key === 'active' ? 'bg-green-500' : key === 'closed' ? 'bg-gray-400' : 'bg-red-500'}`}></span>
+                                                {cfg.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -316,7 +368,6 @@ export default function ChatDashboard() {
                                 </div>
                             )}
                             {messages.map((msg, i) => {
-                                // Show date separator
                                 const showDateSep = i === 0 || formatDate(msg.createdAt) !== formatDate(messages[i - 1].createdAt)
                                 return (
                                     <div key={msg.id}>
@@ -328,19 +379,16 @@ export default function ChatDashboard() {
                                             </div>
                                         )}
                                         <div className={`flex ${msg.sender === 'agent' ? 'justify-end' : 'justify-start'}`}>
-                                            <div
-                                                className={`max-w-[70%] px-3.5 py-2 rounded-2xl text-sm shadow-sm ${msg.sender === 'agent'
-                                                        ? 'bg-blue-600 text-white rounded-br-md'
-                                                        : 'bg-white text-gray-800 rounded-bl-md'
-                                                    }`}
-                                            >
+                                            <div className={`max-w-[70%] px-3.5 py-2 rounded-2xl text-sm shadow-sm ${msg.sender === 'agent'
+                                                ? 'bg-blue-600 text-white rounded-br-md'
+                                                : 'bg-white text-gray-800 rounded-bl-md'
+                                                }`}>
                                                 {msg.sender === 'agent' && msg.agentName && (
                                                     <p className="text-[10px] font-semibold text-blue-200 mb-0.5">{msg.agentName}</p>
                                                 )}
                                                 <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                                                <div className={`flex items-center justify-end gap-1 mt-1`}>
-                                                    <span className={`text-[10px] ${msg.sender === 'agent' ? 'text-blue-200' : 'text-gray-400'
-                                                        }`}>
+                                                <div className="flex items-center justify-end gap-1 mt-1">
+                                                    <span className={`text-[10px] ${msg.sender === 'agent' ? 'text-blue-200' : 'text-gray-400'}`}>
                                                         {formatTime(msg.createdAt)}
                                                     </span>
                                                     {msg.sender === 'agent' && (
@@ -352,6 +400,19 @@ export default function ChatDashboard() {
                                     </div>
                                 )
                             })}
+                            {/* Visitor Typing Indicator */}
+                            {visitorIsTyping && (
+                                <div className="flex justify-start">
+                                    <div className="bg-white text-gray-500 shadow-sm border border-gray-100 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm flex items-center gap-1.5">
+                                        <span className="flex gap-0.5">
+                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                                        </span>
+                                        <span className="text-[10px] text-gray-400 ml-1">Visitor is typing</span>
+                                    </div>
+                                </div>
+                            )}
                             <div ref={messagesEndRef} />
                         </div>
 
@@ -361,16 +422,16 @@ export default function ChatDashboard() {
                                 <input
                                     ref={inputRef}
                                     type="text"
-                                    placeholder={convoDetails?.status === 'closed' ? 'Reopen to reply...' : 'Type a reply...'}
+                                    placeholder={currentStatus !== 'active' ? 'Set status to Active to reply...' : 'Type a reply...'}
                                     value={inputValue}
-                                    onChange={e => setInputValue(e.target.value)}
+                                    onChange={e => handleInputChange(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                                    disabled={convoDetails?.status === 'closed'}
+                                    disabled={currentStatus !== 'active'}
                                     className="flex-1 px-4 py-2.5 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50"
                                 />
                                 <button
                                     onClick={handleSend}
-                                    disabled={!inputValue.trim() || sending || convoDetails?.status === 'closed'}
+                                    disabled={!inputValue.trim() || sending || currentStatus !== 'active'}
                                     className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                                 >
                                     <Send className="w-4 h-4 text-white" />

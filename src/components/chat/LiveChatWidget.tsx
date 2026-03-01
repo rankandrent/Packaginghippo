@@ -26,14 +26,18 @@ export function LiveChatWidget() {
     const [visitorId, setVisitorId] = useState("")
     const [conversationId, setConversationId] = useState<string | null>(null)
     const [unreadFromAgent, setUnreadFromAgent] = useState(0)
+    const [agentIsTyping, setAgentIsTyping] = useState(false)
+    const [assignedAgentName, setAssignedAgentName] = useState("Support")
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     // Initialize from localStorage
     useEffect(() => {
         const storedId = localStorage.getItem('chat_visitor_id')
         const storedName = localStorage.getItem('chat_visitor_name')
         const storedConvoId = localStorage.getItem('chat_conversation_id')
+        const storedAgent = localStorage.getItem('chat_assigned_agent')
 
         if (storedId) {
             setVisitorId(storedId)
@@ -41,9 +45,8 @@ export function LiveChatWidget() {
                 setVisitorName(storedName)
                 setHasStarted(true)
             }
-            if (storedConvoId) {
-                setConversationId(storedConvoId)
-            }
+            if (storedConvoId) setConversationId(storedConvoId)
+            if (storedAgent) setAssignedAgentName(storedAgent)
         } else {
             const newId = generateVisitorId()
             setVisitorId(newId)
@@ -51,7 +54,7 @@ export function LiveChatWidget() {
         }
     }, [])
 
-    // Poll for new messages
+    // Poll for new messages + typing status
     useEffect(() => {
         if (!hasStarted || !visitorId) return
 
@@ -65,8 +68,6 @@ export function LiveChatWidget() {
                         setConversationId(data.conversationId)
                         localStorage.setItem('chat_conversation_id', data.conversationId)
                     }
-
-                    // Count unread agent messages when widget is closed
                     if (!isOpen) {
                         const agentMsgs = data.messages.filter((m: Message) => m.sender === 'agent')
                         const lastSeen = parseInt(localStorage.getItem('chat_last_seen_count') || '0')
@@ -75,23 +76,37 @@ export function LiveChatWidget() {
                         }
                     }
                 }
-            } catch (error) {
-                // Silently fail
-            }
+            } catch { /* silently fail */ }
+        }
+
+        const checkTyping = async () => {
+            try {
+                const res = await fetch(`/api/chat/typing?visitorId=${visitorId}&who=visitor`)
+                const data = await res.json()
+                setAgentIsTyping(data.isTyping)
+                if (data.assignedAgent) {
+                    setAssignedAgentName(data.assignedAgent)
+                    localStorage.setItem('chat_assigned_agent', data.assignedAgent)
+                }
+            } catch { /* silently fail */ }
         }
 
         fetchMessages()
-        pollIntervalRef.current = setInterval(fetchMessages, 3000)
+        checkTyping()
+        pollIntervalRef.current = setInterval(() => {
+            fetchMessages()
+            checkTyping()
+        }, 3000)
 
         return () => {
             if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
         }
     }, [hasStarted, visitorId, isOpen])
 
-    // Scroll to bottom on new messages
+    // Scroll to bottom on new messages or typing status change
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages])
+    }, [messages, agentIsTyping])
 
     // Mark as seen when opened
     useEffect(() => {
@@ -101,6 +116,21 @@ export function LiveChatWidget() {
             setUnreadFromAgent(0)
         }
     }, [isOpen, messages])
+
+    // Send typing indicator when visitor types
+    const handleInputChange = (value: string) => {
+        setInputValue(value)
+        if (value.trim() && visitorId) {
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+            typingTimeoutRef.current = setTimeout(() => {
+                fetch('/api/chat/typing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ visitorId, who: 'visitor' })
+                }).catch(() => { })
+            }, 300)
+        }
+    }
 
     const handleStartChat = () => {
         if (!visitorName.trim()) return
@@ -175,30 +205,26 @@ export function LiveChatWidget() {
             {/* Chat Window */}
             {isOpen && (
                 <div className="fixed bottom-4 right-4 z-50 w-[380px] h-[520px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 animate-in slide-in-from-bottom-4 fade-in duration-300">
-                    {/* Header */}
+                    {/* Header — shows assigned agent name */}
                     <div className="bg-blue-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                                <MessageCircle className="w-5 h-5 text-white" />
+                            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                {assignedAgentName.charAt(0)}
                             </div>
                             <div>
-                                <h3 className="text-white font-semibold text-sm">Packaging Hippo</h3>
+                                <h3 className="text-white font-semibold text-sm">{assignedAgentName}</h3>
                                 <p className="text-blue-100 text-xs flex items-center gap-1">
                                     <span className="w-2 h-2 bg-green-400 rounded-full inline-block"></span>
-                                    Online — We reply instantly
+                                    {agentIsTyping ? 'Typing...' : 'Online — We reply instantly'}
                                 </p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => setIsOpen(false)}
-                            className="text-white/80 hover:text-white transition-colors"
-                        >
+                        <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white transition-colors">
                             <X className="w-5 h-5" />
                         </button>
                     </div>
 
                     {!hasStarted ? (
-                        /* Start Form */
                         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
                             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-2">
                                 <User className="w-8 h-8 text-blue-600" />
@@ -239,27 +265,34 @@ export function LiveChatWidget() {
                                     </div>
                                 )}
                                 {messages.map((msg) => (
-                                    <div
-                                        key={msg.id}
-                                        className={`flex ${msg.sender === 'visitor' ? 'justify-end' : 'justify-start'}`}
-                                    >
-                                        <div
-                                            className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${msg.sender === 'visitor'
-                                                    ? 'bg-blue-600 text-white rounded-br-md'
-                                                    : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-md'
-                                                }`}
-                                        >
+                                    <div key={msg.id} className={`flex ${msg.sender === 'visitor' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${msg.sender === 'visitor'
+                                                ? 'bg-blue-600 text-white rounded-br-md'
+                                                : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-md'
+                                            }`}>
                                             {msg.sender === 'agent' && msg.agentName && (
                                                 <p className="text-[10px] font-semibold text-blue-600 mb-0.5">{msg.agentName}</p>
                                             )}
                                             <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                                            <p className={`text-[10px] mt-1 ${msg.sender === 'visitor' ? 'text-blue-200' : 'text-gray-400'
-                                                }`}>
+                                            <p className={`text-[10px] mt-1 ${msg.sender === 'visitor' ? 'text-blue-200' : 'text-gray-400'}`}>
                                                 {formatTime(msg.createdAt)}
                                             </p>
                                         </div>
                                     </div>
                                 ))}
+                                {/* Typing Indicator */}
+                                {agentIsTyping && (
+                                    <div className="flex justify-start">
+                                        <div className="bg-white text-gray-500 shadow-sm border border-gray-100 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm flex items-center gap-1.5">
+                                            <span className="flex gap-0.5">
+                                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                                            </span>
+                                            <span className="text-[10px] text-gray-400 ml-1">{assignedAgentName} is typing</span>
+                                        </div>
+                                    </div>
+                                )}
                                 <div ref={messagesEndRef} />
                             </div>
 
@@ -270,7 +303,7 @@ export function LiveChatWidget() {
                                         type="text"
                                         placeholder="Type a message..."
                                         value={inputValue}
-                                        onChange={e => setInputValue(e.target.value)}
+                                        onChange={e => handleInputChange(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
                                         className="flex-1 px-3 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
                                         autoFocus

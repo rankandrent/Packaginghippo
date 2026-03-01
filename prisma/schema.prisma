@@ -274,9 +274,12 @@ model ChatConversation {
   visitorId     String        @unique // Browser-generated UUID stored in localStorage
   visitorName   String
   visitorEmail  String?
-  status        String        @default("active") // active, closed
+  assignedAgent String?       // Randomly assigned support agent name
+  status        String        @default("active") // active, closed, loss
   unreadCount   Int           @default(0) // Unread messages from visitor (for agent dashboard)
   lastMessageAt DateTime      @default(now())
+  visitorTyping DateTime?     // Last time visitor was typing
+  agentTyping   DateTime?     // Last time agent was typing
   messages      ChatMessage[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
