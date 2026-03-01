@@ -40,13 +40,13 @@ export async function GET(request: Request) {
 
             // Check if AI was recently triggered (use agentTyping as a debounce flag)
             const lastAiTrigger = conversation.agentTyping ? new Date(conversation.agentTyping).getTime() : 0
-            const aiCooldown = Date.now() - lastAiTrigger > 30_000 // 30-second cooldown
+            const aiCooldown = Date.now() - lastAiTrigger > 10_000 // 10-second cooldown
 
             // Only trigger AI if:
             // 1. Last message is from visitor (not AI or agent — prevents re-triggering after success)
-            // 2. More than 60 seconds have passed since that message
+            // 2. More than 5 seconds have passed since that message (near-instant AI reply)
             // 3. Cooldown period has passed (prevents spam when AI API fails)
-            if (lastMsg.sender === 'visitor' && timeSince > 60_000 && aiCooldown) {
+            if (lastMsg.sender === 'visitor' && timeSince > 5_000 && aiCooldown) {
                 // Set agentTyping as a debounce marker
                 await prisma.chatConversation.update({
                     where: { id: conversation.id },
