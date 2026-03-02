@@ -146,14 +146,16 @@ async function getLayoutSettings() {
                 key: { in: ['layout_product', 'layout_category'] }
             }
         })
+        // Default layout matching best-performing pages:
+        // Category: custom-rigid-boxes | Product: cosmetic-rigid-boxes
         return {
-            product: ['product_tabs', 'quote_form', 'content', 'testimonials', 'faqs', 'related_products'],
-            category: ['testimonials', 'quote_form', 'content', 'faqs', 'related_categories']
+            product: ['product_tabs', 'material_finishing', 'quote_form', 'content', 'testimonials', 'faqs', 'related_products'],
+            category: ['quote_form', 'content', 'testimonials', 'faqs', 'related_categories']
         }
     } catch (error) {
         return {
-            product: ['product_tabs', 'quote_form', 'content', 'testimonials', 'faqs', 'related_products'],
-            category: ['testimonials', 'quote_form', 'content', 'faqs', 'related_categories']
+            product: ['product_tabs', 'material_finishing', 'quote_form', 'content', 'testimonials', 'faqs', 'related_products'],
+            category: ['quote_form', 'content', 'testimonials', 'faqs', 'related_categories']
         }
     }
 }
@@ -179,6 +181,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
     let dynamicSections = (category.sections as unknown as Section[]) || []
 
     // If no sections are configured, use the Default Template
+    // Matching the best-performing category page: custom-rigid-boxes
     if (dynamicSections.length === 0) {
         dynamicSections = [
             {
@@ -188,7 +191,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     heading: category.name,
                     subheading: category.description ? category.description.replace(/<[^>]*>?/gm, '').slice(0, 150) + "..." : "High-quality packaging solutions tailored to your needs.",
                     image: category.imageUrl || "",
-                    ctaText: "Get a Quote",
+                    ctaText: "Get Custom Quote",
                     ctaLink: "/quote"
                 }
             },
@@ -201,9 +204,9 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 id: 'default-cta',
                 type: 'cta',
                 content: {
-                    heading: "Ready to Order?",
-                    subheading: "Get a custom quote for your packaging needs today.",
-                    buttonText: "Request Quote",
+                    heading: "Ready to Elevate Your Brand?",
+                    subheading: "Get premium custom packaging that makes your products stand out.",
+                    buttonText: "Start Your Project",
                     link: "/quote"
                 }
             },
@@ -211,20 +214,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 id: 'default-products',
                 type: 'product_grid',
                 content: {
-                    heading: `Explore ${category.name}`
-                }
-            },
-            {
-                id: 'default-benefits',
-                type: 'benefits',
-                content: {
-                    heading: "Why Choose Us?",
-                    subheading: "We deliver quality and reliability with every box.",
-                    items: [
-                        { title: "Premium Quality", desc: "Durable materials and high-quality printing." },
-                        { title: "Eco-Friendly", desc: "Sustainable packaging options available." },
-                        { title: "Fast Turnaround", desc: "Get your boxes delivered on time, every time." }
-                    ]
+                    heading: `Our ${category.name} Products`
                 }
             }
         ]
