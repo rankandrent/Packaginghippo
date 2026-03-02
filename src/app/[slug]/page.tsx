@@ -147,12 +147,12 @@ async function getLayoutSettings() {
             }
         })
         return {
-            product: ['product_tabs', 'quote_form', 'content', 'faqs', 'related_products'],
+            product: ['product_tabs', 'quote_form', 'content', 'testimonials', 'faqs', 'related_products'],
             category: ['testimonials', 'quote_form', 'content', 'faqs', 'related_categories']
         }
     } catch (error) {
         return {
-            product: ['product_tabs', 'quote_form', 'content', 'faqs', 'related_products'],
+            product: ['product_tabs', 'quote_form', 'content', 'testimonials', 'faqs', 'related_products'],
             category: ['testimonials', 'quote_form', 'content', 'faqs', 'related_categories']
         }
     }

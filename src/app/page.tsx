@@ -159,7 +159,7 @@ export default async function Home() {
         sections={sections as any}
         settings={settings}
         topProducts={topProducts}
-
+        testimonials={testimonials}
         categories={categories}
         featuredBlogs={featuredBlogs}
       />
