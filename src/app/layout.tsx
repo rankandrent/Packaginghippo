@@ -7,7 +7,6 @@ import { Footer } from "@/components/layout/footer";
 import prisma from "@/lib/db";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
-import { LiveChatWidget } from "@/components/chat/LiveChatWidget";
 
 export const dynamic = 'force-dynamic';
 
@@ -142,7 +141,20 @@ export default async function RootLayout({
         <main>{children}</main>
         <Footer />
         <WhatsAppButton />
-        <LiveChatWidget />
+        {/* Tawk.to Live Chat Integration */}
+        <script type="text/javascript" dangerouslySetInnerHTML={{
+          __html: `
+            var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+            (function(){
+            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+            s1.async=true;
+            s1.src='https://embed.tawk.to/66fc04b2e5982d6c7bb7336c/1i9474n3p';
+            s1.charset='UTF-8';
+            s1.setAttribute('crossorigin','*');
+            s0.parentNode.insertBefore(s1,s0);
+            })();
+          `
+        }} />
       </body>
     </html>
   );
