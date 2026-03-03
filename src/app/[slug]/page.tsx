@@ -233,7 +233,12 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
 
     // SEPARATE FAQs from other dynamic sections if 'faqs' is in the layout order
     const faqSections = dynamicSections.filter((s: any) => s.type === 'faq')
-    const otherSections = dynamicSections.filter((s: any) => s.type !== 'faq')
+    // Also filter out quote_form/custom_quote_form if they're already in layoutOrder to prevent duplicates
+    const hasQuoteInLayout = layoutOrder.includes('quote_form')
+    const otherSections = dynamicSections.filter((s: any) =>
+        s.type !== 'faq' &&
+        !(hasQuoteInLayout && (s.type === 'quote_form' || s.type === 'custom_quote_form'))
+    )
 
     const renderSection = (id: string) => {
         switch (id) {
@@ -407,7 +412,13 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
         if (homepageMF) materialFinishingSections.push(homepageMF)
     }
 
-    const otherSections = sections.filter((s: any) => s.type !== 'faq' && s.type !== 'material_finishing')
+    // Filter out quote_form/custom_quote_form to prevent duplicates (hero already has ProductHeroQuoteForm)
+    const otherSections = sections.filter((s: any) =>
+        s.type !== 'faq' &&
+        s.type !== 'material_finishing' &&
+        s.type !== 'quote_form' &&
+        s.type !== 'custom_quote_form'
+    )
 
     const breadcrumbItems = [
         { label: "Products", href: "/products" },
