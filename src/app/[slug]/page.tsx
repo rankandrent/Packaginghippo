@@ -149,12 +149,12 @@ async function getLayoutSettings() {
         // Default layout matching best-performing pages:
         // Category: custom-rigid-boxes | Product: cosmetic-rigid-boxes
         return {
-            product: ['product_tabs', 'material_finishing', 'quote_form', 'content', 'testimonials', 'faqs', 'related_products'],
+            product: ['product_tabs', 'material_finishing', 'content', 'testimonials', 'faqs', 'related_products'],
             category: ['quote_form', 'content', 'testimonials', 'faqs', 'related_categories']
         }
     } catch (error) {
         return {
-            product: ['product_tabs', 'material_finishing', 'quote_form', 'content', 'testimonials', 'faqs', 'related_products'],
+            product: ['product_tabs', 'material_finishing', 'content', 'testimonials', 'faqs', 'related_products'],
             category: ['quote_form', 'content', 'testimonials', 'faqs', 'related_categories']
         }
     }
