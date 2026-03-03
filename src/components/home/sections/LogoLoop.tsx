@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 export function LogoLoop({ data }: { data: any }) {
     if (!data || data.isActive === false) return null
@@ -41,7 +42,7 @@ export function LogoLoop({ data }: { data: any }) {
                             {typeof logo === 'string' && logo.startsWith('http') ? (
                                 <div className="relative h-20 w-48 filter grayscale hover:grayscale-0 transition-all duration-500 opacity-50 hover:opacity-100">
                                     <Image
-                                        src={logo}
+                                        src={getSeoImageUrl(logo)}
                                         alt="Client Logo"
                                         fill
                                         className="object-contain"

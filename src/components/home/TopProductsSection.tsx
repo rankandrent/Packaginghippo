@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { getSeoImageUrl } from "@/lib/image-seo"
 import { ArrowRight } from "lucide-react"
 
 type Product = {
@@ -35,7 +36,7 @@ export function TopProductsSection({ products = [] }: { products: Product[] }) {
                             <div className="relative aspect-square mb-4 rounded-xl overflow-hidden bg-gray-50 group-hover:shadow-lg transition-all duration-300">
                                 {product.images && product.images[0] ? (
                                     <Image
-                                        src={product.images[0]}
+                                        src={getSeoImageUrl(product.images[0])}
                                         alt={product.name}
                                         fill
                                         className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"

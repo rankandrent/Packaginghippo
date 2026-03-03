@@ -3,6 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, Calendar, User } from "lucide-react"
+import { getSeoImageUrl } from "@/lib/image-seo"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -46,7 +47,7 @@ export function FeaturedBlogs({ posts }: { posts: BlogPost[] }) {
                             <div className="relative h-48 w-full overflow-hidden">
                                 {post.mainImage ? (
                                     <Image
-                                        src={post.mainImage}
+                                        src={getSeoImageUrl(post.mainImage)}
                                         alt={post.title}
                                         fill
                                         className="object-cover transition-transform duration-500 hover:scale-105"

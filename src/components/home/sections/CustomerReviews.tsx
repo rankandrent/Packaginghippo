@@ -1,6 +1,7 @@
 "use client"
 
 import { Star } from "lucide-react"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 interface Review {
     name: string
@@ -43,8 +44,8 @@ export function CustomerReviews({ data }: { data: any }) {
                                     <Star
                                         key={i}
                                         className={`w-5 h-5 ${i < (review.rating || 5)
-                                                ? "fill-yellow-400 text-yellow-400"
-                                                : "fill-gray-200 text-gray-200"
+                                            ? "fill-yellow-400 text-yellow-400"
+                                            : "fill-gray-200 text-gray-200"
                                             }`}
                                     />
                                 ))}
@@ -59,7 +60,7 @@ export function CustomerReviews({ data }: { data: any }) {
                             <div className="flex items-center gap-3">
                                 {review.image ? (
                                     <img
-                                        src={review.image}
+                                        src={getSeoImageUrl(review.image)}
                                         alt={review.name}
                                         className="w-12 h-12 rounded-full object-cover"
                                     />

@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowRight, CheckCircle, ChevronDown, Package, Star, Leaf, Box, Quote, Clock, DollarSign, Truck, Palette, Pen, Sparkles, Shield, Zap, Check } from "lucide-react"
 import { PopularProducts } from "@/components/category/PopularProducts"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 // Types matching SectionBuilder
 export type Section = {
@@ -198,7 +199,7 @@ export function HeroSection({ content, breadcrumbs }: { content: any, breadcrumb
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/20 via-zinc-950 to-zinc-950"></div>
             {content.bgImage && (
                 <div className="absolute inset-0 opacity-20">
-                    <Image src={content.bgImage} alt="Background" fill className="object-cover" />
+                    <Image src={getSeoImageUrl(content.bgImage)} alt="Background" fill className="object-cover" />
                 </div>
             )}
             <div className="container mx-auto px-4 relative z-10">
@@ -225,7 +226,7 @@ export function HeroSection({ content, breadcrumbs }: { content: any, breadcrumb
                     </div>
                     {content.image && (
                         <div className="relative z-10 w-full max-w-lg mx-auto aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl transform rotate-[-3deg] border-4 border-white/10">
-                            <Image src={content.image} alt={content.heading} fill className="object-cover" />
+                            <Image src={getSeoImageUrl(content.image)} alt={content.heading} fill className="object-cover" />
                         </div>
                     )}
                 </div>
@@ -311,7 +312,7 @@ function ProductGridSection({ content }: { content: any }) {
                             <Card className="group cursor-pointer hover:shadow-lg transition-all border-none shadow-sm h-full rounded-xl overflow-hidden">
                                 <div className="aspect-[4/3] relative bg-white flex items-center justify-center p-4">
                                     {item.images?.[0] ? (
-                                        <Image src={item.images[0]} alt={item.name} fill className="object-contain p-4 group-hover:scale-105 transition-transform duration-500" />
+                                        <Image src={getSeoImageUrl(item.images[0])} alt={item.name} fill className="object-contain p-4 group-hover:scale-105 transition-transform duration-500" />
                                     ) : (
                                         <Package className="w-12 h-12 text-gray-200" />
                                     )}
@@ -500,7 +501,7 @@ function GallerySection({ content }: { content: any }) {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {images.map((img: string, i: number) => (
                         <div key={i} className="relative aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group">
-                            <Image src={img} alt={`Gallery ${i}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                            <Image src={getSeoImageUrl(img)} alt={`Gallery ${i}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                         </div>
                     ))}
                 </div>
@@ -542,7 +543,7 @@ function CustomerReviewsSection({ content }: { content: any }) {
                                     <div className="flex items-center gap-4 pt-6 border-t border-gray-50">
                                         {review.image ? (
                                             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-yellow-500/20">
-                                                <Image src={review.image} alt={review.name} width={48} height={48} className="object-cover" />
+                                                <Image src={getSeoImageUrl(review.image)} alt={review.name} width={48} height={48} className="object-cover" />
                                             </div>
                                         ) : (
                                             <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-600 font-bold">

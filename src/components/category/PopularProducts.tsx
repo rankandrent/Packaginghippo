@@ -3,6 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, Star } from "lucide-react"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 interface Product {
     id: string
@@ -39,7 +40,7 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                             <Link href={`/${product.slug}`} className="relative aspect-square overflow-hidden bg-gray-100">
                                 {product.images && product.images[0] ? (
                                     <Image
-                                        src={product.images[0]}
+                                        src={getSeoImageUrl(product.images[0])}
                                         alt={product.name}
                                         fill
                                         className="object-cover transition-transform duration-500 group-hover:scale-110"

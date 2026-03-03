@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { getSeoImageUrl } from "@/lib/image-seo"
 import { ArrowRight } from "lucide-react"
 
 type Category = {
@@ -36,7 +37,7 @@ export function CategoriesSection({ categories = [] }: { categories: Category[] 
                             <div className="relative aspect-[4/3] mb-4 rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-xl group-hover:border-green-500/50 transition-all duration-300 transform group-hover:-translate-y-1">
                                 {category.imageUrl ? (
                                     <Image
-                                        src={category.imageUrl}
+                                        src={getSeoImageUrl(category.imageUrl)}
                                         alt={category.name}
                                         fill
                                         className="object-cover group-hover:scale-110 transition-transform duration-500"

@@ -5,6 +5,7 @@ import Image from "next/image"
 import { toast } from "sonner"
 import { Truck } from "lucide-react"
 import { ExitIntentPopup } from "./ExitIntentPopup"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 interface CustomQuoteFormSectionProps {
     image?: string
@@ -319,7 +320,7 @@ Message: ${formData.message}`,
                     <div className="lg:col-span-4 bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl shadow-xl overflow-hidden min-h-[400px] h-full relative">
                         {image ? (
                             <Image
-                                src={image}
+                                src={getSeoImageUrl(image)}
                                 alt="Custom Quote"
                                 fill
                                 className="object-cover"

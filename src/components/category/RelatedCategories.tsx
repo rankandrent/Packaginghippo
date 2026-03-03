@@ -3,6 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 interface Category {
     id: string
@@ -44,7 +45,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                             <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-200">
                                 {category.imageUrl ? (
                                     <Image
-                                        src={category.imageUrl}
+                                        src={getSeoImageUrl(category.imageUrl)}
                                         alt={category.name}
                                         fill
                                         className="object-cover transition-transform duration-500 group-hover:scale-110"

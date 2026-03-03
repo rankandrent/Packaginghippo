@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight } from "lucide-react"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 function PackageIcon({ className }: { className?: string }) {
     return (
@@ -67,7 +68,7 @@ export function PopularProducts({ data }: { data: any }) {
                                         {item.imageUrl ? (
                                             <div className="relative w-full aspect-video mb-6 rounded-xl overflow-hidden bg-gray-100">
                                                 <Image
-                                                    src={item.imageUrl}
+                                                    src={getSeoImageUrl(item.imageUrl)}
                                                     alt={item.name}
                                                     fill
                                                     className="object-cover group-hover:scale-110 transition-transform duration-500"

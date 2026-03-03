@@ -7,6 +7,7 @@ import { DynamicTOC } from "@/components/blog/DynamicTOC"
 import { ShareButtons } from "@/components/blog/ShareButtons"
 import { QuoteForm } from "@/components/forms/QuoteForm"
 import { JsonLd } from "@/components/seo/JsonLd"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 async function getBlogPost(slug: string) {
     const post = await prisma.blogPost.findUnique({
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         openGraph: {
             title: post.seoTitle || post.title,
             description: post.seoDesc || post.excerpt,
-            images: post.mainImage ? [{ url: post.mainImage }] : [],
+            images: post.mainImage ? [{ url: getSeoImageUrl(post.mainImage) }] : [],
             type: 'article',
             publishedTime: post.publishedAt || post.createdAt,
             authors: [post.author?.name || 'Admin'],
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             card: 'summary_large_image',
             title: post.seoTitle || post.title,
             description: post.seoDesc || post.excerpt,
-            images: post.mainImage ? [post.mainImage] : [],
+            images: post.mainImage ? [getSeoImageUrl(post.mainImage)] : [],
         }
     }
 }
@@ -80,7 +81,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                     "@id": `https://packaginghippo.com/blog/${post.slug}`,
                     "headline": post.seoTitle || post.title,
                     "description": post.seoDesc || post.excerpt,
-                    "image": post.mainImage ? [post.mainImage] : [],
+                    "image": post.mainImage ? [getSeoImageUrl(post.mainImage)] : [],
                     "author": {
                         "@type": "Person",
                         "name": post.author?.name || "Admin",
@@ -167,7 +168,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                     {/* Main Content */}
                     <div className="lg:col-span-3">
                         {post.mainImage && (
-                            <img src={post.mainImage} alt={post.title} className="w-full aspect-video object-cover rounded-2xl mb-12 shadow-lg" />
+                            <img src={getSeoImageUrl(post.mainImage)} alt={post.title} className="w-full aspect-video object-cover rounded-2xl mb-12 shadow-lg" />
                         )}
 
                         <div
@@ -224,7 +225,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                             {relatedPosts.map((rp: any) => (
                                 <Link key={rp.id} href={`/blog/${rp.slug}`} className="group space-y-4">
                                     <div className="aspect-video rounded-xl overflow-hidden bg-gray-100 border relative">
-                                        {rp.mainImage && <img src={rp.mainImage} alt={rp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
+                                        {rp.mainImage && <img src={getSeoImageUrl(rp.mainImage)} alt={rp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                                     </div>
                                     <div className="space-y-2">

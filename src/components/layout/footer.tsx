@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react"
 import prisma from "@/lib/db"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 
 async function getSettings() {
@@ -133,7 +134,7 @@ export async function Footer() {
                         {footer.paymentMethodsImage && (
                             <div className="flex items-center justify-center md:justify-end">
                                 <img
-                                    src={footer.paymentMethodsImage}
+                                    src={getSeoImageUrl(footer.paymentMethodsImage)}
                                     alt="Payment Methods"
                                     className="h-8 md:h-10 object-contain grayscale hover:grayscale-0 transition-all duration-300 opacity-70 hover:opacity-100"
                                 />

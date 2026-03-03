@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 interface TabItem {
     id: string
@@ -110,7 +111,7 @@ export default function TabsSection({ data }: TabsSectionProps) {
                                                     {card.image && (
                                                         <div className="relative aspect-[4/3] bg-gray-50 border-b border-gray-100 p-4">
                                                             <Image
-                                                                src={card.image}
+                                                                src={getSeoImageUrl(card.image)}
                                                                 alt={card.title || "Feature"}
                                                                 fill
                                                                 className="object-contain p-2"
@@ -132,7 +133,7 @@ export default function TabsSection({ data }: TabsSectionProps) {
                                             {activeTab.images.map((image, index) => (
                                                 <div key={index} className="relative aspect-square bg-gray-50 rounded-2xl overflow-hidden shadow-inner group border border-gray-100">
                                                     <Image
-                                                        src={image}
+                                                        src={getSeoImageUrl(image)}
                                                         alt={`${activeTab.label} ${index + 1}`}
                                                         fill
                                                         className="object-cover group-hover:scale-110 transition-transform duration-500"

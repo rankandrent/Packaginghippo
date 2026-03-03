@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 type GalleryItem = {
     url: string
@@ -40,7 +41,7 @@ export function GallerySection({ data }: { data: any }) {
                             className="relative group aspect-square overflow-hidden rounded-xl bg-gray-100 cursor-pointer"
                         >
                             <Image
-                                src={item.url}
+                                src={getSeoImageUrl(item.url)}
                                 alt={item.alt || "Gallery Image"}
                                 fill
                                 className="object-cover transition-transform duration-500 group-hover:scale-110"

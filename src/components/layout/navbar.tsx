@@ -1,4 +1,5 @@
 "use client"
+import { getSeoImageUrl } from "@/lib/image-seo"
 // Navigation component for Packaging Hippo
 
 import Link from "next/link"
@@ -176,7 +177,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                                     className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg group transition-colors"
                                                 >
                                                     <div className="w-10 h-10 bg-gray-50 rounded border flex-shrink-0 relative overflow-hidden">
-                                                        {p.images?.[0] ? <img src={p.images[0]} alt="" className="object-cover w-full h-full" /> : <Search className="w-4 h-4 m-3 text-gray-300" />}
+                                                        {p.images?.[0] ? <img src={getSeoImageUrl(p.images[0])} alt="" className="object-cover w-full h-full" /> : <Search className="w-4 h-4 m-3 text-gray-300" />}
                                                     </div>
                                                     <span className="text-sm font-bold text-gray-900 group-hover:text-primary">{p.name}</span>
                                                 </Link>
@@ -196,7 +197,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                                     className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg group transition-colors"
                                                 >
                                                     <div className="w-10 h-10 bg-gray-50 rounded border flex-shrink-0 relative overflow-hidden p-1">
-                                                        {c.imageUrl ? <img src={c.imageUrl} alt="" className="object-contain w-full h-full" /> : <Search className="w-4 h-4 m-3 text-gray-300" />}
+                                                        {c.imageUrl ? <img src={getSeoImageUrl(c.imageUrl)} alt="" className="object-contain w-full h-full" /> : <Search className="w-4 h-4 m-3 text-gray-300" />}
                                                     </div>
                                                     <span className="text-sm font-bold text-gray-900 group-hover:text-primary">{c.name}</span>
                                                 </Link>
@@ -216,7 +217,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                                     className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg group transition-colors"
                                                 >
                                                     <div className="w-10 h-10 bg-gray-50 rounded border flex-shrink-0 relative overflow-hidden">
-                                                        {b.mainImage ? <img src={b.mainImage} alt="" className="object-cover w-full h-full" /> : <Search className="w-4 h-4 m-3 text-gray-300" />}
+                                                        {b.mainImage ? <img src={getSeoImageUrl(b.mainImage)} alt="" className="object-cover w-full h-full" /> : <Search className="w-4 h-4 m-3 text-gray-300" />}
                                                     </div>
                                                     <span className="text-sm font-bold text-gray-900 group-hover:text-primary line-clamp-1">{b.title}</span>
                                                 </Link>

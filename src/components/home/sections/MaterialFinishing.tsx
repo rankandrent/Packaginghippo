@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 export type MaterialFinishingItem = {
     title: string
@@ -47,7 +48,7 @@ export function MaterialFinishing({ data }: { data: MaterialFinishingData }) {
                                     <div className="aspect-[4/3] bg-gray-50 rounded-xl overflow-hidden mb-5 relative border border-gray-100 shadow-sm group-hover:shadow-md transition-shadow">
                                         {item.image ? (
                                             <Image
-                                                src={item.image}
+                                                src={getSeoImageUrl(item.image)}
                                                 alt={item.title || "Stock Type"}
                                                 fill
                                                 className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -80,7 +81,7 @@ export function MaterialFinishing({ data }: { data: MaterialFinishingData }) {
                                     <div className="aspect-[4/3] bg-gray-50 rounded-xl overflow-hidden mb-5 relative border border-gray-100 shadow-sm group-hover:shadow-md transition-shadow">
                                         {item.image ? (
                                             <Image
-                                                src={item.image}
+                                                src={getSeoImageUrl(item.image)}
                                                 alt={item.title || "Finishing Option"}
                                                 fill
                                                 className="object-cover group-hover:scale-105 transition-transform duration-500"

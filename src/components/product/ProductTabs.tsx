@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 interface TabContent {
     content: string
@@ -104,7 +105,7 @@ export function ProductTabs({ tabs }: ProductTabsProps) {
                                         {activeContent.images.map((image, index) => (
                                             <div key={index} className="relative aspect-square bg-gray-50 rounded-2xl overflow-hidden shadow-inner group border border-gray-100">
                                                 <Image
-                                                    src={image}
+                                                    src={getSeoImageUrl(image)}
                                                     alt={`${activeTab} ${index + 1}`}
                                                     fill
                                                     className="object-cover group-hover:scale-110 transition-transform duration-500"

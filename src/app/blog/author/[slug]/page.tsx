@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { notFound } from "next/navigation"
 import prisma from "@/lib/db"
 import { constructMetadataTitle } from "@/lib/utils"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 async function getAuthor(slug: string) {
     return prisma.author.findUnique({
@@ -110,7 +111,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
                             <Link key={post.id} href={`/blog/${post.slug}`} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 flex flex-col">
                                 <div className="aspect-video w-full overflow-hidden bg-gray-100">
                                     {post.mainImage ? (
-                                        <img src={post.mainImage} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <img src={getSeoImageUrl(post.mainImage)} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
                                     )}

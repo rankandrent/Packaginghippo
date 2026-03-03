@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { getSeoImageUrl } from "@/lib/image-seo"
 import { Metadata } from "next"
 import { Calendar, User, ArrowRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -107,7 +108,7 @@ export default async function BlogListingPage({ searchParams }: { searchParams: 
                             <div className="grid lg:grid-cols-2 gap-0 bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 min-h-[450px]">
                                 <div className="relative overflow-hidden aspect-video lg:aspect-auto bg-gray-100">
                                     {featuredPost.mainImage && (
-                                        <img src={featuredPost.mainImage} alt={featuredPost.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                        <img src={getSeoImageUrl(featuredPost.mainImage)} alt={featuredPost.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                     )}
                                     <div className="absolute top-6 left-6">
                                         <Badge className="bg-yellow-500 text-gray-900 border-none font-black uppercase">Featured</Badge>
@@ -138,7 +139,7 @@ export default async function BlogListingPage({ searchParams }: { searchParams: 
                             <Link key={post.id} href={`/blog/${post.slug}`} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 flex flex-col">
                                 <div className="aspect-video w-full overflow-hidden bg-gray-100">
                                     {post.mainImage ? (
-                                        <img src={post.mainImage} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <img src={getSeoImageUrl(post.mainImage)} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
                                     )}
