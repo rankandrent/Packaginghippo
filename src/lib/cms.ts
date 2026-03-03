@@ -40,14 +40,21 @@ export async function getPage(slug: string) {
 
 export async function getTestimonials(categoryId?: string, productId?: string) {
     try {
+        const orConditions: any[] = [
+            { productId: null, categoryId: null },
+            { productId: { isSet: false }, categoryId: { isSet: false } },
+            // Some records might have one set to null and the other missing
+            { productId: null, categoryId: { isSet: false } },
+            { productId: { isSet: false }, categoryId: null }
+        ]
+
+        if (productId) orConditions.push({ productId })
+        if (categoryId) orConditions.push({ categoryId })
+
         const testimonials = await prisma.testimonial.findMany({
             where: {
                 isActive: true,
-                OR: [
-                    { productId: productId },
-                    { categoryId: categoryId },
-                    { productId: null, categoryId: null }
-                ]
+                OR: orConditions
             },
             take: 6
         })
