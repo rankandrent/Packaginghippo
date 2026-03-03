@@ -146,16 +146,15 @@ async function getLayoutSettings() {
                 key: { in: ['layout_product', 'layout_category'] }
             }
         })
-        // Default layout matching best-performing pages:
-        // Category: custom-rigid-boxes | Product: cosmetic-rigid-boxes
+        // Default layout matching requested best structure
         return {
-            product: ['product_tabs', 'material_finishing', 'content', 'testimonials', 'faqs', 'related_products'],
-            category: ['quote_form', 'content', 'testimonials', 'faqs', 'related_categories']
+            product: ['product_tabs', 'material_finishing', 'testimonials', 'content', 'faqs', 'related_products'],
+            category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_products']
         }
     } catch (error) {
         return {
-            product: ['product_tabs', 'material_finishing', 'content', 'testimonials', 'faqs', 'related_products'],
-            category: ['quote_form', 'content', 'testimonials', 'faqs', 'related_categories']
+            product: ['product_tabs', 'material_finishing', 'testimonials', 'content', 'faqs', 'related_products'],
+            category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_products']
         }
     }
 }
@@ -196,9 +195,11 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 }
             },
             {
-                id: 'default-popular',
-                type: 'popular_products',
-                content: {}
+                id: 'default-products',
+                type: 'product_grid',
+                content: {
+                    heading: `Our ${category.name} Products`
+                }
             },
             {
                 id: 'default-cta',
@@ -208,13 +209,6 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     subheading: "Get premium custom packaging that makes your products stand out.",
                     buttonText: "Start Your Project",
                     link: "/quote"
-                }
-            },
-            {
-                id: 'default-products',
-                type: 'product_grid',
-                content: {
-                    heading: `Our ${category.name} Products`
                 }
             }
         ]
@@ -231,12 +225,14 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
         { label: category.name }
     ]
 
-    // SEPARATE FAQs from other dynamic sections if 'faqs' is in the layout order
+    // SEPARATE FAQs and CTAs from other dynamic sections if they are in the layout order
     const faqSections = dynamicSections.filter((s: any) => s.type === 'faq')
+    const ctaSections = dynamicSections.filter((s: any) => s.type === 'cta')
     // Also filter out quote_form/custom_quote_form if they're already in layoutOrder to prevent duplicates
     const hasQuoteInLayout = layoutOrder.includes('quote_form')
     const otherSections = dynamicSections.filter((s: any) =>
         s.type !== 'faq' &&
+        s.type !== 'cta' &&
         !(hasQuoteInLayout && (s.type === 'quote_form' || s.type === 'custom_quote_form'))
     )
 
@@ -255,10 +251,26 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 )
             case 'related_categories':
                 return <RelatedCategories key="related" categories={relatedCategories} />
+            case 'related_products':
+                return popularProducts && popularProducts.length > 0 ? (
+                    <PopularProducts
+                        key="related_products"
+                        categoryName={category.name}
+                        products={popularProducts}
+                    />
+                ) : null
             case 'quote_form':
                 return <CustomQuoteFormSection key="quote" image={quoteFormImage} />
             case 'testimonials':
                 return <TestimonialsSection key="testimonials" testimonials={testimonials} />
+            case 'cta':
+                return ctaSections.length > 0 && (
+                    <SectionRenderer
+                        key="cta"
+                        sections={ctaSections}
+                        quoteFormImage={quoteFormImage}
+                    />
+                )
             case 'faqs':
                 return faqSections.length > 0 && (
                     <SectionRenderer
