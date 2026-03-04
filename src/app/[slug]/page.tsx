@@ -210,6 +210,35 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     buttonText: "Start Your Project",
                     link: "/quote"
                 }
+            },
+            {
+                id: 'default-faq',
+                type: 'faq',
+                content: {
+                    heading: `Frequently Asked Questions About ${category.name}`,
+                    items: [
+                        {
+                            q: `What materials are available for ${category.name}?`,
+                            a: `We offer a wide range of premium materials for ${category.name} including kraft, cardboard, corrugated, rigid board, and eco-friendly options. Each material can be customized to match your brand requirements.`
+                        },
+                        {
+                            q: `What is the minimum order quantity for ${category.name}?`,
+                            a: `Our minimum order quantity for ${category.name} starts at just 100 units, making it accessible for businesses of all sizes. We offer competitive pricing with bulk order discounts.`
+                        },
+                        {
+                            q: `How long does it take to produce ${category.name}?`,
+                            a: `Standard production time for ${category.name} is 8-12 business days after design approval. Rush orders are available with expedited turnaround times upon request.`
+                        },
+                        {
+                            q: `Can I get a sample before placing a bulk order?`,
+                            a: `Yes! We offer sample kits and pre-production samples so you can review the quality, material, and print finish before committing to a full order.`
+                        },
+                        {
+                            q: `Do you offer custom printing and finishing options?`,
+                            a: `Absolutely. We provide full-color CMYK/PMS printing, embossing, debossing, foil stamping, spot UV, matte/gloss lamination, and many other premium finishing options to elevate your packaging.`
+                        }
+                    ]
+                }
             }
         ]
     }
@@ -416,8 +445,41 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
     }
 
     // Extract specific dynamic sections to allow manual sorting
-    const faqSections = sections.filter((s: any) => s.type === 'faq')
+    let faqSections = sections.filter((s: any) => s.type === 'faq')
     const materialFinishingSections = sections.filter((s: any) => s.type === 'material_finishing')
+
+    // Inject default FAQs if none configured
+    if (faqSections.length === 0) {
+        faqSections = [{
+            id: 'default-product-faq',
+            type: 'faq',
+            content: {
+                heading: `Frequently Asked Questions About ${product.name}`,
+                items: [
+                    {
+                        q: `What customization options are available for ${product.name}?`,
+                        a: `We offer full customization for ${product.name} including custom sizes, shapes, colors, printing (CMYK/PMS), and premium finishes like embossing, foil stamping, spot UV, and lamination.`
+                    },
+                    {
+                        q: `What is the minimum order quantity for ${product.name}?`,
+                        a: `The minimum order quantity for ${product.name} starts at just 100 units. We offer flexible quantity options with volume-based pricing discounts for larger orders.`
+                    },
+                    {
+                        q: `How long does production take for ${product.name}?`,
+                        a: `Standard production time for ${product.name} is 8-12 business days after design approval. Rush production is available upon request for urgent orders.`
+                    },
+                    {
+                        q: `Can I request a sample of ${product.name} before ordering?`,
+                        a: `Yes! We provide pre-production samples so you can evaluate the material quality, print accuracy, and overall finish before placing your bulk order.`
+                    },
+                    {
+                        q: `What materials are used for ${product.name}?`,
+                        a: `We use premium materials including kraft paper, cardboard, corrugated board, rigid chipboard, and eco-friendly recyclable options. Material selection depends on your specific requirements for durability and presentation.`
+                    }
+                ]
+            }
+        }]
+    }
 
     if (materialFinishingSections.length === 0) {
         const homepageMF = homepageSections.find((s: any) => s.type === 'material_finishing')
