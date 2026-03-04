@@ -83,17 +83,6 @@ export const DEFAULT_CATEGORY_TEMPLATE = [
 
 export const DEFAULT_PRODUCT_TEMPLATE = [
     {
-        id: 'hero',
-        type: 'hero',
-        title: 'Product Hero',
-        content: {
-            heading: 'Custom Product Name',
-            subheading: 'Durable, stylish, and fully customizable packaging.',
-            ctaText: 'Get Custom Quote',
-            ctaLink: '#quote-form'
-        }
-    },
-    {
         id: 'intro',
         type: 'intro',
         title: 'Product Overview',
