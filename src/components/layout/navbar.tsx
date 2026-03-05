@@ -93,28 +93,33 @@ export function Navbar({ settings, menuData }: NavbarProps) {
         const hasChildren = item.children && item.children.length > 0;
 
         if (hasChildren) {
+            const itemHref = item.href?.startsWith('/') || item.href?.startsWith('http') ? item.href : `/${item.href}`;
             return (
                 <div key={item.id} className="group relative h-full flex items-center">
-                    <Link href={item.href} className="text-sm font-bold text-gray-700 group-hover:text-primary uppercase tracking-wide flex items-center gap-1">
+                    <Link href={itemHref || "#"} className="text-sm font-bold text-gray-700 group-hover:text-primary uppercase tracking-wide flex items-center gap-1">
                         {item.label} <ChevronDown className="w-3 h-3" />
                     </Link>
                     <div className="absolute top-full left-0 min-w-[250px] bg-white shadow-xl border-t-2 border-accent opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-2 rounded-b-lg">
                         <ul className="space-y-1">
-                            {item.children.map((child: any) => (
-                                <li key={child.id}>
-                                    <Link href={child.href} className="block px-4 py-2 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded">
-                                        {child.label}
-                                    </Link>
-                                </li>
-                            ))}
+                            {item.children.map((child: any) => {
+                                const childHref = child.href?.startsWith('/') || child.href?.startsWith('http') ? child.href : `/${child.href}`;
+                                return (
+                                    <li key={child.id}>
+                                        <Link href={childHref || "#"} className="block px-4 py-2 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded">
+                                            {child.label}
+                                        </Link>
+                                    </li>
+                                )
+                            })}
                         </ul>
                     </div>
                 </div>
             )
         }
 
+        const itemHref = item.href?.startsWith('/') || item.href?.startsWith('http') ? item.href : `/${item.href}`;
         return (
-            <Link key={item.id} href={item.href} className="text-sm font-bold text-gray-700 hover:text-primary uppercase tracking-wide h-full flex items-center">
+            <Link key={item.id} href={itemHref || "#"} className="text-sm font-bold text-gray-700 hover:text-primary uppercase tracking-wide h-full flex items-center">
                 {item.label}
             </Link>
         )
@@ -292,11 +297,14 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                     </form>
 
                     <nav className="flex flex-col space-y-3">
-                        {navItems.map((item, idx) => (
-                            <Link key={idx} href={item.href} className="text-sm font-bold text-gray-900 uppercase border-b pb-2" onClick={() => setIsOpen(false)}>
-                                {item.label}
-                            </Link>
-                        ))}
+                        {navItems.map((item, idx) => {
+                            const itemHref = item.href?.startsWith('/') || item.href?.startsWith('http') ? item.href : `/${item.href}`;
+                            return (
+                                <Link key={idx} href={itemHref || "#"} className="text-sm font-bold text-gray-900 uppercase border-b pb-2" onClick={() => setIsOpen(false)}>
+                                    {item.label}
+                                </Link>
+                            )
+                        })}
                     </nav>
 
                     <div className="pt-2 flex flex-col gap-3">
