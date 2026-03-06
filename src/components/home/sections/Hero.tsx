@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { ArrowRight, Box, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -55,13 +56,17 @@ export function Hero({ data }: { data: any }) {
                     >
                         <div className="relative z-10 w-full max-w-md aspect-square bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-3xl shadow-2xl shadow-yellow-500/20 transform rotate-[-5deg] flex items-center justify-center border-t border-white/20">
                             {data.hero_image ? (
-                                <img
-                                    src={seoValues.imageUrl}
-                                    alt={seoValues.altText}
-                                    title={seoValues.altText} // Good for tooltip/SEO
-                                    className="w-full h-full object-cover rounded-3xl"
-                                    loading="eager" // Hero image should load fast
-                                />
+                                <div className="relative w-full h-full rounded-3xl overflow-hidden">
+                                    <Image
+                                        src={seoValues.imageUrl}
+                                        alt={seoValues.altText}
+                                        title={seoValues.altText}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 500px"
+                                        className="object-cover"
+                                        priority={true}
+                                    />
+                                </div>
                             ) : (
                                 <Box className="w-32 h-32 md:w-48 md:h-48 text-black opacity-50" />
                             )}
