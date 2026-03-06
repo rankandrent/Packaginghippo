@@ -347,7 +347,7 @@ function TextSection({ content }: { content: any }) {
     if (!content.html) return null
     return (
         <section className="py-16 bg-white">
-            <div className="container mx-auto px-4 prose max-w-none text-gray-700 leading-relaxed">
+            <div className="container mx-auto px-4 max-w-5xl prose prose-lg text-gray-700 leading-relaxed">
                 {content.heading && <h2 className="text-3xl font-bold text-gray-900 mb-6">{content.heading}</h2>}
                 <div className="rich-text" dangerouslySetInnerHTML={{ __html: content.html }} />
             </div>
@@ -361,7 +361,7 @@ function SeoContentSection({ content }: { content: any }) {
 
     return (
         <section className="py-16 bg-white border-t border-gray-100">
-            <div className="container mx-auto px-4">
+            <div className="container mx-auto px-4 max-w-5xl">
                 {content.heading && (
                     <h2 className="text-3xl font-bold mb-8 text-gray-900">{content.heading}</h2>
                 )}
@@ -372,7 +372,7 @@ function SeoContentSection({ content }: { content: any }) {
                         style={{ maxHeight: isExpanded ? 'none' : `${collapsedHeight}px` }}
                     >
                         <div
-                            className="prose max-w-none text-gray-600 leading-relaxed rich-text"
+                            className="prose prose-lg max-w-none text-gray-600 leading-relaxed rich-text"
                             dangerouslySetInnerHTML={{ __html: content.content }}
                             suppressHydrationWarning
                         />
