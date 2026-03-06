@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/footer";
 import prisma from "@/lib/db";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import Script from "next/script";
 
 export const dynamic = 'force-dynamic';
 
@@ -141,10 +142,6 @@ export default async function RootLayout({
         <main>{children}</main>
         <Footer />
         <WhatsAppButton />
-        import Script from "next/script";
-
-        // ... further down in the layout ...
-
         {/* Tawk.to Live Chat Integration */}
         <Script
           id="tawk-to"
