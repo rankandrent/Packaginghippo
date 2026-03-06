@@ -348,8 +348,8 @@ function TextSection({ content }: { content: any }) {
     const contentRef = React.useRef<HTMLDivElement>(null)
     const [needsReadMore, setNeedsReadMore] = useState(false)
 
-    // ~1200px is roughly 500 words in prose-lg
-    const COLLAPSED_HEIGHT = 1200
+    // ~600px is roughly 250 words in prose-lg
+    const COLLAPSED_HEIGHT = 600
 
     useEffect(() => {
         if (contentRef.current) {
