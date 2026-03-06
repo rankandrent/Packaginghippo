@@ -24,8 +24,11 @@ import {
     Leaf,
     Truck,
     Settings,
-    Quote
+    Quote,
+    Copy,
+    ClipboardPaste
 } from "lucide-react"
+import { toast } from "sonner"
 import { RichTextEditor } from "./RichTextEditor"
 import { ImageUploader } from "./ImageUploader"
 import {
@@ -113,6 +116,42 @@ export function SectionBuilder({ sections = [], onChange }: SectionBuilderProps)
         onChange([...sections, newSection])
     }
 
+    const handleCopySection = (section: Section) => {
+        try {
+            // Create a deep copy to ensure no references are kept
+            const sectionToCopy = JSON.parse(JSON.stringify(section));
+            localStorage.setItem("copied_packaging_section", JSON.stringify(sectionToCopy));
+            toast.success(`Copied "${section.title}" section to clipboard!`);
+        } catch (error) {
+            console.error("Failed to copy section:", error);
+            toast.error("Failed to copy section.");
+        }
+    }
+
+    const handlePasteSection = () => {
+        try {
+            const copiedData = localStorage.getItem("copied_packaging_section");
+            if (!copiedData) {
+                toast.error("No section found in clipboard.");
+                return;
+            }
+
+            const parsedSection = JSON.parse(copiedData) as Section;
+            // Generate a new ID for the pasted section
+            const newSection: Section = {
+                ...parsedSection,
+                id: Math.random().toString(36).substring(7),
+                title: `${parsedSection.title || 'Copied'} (Paste)`
+            };
+
+            onChange([...sections, newSection]);
+            toast.success("Pasted section successfully!");
+        } catch (error) {
+            console.error("Failed to paste section:", error);
+            toast.error("Failed to paste section.");
+        }
+    }
+
     const removeSection = (id: string) => {
         onChange(sections.filter(s => s.id !== id))
     }
@@ -135,40 +174,50 @@ export function SectionBuilder({ sections = [], onChange }: SectionBuilderProps)
     return (
         <div className="space-y-8">
             <div className="p-6 bg-white rounded-xl border shadow-sm">
-                <div className="mb-4">
-                    <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Add New Section</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        <SectionButton icon={LayoutTemplate} label="Hero" onClick={() => addSection('hero')} />
-                        <SectionButton icon={ShoppingBag} label="Products" onClick={() => addSection('product_grid')} />
-                        <SectionButton icon={Type} label="Text Block" onClick={() => addSection('text')} />
-                        <SectionButton icon={HelpCircle} label="FAQ" onClick={() => addSection('faq')} />
+                <div className="mb-4 flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Add New Section</h4>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                        onClick={handlePasteSection}
+                        type="button"
+                    >
+                        <ClipboardPaste className="w-4 h-4 mr-2" />
+                        Paste Copied Section
+                    </Button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <SectionButton icon={LayoutTemplate} label="Hero" onClick={() => addSection('hero')} />
+                    <SectionButton icon={ShoppingBag} label="Products" onClick={() => addSection('product_grid')} />
+                    <SectionButton icon={Type} label="Text Block" onClick={() => addSection('text')} />
+                    <SectionButton icon={HelpCircle} label="FAQ" onClick={() => addSection('faq')} />
 
-                        <SectionButton icon={List} label="Benefits" onClick={() => addSection('benefits')} />
-                        <SectionButton icon={ImageIcon} label="Gallery" onClick={() => addSection('gallery')} />
-                        <SectionButton icon={MessageSquare} label="Reviews" onClick={() => addSection('customer_reviews')} />
-                        <SectionButton icon={Play} label="Video" onClick={() => addSection('video_section')} />
+                    <SectionButton icon={List} label="Benefits" onClick={() => addSection('benefits')} />
+                    <SectionButton icon={ImageIcon} label="Gallery" onClick={() => addSection('gallery')} />
+                    <SectionButton icon={MessageSquare} label="Reviews" onClick={() => addSection('customer_reviews')} />
+                    <SectionButton icon={Play} label="Video" onClick={() => addSection('video_section')} />
 
-                        <SectionButton icon={Settings} label="Intro" onClick={() => addSection('intro')} />
-                        <SectionButton icon={LayoutTemplate} label="Services List" onClick={() => addSection('services_list')} />
-                        <SectionButton icon={Settings} label="How It Works" onClick={() => addSection('how_it_works')} />
-                        <SectionButton icon={Leaf} label="Eco Friendly" onClick={() => addSection('eco_friendly')} />
+                    <SectionButton icon={Settings} label="Intro" onClick={() => addSection('intro')} />
+                    <SectionButton icon={LayoutTemplate} label="Services List" onClick={() => addSection('services_list')} />
+                    <SectionButton icon={Settings} label="How It Works" onClick={() => addSection('how_it_works')} />
+                    <SectionButton icon={Leaf} label="Eco Friendly" onClick={() => addSection('eco_friendly')} />
 
-                        <SectionButton icon={LayoutTemplate} label="Printing" onClick={() => addSection('printing')} />
-                        <SectionButton icon={LayoutTemplate} label="Industries" onClick={() => addSection('industries')} />
-                        <SectionButton icon={LayoutTemplate} label="Steps" onClick={() => addSection('steps')} />
-                        <SectionButton icon={Settings} label="Order Process" onClick={() => addSection('ordering_process')} />
+                    <SectionButton icon={LayoutTemplate} label="Printing" onClick={() => addSection('printing')} />
+                    <SectionButton icon={LayoutTemplate} label="Industries" onClick={() => addSection('industries')} />
+                    <SectionButton icon={LayoutTemplate} label="Steps" onClick={() => addSection('steps')} />
+                    <SectionButton icon={Settings} label="Order Process" onClick={() => addSection('ordering_process')} />
 
-                        <SectionButton icon={Star} label="Why Choose Us" onClick={() => addSection('why_choose_us')} />
-                        <SectionButton icon={Quote} label="Quote Form" onClick={() => addSection('quote_form')} />
-                        <SectionButton icon={Quote} label="Custom Quote" onClick={() => addSection('custom_quote_form')} />
-                        <SectionButton icon={LayoutTemplate} label="Featured Blogs" onClick={() => addSection('featured_blogs')} />
-                        <SectionButton icon={Settings} label="SEO Content" onClick={() => addSection('seo_content')} />
-                        <SectionButton icon={LayoutTemplate} label="CTA" onClick={() => addSection('cta')} />
-                        <SectionButton icon={LayoutTemplate} label="Features Bar" onClick={() => addSection('features_bar')} />
-                        <SectionButton icon={LayoutTemplate} label="Logo Loop" onClick={() => addSection('logo_loop')} />
-                        <SectionButton icon={List} label="Tabs" onClick={() => addSection('tabs')} />
-                        <SectionButton icon={LayoutTemplate} label="Material & Finish" onClick={() => addSection('material_finishing')} />
-                    </div>
+                    <SectionButton icon={Star} label="Why Choose Us" onClick={() => addSection('why_choose_us')} />
+                    <SectionButton icon={Quote} label="Quote Form" onClick={() => addSection('quote_form')} />
+                    <SectionButton icon={Quote} label="Custom Quote" onClick={() => addSection('custom_quote_form')} />
+                    <SectionButton icon={LayoutTemplate} label="Featured Blogs" onClick={() => addSection('featured_blogs')} />
+                    <SectionButton icon={Settings} label="SEO Content" onClick={() => addSection('seo_content')} />
+                    <SectionButton icon={LayoutTemplate} label="CTA" onClick={() => addSection('cta')} />
+                    <SectionButton icon={LayoutTemplate} label="Features Bar" onClick={() => addSection('features_bar')} />
+                    <SectionButton icon={LayoutTemplate} label="Logo Loop" onClick={() => addSection('logo_loop')} />
+                    <SectionButton icon={List} label="Tabs" onClick={() => addSection('tabs')} />
+                    <SectionButton icon={LayoutTemplate} label="Material & Finish" onClick={() => addSection('material_finishing')} />
                 </div>
             </div>
 
@@ -188,6 +237,7 @@ export function SectionBuilder({ sections = [], onChange }: SectionBuilderProps)
                                 section={section}
                                 index={index}
                                 onRemove={() => removeSection(section.id)}
+                                onCopy={() => handleCopySection(section)}
                                 onUpdate={(k, v) => updateSection(index, k, v)}
                                 onUpdateTitle={(t) => updateSectionTitle(index, t)}
                             />
@@ -196,16 +246,18 @@ export function SectionBuilder({ sections = [], onChange }: SectionBuilderProps)
                 </SortableContext>
             </DndContext>
 
-            {sections.length === 0 && (
-                <div className="text-center py-16 border-2 border-dashed rounded-xl bg-gray-50/50">
-                    <div className="max-w-md mx-auto">
-                        <LayoutTemplate className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900">No sections added</h3>
-                        <p className="text-gray-500 mt-1">Select a section type from the list above to start building your page.</p>
+            {
+                sections.length === 0 && (
+                    <div className="text-center py-16 border-2 border-dashed rounded-xl bg-gray-50/50">
+                        <div className="max-w-md mx-auto">
+                            <LayoutTemplate className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900">No sections added</h3>
+                            <p className="text-gray-500 mt-1">Select a section type from the list above to start building your page.</p>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     )
 }
 
@@ -222,10 +274,11 @@ function SectionButton({ icon: Icon, label, onClick }: { icon: any, label: strin
     )
 }
 
-function SortableSectionItem({ section, index, onRemove, onUpdate, onUpdateTitle }: {
+function SortableSectionItem({ section, index, onRemove, onCopy, onUpdate, onUpdateTitle }: {
     section: Section,
     index: number,
     onRemove: () => void,
+    onCopy: () => void,
     onUpdate: (key: string, value: any) => void,
     onUpdateTitle: (title: string) => void
 }) {
@@ -265,14 +318,26 @@ function SortableSectionItem({ section, index, onRemove, onUpdate, onUpdateTitle
                         </span>
                     </div>
 
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-gray-400 hover:text-red-600 hover:bg-red-50"
-                        onClick={onRemove}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                            onClick={(e) => { e.preventDefault(); onCopy(); }}
+                            title="Copy Section"
+                        >
+                            <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-gray-400 hover:text-red-600 hover:bg-red-50"
+                            onClick={(e) => { e.preventDefault(); onRemove(); }}
+                            title="Delete Section"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent className="p-6">
                     {renderEditor(section.type, section.content, onUpdate)}
