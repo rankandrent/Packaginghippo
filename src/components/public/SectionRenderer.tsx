@@ -344,12 +344,62 @@ function ProductGridSection({ content }: { content: any }) {
 // ... existing sub components ...
 
 function TextSection({ content }: { content: any }) {
+    const [isExpanded, setIsExpanded] = useState(false)
+    const contentRef = React.useRef<HTMLDivElement>(null)
+    const [needsReadMore, setNeedsReadMore] = useState(false)
+
+    // ~1200px is roughly 500 words in prose-lg
+    const COLLAPSED_HEIGHT = 1200
+
+    useEffect(() => {
+        if (contentRef.current) {
+            // Check if actual content height exceeds our collapsed height
+            if (contentRef.current.scrollHeight > COLLAPSED_HEIGHT) {
+                setNeedsReadMore(true)
+            }
+        }
+    }, [content])
+
     if (!content.html) return null
+
     return (
         <section className="py-16 bg-white">
-            <div className="container mx-auto px-4 max-w-5xl prose prose-lg text-gray-700 leading-relaxed">
+            <div className="container mx-auto px-4 max-w-5xl">
                 {content.heading && <h2 className="text-3xl font-bold text-gray-900 mb-6">{content.heading}</h2>}
-                <div className="rich-text" dangerouslySetInnerHTML={{ __html: content.html }} />
+
+                <div className="relative">
+                    <div
+                        className={`overflow-hidden transition-all duration-700 ease-in-out ${isExpanded ? '' : 'relative'}`}
+                        style={{ maxHeight: !needsReadMore || isExpanded ? 'none' : `${COLLAPSED_HEIGHT}px` }}
+                    >
+                        <div
+                            ref={contentRef}
+                            className="prose prose-lg max-w-none text-gray-700 leading-relaxed rich-text"
+                            dangerouslySetInnerHTML={{ __html: content.html }}
+                        />
+
+                        {/* Gradient Fade Overlay when collapsed */}
+                        {needsReadMore && !isExpanded && (
+                            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                        )}
+                    </div>
+
+                    {needsReadMore && (
+                        <div className="mt-8 text-center relative z-10">
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsExpanded(!isExpanded)}
+                                className="bg-white hover:bg-gray-50 text-gray-900 border-gray-200 shadow-sm transition-all px-8 rounded-full"
+                            >
+                                {isExpanded ? (
+                                    <>Read Less <ChevronDown className="ml-2 w-4 h-4 rotate-180" /></>
+                                ) : (
+                                    <>Read More <ChevronDown className="ml-2 w-4 h-4" /></>
+                                )}
+                            </Button>
+                        </div>
+                    )}
+                </div>
             </div>
         </section>
     )
