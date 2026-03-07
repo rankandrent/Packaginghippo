@@ -262,6 +262,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
     const otherSections = dynamicSections.filter((s: any) =>
         s.type !== 'faq' &&
         s.type !== 'cta' &&
+        s.type !== 'popular_products' &&
         !(hasQuoteInLayout && (s.type === 'quote_form' || s.type === 'custom_quote_form'))
     )
 
