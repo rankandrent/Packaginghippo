@@ -42,7 +42,32 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, description, templateId, layout } = body
+        const { name, slug, description, templateId, layout, cloneFromId } = body
+
+        if (cloneFromId) {
+            const sourceCat = await prisma.productCategory.findUnique({
+                where: { id: cloneFromId }
+            })
+            if (!sourceCat) {
+                return NextResponse.json({ error: 'Source category not found' }, { status: 404 })
+            }
+            const category = await prisma.productCategory.create({
+                data: {
+                    name,
+                    slug,
+                    description: sourceCat.description,
+                    imageUrl: sourceCat.imageUrl,
+                    seoTitle: sourceCat.seoTitle,
+                    seoDesc: sourceCat.seoDesc,
+                    seoKeywords: sourceCat.seoKeywords,
+                    descriptionCollapsedHeight: sourceCat.descriptionCollapsedHeight,
+                    isActive: false, // Default to draft
+                    sections: sourceCat.sections ?? [],
+                    layout: sourceCat.layout,
+                },
+            })
+            return NextResponse.json({ category })
+        }
 
         let initialSections: any[] = []
 

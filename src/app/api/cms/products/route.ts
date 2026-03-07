@@ -44,7 +44,41 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, categoryId, templateId } = body
+        const { name, slug, categoryId, templateId, cloneFromId } = body
+
+        if (cloneFromId) {
+            const sourceProduct = await prisma.product.findUnique({
+                where: { id: cloneFromId }
+            })
+            if (!sourceProduct) {
+                return NextResponse.json({ error: 'Source product not found' }, { status: 404 })
+            }
+            const product = await prisma.product.create({
+                data: {
+                    name,
+                    slug,
+                    categoryId: sourceProduct.categoryId,
+                    sections: sourceProduct.sections ?? [],
+                    tabs: sourceProduct.tabs ?? [], // Copy tabs
+                    images: sourceProduct.images ?? [], // Copy images
+                    description: sourceProduct.description,
+                    shortDesc: sourceProduct.shortDesc,
+                    minOrder: sourceProduct.minOrder,
+                    price: sourceProduct.price,
+                    dimensions: sourceProduct.dimensions,
+                    materials: sourceProduct.materials,
+                    finishings: sourceProduct.finishings,
+                    seoTitle: sourceProduct.seoTitle,
+                    seoDesc: sourceProduct.seoDesc,
+                    seoKeywords: sourceProduct.seoKeywords,
+                    descriptionCollapsedHeight: sourceProduct.descriptionCollapsedHeight,
+                    isActive: false, // Default to draft when cloned
+                    isTopProduct: false,
+                    relatedProductIds: sourceProduct.relatedProductIds ?? [],
+                },
+            })
+            return NextResponse.json({ product })
+        }
 
         if (!categoryId) {
             return NextResponse.json({ error: 'Category is required' }, { status: 400 })

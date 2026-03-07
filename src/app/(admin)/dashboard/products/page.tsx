@@ -14,7 +14,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Plus, Pencil, Trash2, Loader2, Eye } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, Eye, Copy } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -141,6 +141,31 @@ export default function ProductsPage() {
         }
     }
 
+    async function cloneProduct(product: Product) {
+        const newName = prompt(`Enter new name for the cloned product:`, `Copy of ${product.name}`)
+        if (!newName) return
+
+        const slug = newName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
+
+        try {
+            const res = await fetch('/api/cms/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: newName, slug, cloneFromId: product.id }),
+            })
+
+            if (!res.ok) {
+                const errorData = await res.json()
+                throw new Error(errorData.details || errorData.error || 'Failed to clone')
+            }
+            const data = await res.json()
+            router.push(`/dashboard/products/${data.product.id}`)
+        } catch (error: any) {
+            console.error("Error cloning product:", error)
+            alert(error.message || "Error cloning product")
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex justify-center py-8">
@@ -263,6 +288,14 @@ export default function ProductsPage() {
                                             title="View Product"
                                         >
                                             <Eye className="h-4 w-4 text-blue-500" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => cloneProduct(product)}
+                                            title="Clone Product"
+                                        >
+                                            <Copy className="h-4 w-4 text-green-600" />
                                         </Button>
                                         <Button
                                             variant="ghost"

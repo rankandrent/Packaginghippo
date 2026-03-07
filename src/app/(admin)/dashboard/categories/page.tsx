@@ -17,7 +17,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog"
-import { Plus, Pencil, Trash2, Loader2, Search, Filter, Eye } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, Search, Filter, Eye, Copy } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -109,6 +109,30 @@ export default function CategoriesPage() {
         } catch (error) {
             console.error("Error deleting category:", error)
             alert("Error deleting category")
+        }
+    }
+
+    async function cloneCategory(category: Category) {
+        const newName = prompt(`Enter new name for the cloned category:`, `Copy of ${category.name}`)
+        if (!newName) return
+
+        const slug = newName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
+
+        try {
+            const res = await fetch('/api/cms/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: newName, slug, cloneFromId: category.id }),
+            })
+
+            if (!res.ok) {
+                throw new Error('Failed to clone')
+            }
+            const data = await res.json()
+            router.push(`/dashboard/categories/${data.category.id}`)
+        } catch (error) {
+            console.error("Error cloning category:", error)
+            alert("Error cloning category")
         }
     }
 
@@ -236,6 +260,14 @@ export default function CategoriesPage() {
                                                     title="View Category"
                                                 >
                                                     <Eye className="h-4 w-4 text-blue-500" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => cloneCategory(cat)}
+                                                    title="Clone Category"
+                                                >
+                                                    <Copy className="h-4 w-4 text-green-600" />
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
