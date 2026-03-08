@@ -93,6 +93,7 @@ model ProductCategory {
   layout      Json?    // Custom order: ['content', 'related_categories', 'quote_form', 'testimonials']
   order       Int       @default(0)
   isActive    Boolean   @default(false)
+  relatedCategoryIds String[]  @db.ObjectId // Manually curated related categories
   products    Product[]
   testimonials Testimonial[]
   createdAt   DateTime  @default(now())

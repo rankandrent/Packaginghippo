@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
                     isActive: false, // Default to draft
                     sections: sourceCat.sections ?? [],
                     layout: sourceCat.layout,
+                    relatedCategoryIds: sourceCat.relatedCategoryIds ?? [],
                 },
             })
             return NextResponse.json({ category })
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json()
-        const { id, name, slug, description, imageUrl, seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, order, isActive, sections, layout } = body
+        const { id, name, slug, description, imageUrl, seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, order, isActive, sections, layout, relatedCategoryIds } = body
 
         const updated = await prisma.productCategory.update({
             where: { id },
@@ -119,6 +120,7 @@ export async function PUT(request: NextRequest) {
                 isActive,
                 sections,
                 layout,
+                relatedCategoryIds,
                 updatedAt: new Date(),
             },
         })

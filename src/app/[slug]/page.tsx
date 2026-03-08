@@ -164,7 +164,7 @@ async function getLayoutSettings() {
 // ==========================================
 async function CategoryView({ category, slug }: { category: any, slug: string }) {
     const testimonials = await getTestimonials(category.id)
-    const relatedCategories = await getRelatedCategories(slug)
+    const relatedCategories = await getRelatedCategories(slug, category.relatedCategoryIds || [])
     const popularProducts = await getPopularProducts(category.id)
     const quoteFormImage = await getQuoteFormImage()
     const featuredBlogs = await getFeaturedBlogs()

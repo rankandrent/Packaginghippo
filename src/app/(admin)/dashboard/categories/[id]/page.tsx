@@ -31,6 +31,7 @@ type Category = {
     isActive: boolean
     sections: any
     layout: string[] | null
+    relatedCategoryIds: string[] | null
 }
 
 export default function CategoryEditor({ params }: { params: Promise<{ id: string }> }) {
@@ -41,6 +42,7 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
     const [sections, setSections] = useState<Section[]>([])
     const [layout, setLayout] = useState<string[]>(['testimonials', 'quote_form', 'content', 'faqs', 'related_categories'])
     const router = useRouter()
+    const [categories, setCategories] = useState<{ id: string, name: string }[]>([])
 
     const [scrapeUrl, setScrapeUrl] = useState("")
     const [scraping, setScraping] = useState(false)
@@ -91,6 +93,12 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
             if (data.error) throw new Error(data.error)
 
             setCategory(data.category)
+
+            // Also fetch all categories for the dropdown
+            const allRes = await fetch('/api/cms/categories')
+            const allData = await allRes.json()
+            setCategories(allData.categories || [])
+
             if (data.category.sections && Array.isArray(data.category.sections) && data.category.sections.length > 0) {
                 setSections(data.category.sections)
             } else {
@@ -148,7 +156,8 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                 body: JSON.stringify({
                     ...category,
                     sections: sections,
-                    layout: layout
+                    layout: layout,
+                    relatedCategoryIds: category.relatedCategoryIds,
                 }),
             })
 
@@ -326,6 +335,37 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                                 checked={category.isActive}
                                 onCheckedChange={(checked) => setCategory({ ...category, isActive: checked })}
                             />
+                        </div>
+
+                        <div className="rounded-lg border bg-card p-6 space-y-4 shadow-sm">
+                            <h3 className="font-semibold text-lg">Curated Related Categories</h3>
+                            <p className="text-sm text-muted-foreground">Select specific categories to show instead of the latest ones.</p>
+                            <div className="flex flex-col gap-2 max-h-48 overflow-y-auto border p-2 rounded-md">
+                                {categories.map(c => {
+                                    if (c.id === category.id) return null // Don't show self
+                                    const isSelected = category.relatedCategoryIds?.includes(c.id)
+                                    return (
+                                        <div key={c.id} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded">
+                                            <input
+                                                type="checkbox"
+                                                id={`cat-${c.id}`}
+                                                checked={isSelected || false}
+                                                onChange={(e) => {
+                                                    const current = category.relatedCategoryIds || []
+                                                    const updated = e.target.checked
+                                                        ? [...current, c.id]
+                                                        : current.filter(id => id !== c.id)
+                                                    setCategory({ ...category, relatedCategoryIds: updated })
+                                                }}
+                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                                            />
+                                            <label htmlFor={`cat-${c.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1">
+                                                {c.name}
+                                            </label>
+                                        </div>
+                                    )
+                                })}
+                            </div>
                         </div>
                     </div>
 

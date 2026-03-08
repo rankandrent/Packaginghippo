@@ -80,24 +80,49 @@ export async function getTestimonials(categoryId?: string, productId?: string) {
     }
 }
 
-export async function getRelatedCategories(currentSlug: string) {
-    const categories = await prisma.productCategory.findMany({
-        where: {
-            isActive: true,
-            slug: { not: currentSlug }
-        },
-        take: 4,
-        orderBy: {
-            createdAt: 'desc'
-        },
-        select: {
-            id: true,
-            name: true,
-            slug: true,
-            imageUrl: true,
-            description: true
-        }
-    });
+export async function getRelatedCategories(currentSlug: string, curatedIds: string[] = []) {
+    let categories: any[] = [];
+
+    if (curatedIds && curatedIds.length > 0) {
+        // Fetch manually curated categories
+        categories = await prisma.productCategory.findMany({
+            where: {
+                id: { in: curatedIds },
+                isActive: true
+            },
+            take: 4,
+            select: {
+                id: true,
+                name: true,
+                slug: true,
+                imageUrl: true,
+                description: true
+            }
+        });
+    }
+
+    // If no curated categories found (or less than we want?), we could fallback. 
+    // Usually, 1-4 curated is enough. If absolutely 0, fallback to latest.
+    if (categories.length === 0) {
+        categories = await prisma.productCategory.findMany({
+            where: {
+                isActive: true,
+                slug: { not: currentSlug }
+            },
+            take: 4,
+            orderBy: {
+                createdAt: 'desc'
+            },
+            select: {
+                id: true,
+                name: true,
+                slug: true,
+                imageUrl: true,
+                description: true
+            }
+        });
+    }
+
     return categories;
 }
 
