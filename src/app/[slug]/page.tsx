@@ -140,22 +140,27 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
 // Helper to fetch layout settings
 async function getLayoutSettings() {
+    const defaultLayout = {
+        product: ['product_tabs', 'material_finishing', 'testimonials', 'content', 'faqs', 'related_products'],
+        category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_categories']
+    }
+
     try {
         const settings = await prisma.siteSettings.findMany({
             where: {
                 key: { in: ['layout_product', 'layout_category'] }
             }
         })
-        // Default layout matching requested best structure
+
+        const storedProductLayout = settings.find(s => s.key === 'layout_product')?.value
+        const storedCategoryLayout = settings.find(s => s.key === 'layout_category')?.value
+
         return {
-            product: ['product_tabs', 'material_finishing', 'testimonials', 'content', 'faqs', 'related_products'],
-            category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_products']
+            product: Array.isArray(storedProductLayout) ? storedProductLayout : defaultLayout.product,
+            category: Array.isArray(storedCategoryLayout) ? storedCategoryLayout : defaultLayout.category
         }
     } catch (error) {
-        return {
-            product: ['product_tabs', 'material_finishing', 'testimonials', 'content', 'faqs', 'related_products'],
-            category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_products']
-        }
+        return defaultLayout
     }
 }
 
