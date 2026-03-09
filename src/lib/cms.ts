@@ -40,37 +40,61 @@ export async function getPage(slug: string) {
 
 export async function getTestimonials(categoryId?: string, productId?: string) {
     try {
-        const orConditions: any[] = [
-            { productId: null, categoryId: null },
-            { productId: { isSet: false }, categoryId: { isSet: false } },
-            // Some records might have one set to null and the other missing
-            { productId: null, categoryId: { isSet: false } },
-            { productId: { isSet: false }, categoryId: null }
-        ]
+        let specificTestimonials: any[] = []
 
-        if (productId) orConditions.push({ productId })
-        if (categoryId) orConditions.push({ categoryId })
+        // 1. Fetch specific testimonials first
+        if (productId || categoryId) {
+            const specificConditions: any[] = []
+            if (productId) specificConditions.push({ productId })
+            if (categoryId) specificConditions.push({ categoryId })
 
-        const testimonials = await prisma.testimonial.findMany({
-            where: {
-                isActive: true,
-                OR: orConditions
-            },
-            take: 6
-        })
+            specificTestimonials = await prisma.testimonial.findMany({
+                where: {
+                    isActive: true,
+                    OR: specificConditions
+                },
+                take: 6
+            })
+        }
 
-        return testimonials.sort((a: any, b: any) => {
-            // Prioritize specific matches
-            if (productId) {
-                if (a.productId === productId && b.productId !== productId) return -1
-                if (a.productId !== productId && b.productId === productId) return 1
-            }
-            if (categoryId) {
-                if (a.categoryId === categoryId && b.categoryId !== categoryId) return -1
-                if (a.categoryId !== categoryId && b.categoryId === categoryId) return 1
-            }
-            return 0
-        }).map((t: any) => ({
+        let needed = 6 - specificTestimonials.length
+        let generalTestimonials: any[] = []
+
+        // 2. If we need more, fetch "general" testimonials (no product/category assigned)
+        if (needed > 0) {
+            generalTestimonials = await prisma.testimonial.findMany({
+                where: {
+                    isActive: true,
+                    id: { notIn: specificTestimonials.map(t => t.id) },
+                    OR: [
+                        { productId: null, categoryId: null },
+                        { productId: { isSet: false }, categoryId: { isSet: false } },
+                        { productId: null, categoryId: { isSet: false } },
+                        { productId: { isSet: false }, categoryId: null }
+                    ]
+                },
+                take: needed
+            })
+        }
+
+        needed = 6 - (specificTestimonials.length + generalTestimonials.length)
+        let anyTestimonials: any[] = []
+
+        // 3. If STILL need more, fetch ANY active testimonials as ultimate fallback
+        if (needed > 0) {
+            const excludeIds = [...specificTestimonials, ...generalTestimonials].map(t => t.id)
+            anyTestimonials = await prisma.testimonial.findMany({
+                where: {
+                    isActive: true,
+                    id: { notIn: excludeIds }
+                },
+                take: needed
+            })
+        }
+
+        const allTestimonials = [...specificTestimonials, ...generalTestimonials, ...anyTestimonials]
+
+        return allTestimonials.map((t: any) => ({
             ...t,
             rating: t.rating
         }))
