@@ -417,20 +417,9 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
     const testimonials = await getTestimonials(product.id)
     const homepageSections = await getHomepageSections()
     const layoutSettings = await getLayoutSettings()
-    let layoutOrder = product.layout && Array.isArray(product.layout) && product.layout.length > 0
-        ? [...product.layout]
-        : [...layoutSettings.product]
-
-    // Enforce "content" (Product Overview) is after "faqs" globally for all products
-    if (layoutOrder.includes('content') && layoutOrder.includes('faqs')) {
-        const cIdx = layoutOrder.indexOf('content')
-        const fIdx = layoutOrder.indexOf('faqs')
-        if (cIdx < fIdx) {
-            layoutOrder = layoutOrder.filter((item: string) => item !== 'content')
-            const newFaqsIdx = layoutOrder.indexOf('faqs')
-            layoutOrder.splice(newFaqsIdx + 1, 0, 'content')
-        }
-    }
+    const layoutOrder = product.layout && Array.isArray(product.layout) && product.layout.length > 0
+        ? product.layout
+        : layoutSettings.product
 
     // Check if the product has manually curated related products
     let popularProducts: any[] = []

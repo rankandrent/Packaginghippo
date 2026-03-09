@@ -364,7 +364,7 @@ function TextSection({ content }: { content: any }) {
 
     return (
         <section className="py-16 bg-white">
-            <div className="container mx-auto px-4 max-w-5xl">
+            <div className="container mx-auto px-4">
                 {content.heading && <h2 className="text-3xl font-bold text-gray-900 mb-6">{content.heading}</h2>}
 
                 <div className="relative">
@@ -411,7 +411,7 @@ function SeoContentSection({ content }: { content: any }) {
 
     return (
         <section className="py-16 bg-white border-t border-gray-100">
-            <div className="container mx-auto px-4 max-w-5xl">
+            <div className="container mx-auto px-4">
                 {content.heading && (
                     <h2 className="text-3xl font-bold mb-8 text-gray-900">{content.heading}</h2>
                 )}
