@@ -140,27 +140,22 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
 // Helper to fetch layout settings
 async function getLayoutSettings() {
-    const defaultLayout = {
-        product: ['product_tabs', 'material_finishing', 'testimonials', 'content', 'faqs', 'related_products'],
-        category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_categories', 'related_products']
-    }
-
     try {
         const settings = await prisma.siteSettings.findMany({
             where: {
                 key: { in: ['layout_product', 'layout_category'] }
             }
         })
-
-        const storedProductLayout = settings.find(s => s.key === 'layout_product')?.value
-        const storedCategoryLayout = settings.find(s => s.key === 'layout_category')?.value
-
+        // Default layout matching requested best structure
         return {
-            product: Array.isArray(storedProductLayout) ? storedProductLayout : defaultLayout.product,
-            category: Array.isArray(storedCategoryLayout) ? storedCategoryLayout : defaultLayout.category
+            product: ['product_tabs', 'material_finishing', 'testimonials', 'faqs', 'content', 'related_products'],
+            category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_products']
         }
     } catch (error) {
-        return defaultLayout
+        return {
+            product: ['product_tabs', 'material_finishing', 'testimonials', 'faqs', 'content', 'related_products'],
+            category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_products']
+        }
     }
 }
 
@@ -422,9 +417,20 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
     const testimonials = await getTestimonials(product.id)
     const homepageSections = await getHomepageSections()
     const layoutSettings = await getLayoutSettings()
-    const layoutOrder = product.layout && Array.isArray(product.layout) && product.layout.length > 0
-        ? product.layout
-        : layoutSettings.product
+    let layoutOrder = product.layout && Array.isArray(product.layout) && product.layout.length > 0
+        ? [...product.layout]
+        : [...layoutSettings.product]
+
+    // Enforce "content" (Product Overview) is after "faqs" globally for all products
+    if (layoutOrder.includes('content') && layoutOrder.includes('faqs')) {
+        const cIdx = layoutOrder.indexOf('content')
+        const fIdx = layoutOrder.indexOf('faqs')
+        if (cIdx < fIdx) {
+            layoutOrder = layoutOrder.filter((item: string) => item !== 'content')
+            const newFaqsIdx = layoutOrder.indexOf('faqs')
+            layoutOrder.splice(newFaqsIdx + 1, 0, 'content')
+        }
+    }
 
     // Check if the product has manually curated related products
     let popularProducts: any[] = []

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { toast } from "sonner"
 import { Truck } from "lucide-react"
@@ -28,20 +28,11 @@ export function CustomQuoteFormSection({ image }: CustomQuoteFormSectionProps) {
         captcha: ""
     })
 
-    const [captchaQuestion, setCaptchaQuestion] = useState({
-        num1: 5,
-        num2: 5,
-        answer: 10
-    })
-    const [isMounted, setIsMounted] = useState(false)
-
-    // Run only on client to avoid hydration mismatch
-    useEffect(() => {
-        setIsMounted(true)
+    const [captchaQuestion] = useState(() => {
         const num1 = Math.floor(Math.random() * 10) + 1
         const num2 = Math.floor(Math.random() * 10) + 1
-        setCaptchaQuestion({ num1, num2, answer: num1 + num2 })
-    }, [])
+        return { num1, num2, answer: num1 + num2 }
+    })
 
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
