@@ -142,7 +142,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 async function getLayoutSettings() {
     const defaultLayout = {
         product: ['product_tabs', 'material_finishing', 'testimonials', 'content', 'faqs', 'related_products'],
-        category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_categories']
+        category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_categories', 'related_products']
     }
 
     try {
