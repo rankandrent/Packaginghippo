@@ -48,7 +48,7 @@ export function DynamicTOC({ selector = ".prose" }: { selector?: string }) {
 
     return (
         <div className="sticky top-32 space-y-4">
-            <h3 className="font-bold text-blue-900 uppercase tracking-wider text-xs border-b pb-2">Table of Contents</h3>
+            <h3 className="font-bold text-blue-900 tracking-wider text-xs border-b pb-2">Table of Contents</h3>
             <nav className="max-h-[60vh] overflow-y-auto pr-4 scrollbar-hide">
                 <ul className="space-y-3">
                     {headings.map((item) => (

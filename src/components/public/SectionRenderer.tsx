@@ -602,7 +602,7 @@ function CustomerReviewsSection({ content }: { content: any }) {
                                         )}
                                         <div>
                                             <h4 className="font-bold text-gray-900">{review.name}</h4>
-                                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">{review.role}</p>
+                                            <p className="text-xs text-gray-400 font-medium tracking-wider">{review.role}</p>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -635,7 +635,7 @@ function FeaturesBarSection({ content }: { content: any }) {
             <div className="container mx-auto px-4">
                 {content.heading && (
                     <div className="text-center mb-10">
-                        <h2 className="text-xl font-bold text-white uppercase tracking-widest opacity-60 italic">{content.heading}</h2>
+                        <h2 className="text-xl font-bold text-white tracking-widest opacity-60 italic">{content.heading}</h2>
                     </div>
                 )}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
@@ -646,8 +646,8 @@ function FeaturesBarSection({ content }: { content: any }) {
                                 <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-yellow-500 transition-all duration-300 group-hover:rotate-12">
                                     <Icon className="w-6 h-6 text-yellow-500 group-hover:text-black transition-colors" />
                                 </div>
-                                <h3 className="text-white font-black text-sm uppercase tracking-tight">{feature.title}</h3>
-                                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-1">{feature.subtitle}</p>
+                                <h3 className="text-white font-black text-sm tracking-tight">{feature.title}</h3>
+                                <p className="text-gray-500 text-[10px] font-bold tracking-widest mt-1">{feature.subtitle}</p>
                             </div>
                         )
                     })}
