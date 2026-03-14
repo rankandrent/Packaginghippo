@@ -40,7 +40,8 @@ export async function middleware(request: NextRequest) {
 
     // --- Dynamic Redirect Logic (SEO) ---
     // Only check for redirects on page requests (not static, api, or internal)
-    const isStaticPath = pathname.includes('.') || pathname.startsWith('/_next') || pathname.startsWith('/api')
+    // EXCEPTION: Allow .html files to be checked for legacy blog redirects
+    const isStaticPath = (pathname.includes('.') && !pathname.endsWith('.html')) || pathname.startsWith('/_next') || pathname.startsWith('/api')
 
     if (!isStaticPath) {
         try {
