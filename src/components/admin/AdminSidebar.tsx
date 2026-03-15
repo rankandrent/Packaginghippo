@@ -21,7 +21,8 @@ import {
     Star,
     Image,
     Link as LinkIcon,
-    LayoutTemplate
+    LayoutTemplate,
+    ShoppingBag
 } from "lucide-react"
 
 const sidebarItems = [
@@ -29,6 +30,11 @@ const sidebarItems = [
         title: "Dashboard",
         href: "/dashboard",
         icon: LayoutDashboard,
+    },
+    {
+        title: "Orders",
+        href: "/dashboard/orders",
+        icon: ShoppingBag,
     },
     {
         title: "Pages",

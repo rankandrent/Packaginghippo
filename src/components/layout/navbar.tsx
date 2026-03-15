@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRouter, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { useCart } from "@/context/CartContext"
+import { CartDrawer } from "@/components/cart/CartDrawer"
 
 type NavbarProps = {
     settings?: {
@@ -38,6 +40,8 @@ export function Navbar({ settings, menuData }: NavbarProps) {
     const [showSuggestions, setShowSuggestions] = useState(false)
 
     const [isOpen, setIsOpen] = useState(false)
+    const [isCartOpen, setIsCartOpen] = useState(false)
+    const { totalItems } = useCart()
     const siteName = settings?.siteName || "PackagingHippo"
     const phone = settings?.phone || "+1 845 379 9277"
 
@@ -257,10 +261,17 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                 <span className="text-sm font-bold text-gray-900">{phone}</span>
                             </div>
                         </a>
-                        <div className="relative">
+                        <button 
+                            onClick={() => setIsCartOpen(true)}
+                            className="relative hover:opacity-80 transition-opacity"
+                        >
                             <ShoppingCart className="w-8 h-8 text-primary" />
-                            <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
-                        </div>
+                            {totalItems > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-in zoom-in">
+                                    {totalItems}
+                                </span>
+                            )}
+                        </button>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -318,6 +329,8 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                     </div>
                 </div>
             )}
+
+            <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
         </header>
     )
 }

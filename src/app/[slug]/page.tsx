@@ -1,5 +1,5 @@
 
-import { notFound, redirect } from "next/navigation"
+import { notFound, permanentRedirect, redirect } from "next/navigation"
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
@@ -16,6 +16,7 @@ import { CustomQuoteFormSection } from "@/components/home/CustomQuoteFormSection
 import { ProductHeroQuoteForm } from "@/components/forms/ProductHeroQuoteForm"
 import { ProductTabs } from "@/components/product/ProductTabs"
 import { ProductImageGallery } from "@/components/product/ProductImageGallery"
+import { AddToCartButton } from "@/components/cart/AddToCartButton"
 import { Button } from "@/components/ui/button"
 import { cn, constructMetadataTitle } from "@/lib/utils"
 import { getSeoImageUrl } from "@/lib/image-seo"
@@ -131,7 +132,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         select: { id: true }
     })
     if (blogPost) {
-        redirect(`/blog/${slug}`)
+        permanentRedirect(`/blog/${slug}`)
     }
 
     // 5. Not Found
@@ -678,13 +679,46 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                     <h1 className="text-3xl md:text-5xl font-black text-gray-900 leading-[1.1] tracking-tight">{product.name}</h1>
                                 </div>
 
+                                {product.isEcommerce && product.ecommercePrice ? (
+                                    <div className="flex items-baseline gap-2 mb-4">
+                                        <span className="text-4xl font-black text-blue-600">${product.ecommercePrice.toFixed(2)}</span>
+                                        <span className="text-sm text-gray-500 line-through">${(product.ecommercePrice * 1.2).toFixed(2)}</span>
+                                        <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter ml-2">Save 20%</span>
+                                    </div>
+                                ) : (
+                                    <div className="bg-blue-50/50 border border-blue-100/50 p-4 rounded-xl mb-4">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-sm font-bold text-blue-900">Custom Quote Required</span>
+                                        </div>
+                                        <p className="text-xs text-blue-700/70 italic">Please fill out the form below to get exact pricing for your specific requirements.</p>
+                                    </div>
+                                )}
+
                                 <div className="prose prose-sm text-gray-600 max-w-none">
                                     <p className="line-clamp-4">{product.shortDesc}</p>
                                 </div>
 
-                                {/* Compact Form Injection */}
-                                <div className="pt-2">
-                                    <ProductHeroQuoteForm productSlug={product.slug} />
+                                {/* Compact Form Injection or Add to Cart */}
+                                <div className="pt-2 space-y-4">
+                                    {product.isEcommerce ? (
+                                        <div className="flex flex-col sm:flex-row gap-4 items-center">
+                                            <AddToCartButton 
+                                                product={{
+                                                    id: product.id,
+                                                    name: product.name,
+                                                    slug: product.slug,
+                                                    price: product.ecommercePrice || 0,
+                                                    image: product.images?.[0] || ""
+                                                }}
+                                                className="w-full h-14 text-lg font-black rounded-xl shadow-lg shadow-blue-200"
+                                            />
+                                            <Button asChild variant="outline" className="w-full h-14 text-lg font-bold rounded-xl border-gray-200">
+                                                <Link href="/quote">Bulk Quote</Link>
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <ProductHeroQuoteForm productSlug={product.slug} />
+                                    )}
                                 </div>
 
                                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 italic text-xs text-gray-500 flex items-center gap-2">
@@ -757,7 +791,7 @@ async function PageView({ page, slug }: { page: any, slug: string }) {
                         <div className="mb-4">
                             <Breadcrumbs items={breadcrumbItems} theme="light" />
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black text-blue-900 uppercase tracking-tight">
+                        <h1 className="text-4xl md:text-5xl font-black text-blue-900 tracking-tight">
                             {page.title}
                         </h1>
                     </div>

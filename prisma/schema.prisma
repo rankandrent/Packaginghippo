@@ -129,12 +129,72 @@ model Product {
   descriptionCollapsedHeight Int @default(300)
   tabs        Json?    // Tabbed content: specification, box_features, materials, printing_methods, inks, finishing, addons
 
+  // E-commerce fields
+  isEcommerce    Boolean   @default(false)
+  ecommercePrice Float?
+  stockStatus    String    @default("IN_STOCK") // IN_STOCK, OUT_OF_STOCK, PRE_ORDER
+  
   isActive    Boolean   @default(false)
   isTopProduct Boolean  @default(false)
   isFeaturedInCategory Boolean @default(false)
   testimonials Testimonial[]
+  orderItems   OrderItem[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+// ============================================
+// ORDERS & E-COMMERCE TRANSACTIONS
+// ============================================
+
+model Order {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber     String      @unique // e.g., PH-12345
+  
+  // Customer Info
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  
+  // Shipping Address
+  addressLine1    String
+  addressLine2    String?
+  city            String
+  state           String
+  zipCode         String
+  country         String     @default("USA")
+  
+  // Order Totals
+  subtotal        Float
+  shippingCost    Float      @default(0)
+  taxAmount       Float      @default(0)
+  totalAmount     Float
+  
+  // Status & Tracking
+  status          String      @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  paymentStatus   String      @default("UNPAID")  // UNPAID, PAID, REFUNDED
+  paymentMethod   String?     // "STRIPE", "PAYPAL", "WIRE", etc.
+  trackingNumber  String?
+  notes           String?
+  
+  items           OrderItem[]
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model OrderItem {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId     String   @db.ObjectId
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId   String   @db.ObjectId
+  product     Product  @relation(fields: [productId], references: [id])
+  
+  quantity    Int
+  priceAtTime Float    // Lock in the price at the time of purchase
+  
+  createdAt   DateTime @default(now())
 }
 
 // ============================================

@@ -57,7 +57,7 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                             </Link>
 
                             <div className="p-6 flex flex-col flex-grow">
-                                <h3 className="text-lg font-black text-gray-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">
+                                <h3 className="text-lg font-black text-gray-900 group-hover:text-blue-600 transition-colors tracking-tight">
                                     <Link href={`/${product.slug}`}>
                                         {product.name}
                                     </Link>

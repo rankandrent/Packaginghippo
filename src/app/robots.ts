@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next'
 import prisma from '@/lib/db'
 
-export const dynamic = 'force-dynamic'
+// Revalidate every hour
+export const revalidate = 3600
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
     try {

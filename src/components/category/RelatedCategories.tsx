@@ -24,7 +24,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
         <section className="py-16 bg-white border-t border-gray-100">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-10">
-                    <h2 className="text-3xl font-black text-blue-900 uppercase">
+                    <h2 className="text-3xl font-black text-blue-900">
                         Related Categories
                     </h2>
                     <Link
@@ -58,7 +58,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
 
                                 <div className="absolute bottom-4 left-4 right-4">
-                                    <h3 className="text-white text-lg font-bold truncate shadow-sm uppercase">
+                                    <h3 className="text-white text-lg font-bold truncate shadow-sm">
                                         {category.name}
                                     </h3>
                                 </div>

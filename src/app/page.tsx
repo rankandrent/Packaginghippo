@@ -3,7 +3,7 @@ import { constructMetadataTitle } from "@/lib/utils"
 import HomePageClient from "@/components/home/HomePageClient"
 
 // Revalidate data every 60 seconds (ISR)
-export const revalidate = 0
+export const revalidate = 60
 
 async function getHomepageData() {
   try {

@@ -9,8 +9,8 @@ export function ProductImageGallery({ images, name }: { images: string[], name: 
 
     if (!images || images.length === 0) {
         return (
-            <div className="relative aspect-[1/1] rounded-2xl overflow-hidden bg-gray-50 border shadow-sm">
-                <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
+            <div className="relative aspect-[6/5] rounded-2xl overflow-hidden bg-gray-50 border shadow-sm">
+                <div className="flex items-center justify-center h-full text-gray-400 font-bold uppercase tracking-widest text-xs">No Image Available</div>
             </div>
         )
     }
@@ -18,29 +18,32 @@ export function ProductImageGallery({ images, name }: { images: string[], name: 
     return (
         <>
             {/* Main Image */}
-            <div className="relative aspect-[1/1] rounded-2xl overflow-hidden bg-gray-50 border shadow-sm">
+            <div className="relative aspect-[6/5] rounded-2xl overflow-hidden bg-white border shadow-sm group">
                 <Image
                     src={images[selected]}
                     alt={`${name} - Image ${selected + 1}`}
                     fill
-                    className="object-cover transition-opacity duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1210px) 50vw, 600px"
+                    className="object-contain transition-opacity duration-300"
                     priority={selected === 0}
                 />
             </div>
 
             {/* Thumbnails */}
             {images.length > 1 && (
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-5 gap-3">
                     {images.slice(0, 5).map((img, i) => (
                         <div
                             key={i}
                             onClick={() => setSelected(i)}
                             className={cn(
-                                "relative aspect-square rounded-lg overflow-hidden border cursor-pointer hover:border-yellow-500 transition-all",
-                                i === selected ? "border-yellow-500 ring-2 ring-yellow-500/20" : "border-gray-100"
+                                "relative aspect-[6/5] rounded-xl overflow-hidden border-2 cursor-pointer transition-all duration-300",
+                                i === selected 
+                                    ? "border-blue-600 ring-4 ring-blue-600/10 scale-95" 
+                                    : "border-gray-100 hover:border-blue-200 grayscale-[0.5] hover:grayscale-0"
                             )}
                         >
-                            <Image src={img} alt={`${name} thumbnail ${i + 1}`} fill className="object-cover" />
+                            <Image src={img} alt={`${name} thumbnail ${i + 1}`} fill sizes="120px" className="object-cover" />
                         </div>
                     ))}
                 </div>

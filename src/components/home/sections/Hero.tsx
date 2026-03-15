@@ -49,9 +49,9 @@ export function Hero({ data }: { data: any }) {
                     </motion.div>
 
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
+                        transition={{ duration: 0.3 }}
                         className="relative flex justify-center md:justify-end"
                     >
                         <div className="relative z-10 w-full max-w-md aspect-square bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-3xl shadow-2xl shadow-yellow-500/20 transform rotate-[-5deg] flex items-center justify-center border-t border-white/20">
@@ -62,9 +62,10 @@ export function Hero({ data }: { data: any }) {
                                         alt={seoValues.altText}
                                         title={seoValues.altText}
                                         fill
-                                        sizes="(max-width: 768px) 100vw, 500px"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                                         className="object-cover"
                                         priority={true}
+                                        quality={90}
                                     />
                                 </div>
                             ) : (

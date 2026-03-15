@@ -7,9 +7,11 @@ import { Footer } from "@/components/layout/footer";
 import prisma from "@/lib/db";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { CartProvider } from "@/context/CartContext";
 import Script from "next/script";
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate layout-level data every hour
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -138,9 +140,11 @@ export default async function RootLayout({
             "priceRange": "$$"
           }}
         />
-        <Navbar settings={generalSettings} menuData={menuSettings} />
-        <main>{children}</main>
-        <Footer />
+        <CartProvider>
+          <Navbar settings={generalSettings} menuData={menuSettings} />
+          <main>{children}</main>
+          <Footer />
+        </CartProvider>
         <WhatsAppButton />
         {/* Tawk.to Live Chat Integration */}
         <Script

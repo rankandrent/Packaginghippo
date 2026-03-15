@@ -45,11 +45,12 @@ export function LogoLoop({ data }: { data: any }) {
                                         src={getSeoImageUrl(logo)}
                                         alt="Client Logo"
                                         fill
+                                        sizes="200px"
                                         className="object-contain"
                                     />
                                 </div>
                             ) : (
-                                <span className="text-xl md:text-2xl font-black text-gray-300 hover:text-blue-900 transition-all duration-500 uppercase tracking-tighter opacity-50 hover:opacity-100 italic">
+                                <span className="text-xl md:text-2xl font-black text-gray-300 hover:text-blue-900 transition-all duration-500 tracking-tighter opacity-50 hover:opacity-100 italic">
                                     {typeof logo === 'string' ? logo : logo.name}
                                 </span>
                             )}

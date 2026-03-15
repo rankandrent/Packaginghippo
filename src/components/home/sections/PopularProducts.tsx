@@ -71,6 +71,7 @@ export function PopularProducts({ data }: { data: any }) {
                                                     src={getSeoImageUrl(item.imageUrl)}
                                                     alt={item.name}
                                                     fill
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1210px) 33vw, 400px"
                                                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                                                 />
                                             </div>
@@ -79,7 +80,7 @@ export function PopularProducts({ data }: { data: any }) {
                                                 <PackageIcon className="w-7 h-7 text-yellow-600 group-hover:text-black transition-colors" />
                                             </div>
                                         )}
-                                        <h3 className="font-black text-xl text-gray-900 group-hover:text-yellow-600 transition-colors uppercase tracking-tight">{item.name}</h3>
+                                        <h3 className="font-black text-xl text-gray-900 group-hover:text-yellow-600 transition-colors tracking-tight">{item.name}</h3>
                                     </CardContent>
                                 </Card>
                             </Link>
