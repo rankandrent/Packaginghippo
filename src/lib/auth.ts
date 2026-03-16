@@ -3,8 +3,13 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 
+const JWT_SECRET_STR = process.env.JWT_SECRET;
+if (!JWT_SECRET_STR && process.env.NODE_ENV === 'production') {
+    console.error('CRITICAL: JWT_SECRET is not defined in production! Using fallback key.');
+}
+
 const JWT_SECRET = new TextEncoder().encode(
-    process.env.JWT_SECRET || 'your-secret-key-change-this-in-production'
+    JWT_SECRET_STR || 'your-secret-key-change-this-in-production'
 );
 
 const TOKEN_NAME = 'admin-token';
@@ -14,6 +19,13 @@ export interface JWTPayload {
     email: string;
     name?: string;
     [key: string]: any;
+}
+
+// Session verification for API routes
+export async function verifySession(): Promise<JWTPayload | null> {
+    const token = await getAuthToken();
+    if (!token) return null;
+    return verifyToken(token);
 }
 
 // Password hashing

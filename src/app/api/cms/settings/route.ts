@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
+import { verifySession } from '@/lib/auth'
+import { z } from 'zod'
+
+const settingSchema = z.object({
+    key: z.string().min(1),
+    value: z.any(),
+})
 
 // GET settings by key
 export async function GET(request: NextRequest) {
     try {
+        const session = await verifySession()
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
         const { searchParams } = new URL(request.url)
         const key = searchParams.get('key')
 
@@ -25,8 +37,20 @@ export async function GET(request: NextRequest) {
 // PUT update or create settings
 export async function PUT(request: NextRequest) {
     try {
+        const session = await verifySession()
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
         const body = await request.json()
-        const { key, value } = body
+        
+        // Validate input
+        const validation = settingSchema.safeParse(body)
+        if (!validation.success) {
+            return NextResponse.json({ error: 'Invalid input', details: validation.error.format() }, { status: 400 })
+        }
+
+        const { key, value } = validation.data
 
         const setting = await prisma.siteSettings.upsert({
             where: { key },

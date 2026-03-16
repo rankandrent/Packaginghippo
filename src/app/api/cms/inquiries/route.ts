@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
+import { verifySession } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
     try {
+        const session = await verifySession()
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
         const { searchParams } = new URL(request.url)
         const id = searchParams.get('id')
 
@@ -40,6 +45,10 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
     try {
+        const session = await verifySession()
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
         const { searchParams } = new URL(request.url)
         const id = searchParams.get('id')
         if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 })

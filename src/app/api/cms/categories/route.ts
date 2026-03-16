@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
+import { verifySession } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
 // GET all categories or single by ID
 export async function GET(request: NextRequest) {
     try {
+        const session = await verifySession()
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
         const { searchParams } = new URL(request.url)
         const id = searchParams.get('id')
 
@@ -41,6 +46,10 @@ export async function GET(request: NextRequest) {
 // POST create a new category
 export async function POST(request: NextRequest) {
     try {
+        const session = await verifySession()
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
         const body = await request.json()
         const { name, slug, description, templateId, layout, cloneFromId } = body
 
@@ -102,6 +111,10 @@ export async function POST(request: NextRequest) {
 // PUT update a category
 export async function PUT(request: NextRequest) {
     try {
+        const session = await verifySession()
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
         const body = await request.json()
         const { id, name, slug, description, imageUrl, seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, order, isActive, sections, layout, relatedCategoryIds } = body
 
@@ -139,6 +152,10 @@ export async function PUT(request: NextRequest) {
 // DELETE a category
 export async function DELETE(request: NextRequest) {
     try {
+        const session = await verifySession()
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
         const { searchParams } = new URL(request.url)
         const id = searchParams.get('id')
 
