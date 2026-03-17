@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { CartProvider } from "@/context/CartContext";
 import Script from "next/script";
+import { Suspense } from "react";
 
 // export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Revalidate layout-level data every hour
@@ -32,11 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const seo = settings.seo || {};
 
-  // Use host from headers to ensure canonicals match the current environment (fixed staging canonical issue)
-  const headerList = await headers();
-  const host = headerList.get('host') || 'packaginghippo.com';
-  const protocol = host.includes('localhost') ? 'http' : 'https';
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://packaginghippo.com';
 
   return {
     metadataBase: new URL(baseUrl),
@@ -141,7 +138,9 @@ export default async function RootLayout({
           }}
         />
         <CartProvider>
-          <Navbar settings={generalSettings} menuData={menuSettings} />
+          <Suspense fallback={<div className="h-24 bg-white" />}>
+            <Navbar settings={generalSettings} menuData={menuSettings} />
+          </Suspense>
           <main>{children}</main>
           <Footer />
         </CartProvider>
