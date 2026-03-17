@@ -20,7 +20,7 @@ export function GallerySection({ data }: { data: any }) {
         <section className="py-16 bg-white">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-5xl font-black text-zinc-900 mb-4 uppercase">
+                    <h2 className="text-3xl md:text-5xl font-black text-zinc-900 mb-4">
                         {data.heading || "Our Gallery"}
                     </h2>
                     {data.subheading && (

@@ -17,7 +17,7 @@ export function LogoLoop({ data }: { data: any }) {
         <section className="py-6 bg-white border-y border-gray-100 overflow-hidden">
             <div className="container mx-auto px-4 mb-2 text-center">
                 {data.heading && (
-                    <h3 className="text-xs font-black text-blue-900/40 uppercase tracking-[0.2em] mb-2">
+                    <h3 className="text-xs font-black text-blue-900/40 tracking-[0.2em] mb-2">
                         {data.heading}
                     </h3>
                 )}

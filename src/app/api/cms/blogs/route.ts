@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
-import { verifySession } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
     try {
-        const session = await verifySession()
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-
         const { searchParams } = new URL(request.url)
         const id = searchParams.get('id')
         const slug = searchParams.get('slug')
@@ -52,11 +46,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
-        const session = await verifySession()
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-
         const body = await request.json()
         const post = await prisma.blogPost.create({
             data: {
@@ -83,11 +72,6 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
     try {
-        const session = await verifySession()
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-
         const body = await request.json()
         const { id, author, category, createdAt, updatedAt, ...data } = body
 
@@ -108,11 +92,6 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
     try {
-        const session = await verifySession()
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-
         const { searchParams } = new URL(request.url)
         const id = searchParams.get('id')
         if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 })

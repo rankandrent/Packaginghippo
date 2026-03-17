@@ -118,7 +118,7 @@ Message: ${formData.message}`,
                                     </svg>
                                 </div>
                                 <div className="space-y-2">
-                                    <h2 className="text-3xl font-black text-blue-900 uppercase">Thank You!</h2>
+                                    <h2 className="text-3xl font-black text-blue-900">Thank You!</h2>
                                     <p className="text-gray-600 max-w-md mx-auto">
                                         Your quote request has been received. Our team will review your requirements and get back to you shortly with a competitive price.
                                     </p>
@@ -133,12 +133,12 @@ Message: ${formData.message}`,
                         ) : (
                             <>
                                 <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-3xl font-black text-blue-900 uppercase">
+                                    <h2 className="text-3xl font-black text-blue-900">
                                         Get Custom Quote
                                     </h2>
                                     <div className="flex items-center gap-2 bg-yellow-50 px-3 py-1.5 rounded-lg border border-yellow-200">
                                         <Truck className="w-4 h-4 text-blue-900" />
-                                        <span className="text-xs font-bold text-blue-900 uppercase">Free Shipping</span>
+                                        <span className="text-xs font-bold text-blue-900">Free Shipping</span>
                                     </div>
                                 </div>
 
@@ -213,7 +213,7 @@ Message: ${formData.message}`,
 
                                     {/* Row 3: Size */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-gray-600 uppercase">Size:</label>
+                                        <label className="text-xs font-bold text-gray-600">Size:</label>
                                         <div className="grid grid-cols-4 gap-3">
                                             <input
                                                 type="number"
@@ -307,7 +307,7 @@ Message: ${formData.message}`,
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-black uppercase py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-black py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                                     >
                                         {isSubmitting ? "Submitting..." : "Submit"}
                                     </button>

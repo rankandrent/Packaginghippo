@@ -69,7 +69,7 @@ export default async function BlogListingPage({ searchParams }: { searchParams: 
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100 border-none px-4 py-1">OUR BLOG</Badge>
-                        <h1 className="text-4xl md:text-6xl font-black text-blue-900 mb-6 uppercase tracking-tight">
+                        <h1 className="text-4xl md:text-6xl font-black text-blue-900 mb-6 tracking-tight">
                             {authorData ? `Posts by ${authorData.name}` : (category ? `${category} Insights` : "Packaging Insights")}
                         </h1>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -93,7 +93,7 @@ export default async function BlogListingPage({ searchParams }: { searchParams: 
                                 key={cat.id}
                                 href={`/blog?category=${cat.slug}`}
                                 className={cn(
-                                    "px-6 py-2 rounded-full text-sm font-bold transition-all border uppercase",
+                                    "px-6 py-2 rounded-full text-sm font-bold transition-all border",
                                     category === cat.slug ? "bg-blue-900 text-white border-blue-900 shadow-lg shadow-blue-900/20" : "bg-white text-gray-500 border-gray-200 hover:border-blue-900 hover:text-blue-900"
                                 )}
                             >
@@ -120,7 +120,7 @@ export default async function BlogListingPage({ searchParams }: { searchParams: 
                                         <span className="w-1 h-1 bg-gray-300 rounded-full" />
                                         <span>{featuredPost.author?.name || 'Admin'}</span>
                                     </div>
-                                    <h2 className="text-3xl md:text-4xl font-black text-blue-900 mb-6 group-hover:text-blue-700 transition-colors uppercase leading-tight">
+                                    <h2 className="text-3xl md:text-4xl font-black text-blue-900 mb-6 group-hover:text-blue-700 transition-colors leading-tight">
                                         {featuredPost.title}
                                     </h2>
                                     <p className="text-gray-600 text-lg mb-8 line-clamp-3 leading-relaxed">
@@ -149,7 +149,7 @@ export default async function BlogListingPage({ searchParams }: { searchParams: 
                                         <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}</span>
                                         <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> {post.author?.name || 'Admin'}</span>
                                     </div>
-                                    <h2 className="text-xl font-black text-blue-900 mb-4 group-hover:text-blue-700 transition-colors line-clamp-2 uppercase leading-snug">
+                                    <h2 className="text-xl font-black text-blue-900 mb-4 group-hover:text-blue-700 transition-colors line-clamp-2 leading-snug">
                                         {post.title}
                                     </h2>
                                     <p className="text-gray-600 text-sm line-clamp-3 mb-6 flex-1 leading-relaxed">

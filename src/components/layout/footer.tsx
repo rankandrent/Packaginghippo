@@ -41,7 +41,7 @@ export async function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     {/* Brand */}
                     <div className="space-y-4">
-                        <h3 className="text-2xl font-black text-yellow-500 uppercase">{siteName}</h3>
+                        <h3 className="text-2xl font-black text-yellow-500">{siteName}</h3>
                         <p className="text-gray-400 text-sm leading-relaxed">
                             {tagline}
                         </p>

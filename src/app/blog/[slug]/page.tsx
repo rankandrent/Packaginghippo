@@ -122,7 +122,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                             <ChevronRight className="w-3 h-3" />
                             <span className="truncate">{post.title}</span>
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-black text-blue-900 uppercase mb-6 leading-tight">
+                        <h1 className="text-3xl md:text-5xl font-black text-blue-900 mb-6 leading-tight">
                             {post.title}
                         </h1>
                         <div className="flex flex-wrap items-center gap-6">
@@ -176,15 +176,6 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                             dangerouslySetInnerHTML={{ __html: post.content }}
                         />
 
-                        {/* RFQ Form */}
-                        <div className="mt-16 pt-16 border-t">
-                            <QuoteForm
-                                theme="light"
-                                title="Custom Packaging Quote"
-                                subtitle="Interested in similar packaging? Get a custom quote for your business today."
-                                pageSource={`Blog: ${post.title}`}
-                            />
-                        </div>
 
                         {/* Author Info (EEAT) */}
                         <div className="mt-16 p-8 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
@@ -193,7 +184,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                             </div>
                             <div className="space-y-3">
                                 <div>
-                                    <h4 className="text-xl font-bold text-blue-900 uppercase">Written by {post.author?.name || 'Admin'}</h4>
+                                    <h4 className="text-xl font-bold text-blue-900">Written by {post.author?.name || 'Admin'}</h4>
                                     <p className="text-sm font-semibold text-gray-500">{post.author?.role || 'Packaging Expert'}</p>
                                 </div>
                                 <p className="text-gray-600 leading-relaxed">
@@ -218,7 +209,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                 {relatedPosts.length > 0 && (
                     <div className="mt-24 pt-16 border-t max-w-6xl mx-auto">
                         <div className="flex items-center justify-between mb-12">
-                            <h2 className="text-3xl font-black text-blue-900 uppercase">Related Articles</h2>
+                            <h2 className="text-3xl font-black text-blue-900">Related Articles</h2>
                             <Link href="/blog" className="text-sm font-bold text-blue-900 hover:underline flex items-center gap-2">View All Posts <ChevronRight className="w-4 h-4" /></Link>
                         </div>
                         <div className="grid md:grid-cols-3 gap-8">
@@ -229,7 +220,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                                     </div>
                                     <div className="space-y-2">
-                                        <h4 className="font-bold text-gray-900 leading-snug group-hover:text-blue-900 transition-colors uppercase line-clamp-2">{rp.title}</h4>
+                                        <h4 className="font-bold text-gray-900 leading-snug group-hover:text-blue-900 transition-colors line-clamp-2">{rp.title}</h4>
                                         <p className="text-xs text-gray-500">{new Date(rp.publishedAt || rp.createdAt).toLocaleDateString()}</p>
                                     </div>
                                 </Link>

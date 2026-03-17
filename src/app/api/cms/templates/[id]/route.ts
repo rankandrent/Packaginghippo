@@ -1,16 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+
+import { NextResponse } from 'next/server'
 import prisma from '@/lib/db'
-import { verifySession } from '@/lib/auth'
 
 export async function GET(
-    request: NextRequest,
+    request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await verifySession()
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
         const { id } = await params
         const template = await prisma.pageTemplate.findUnique({
             where: { id },
@@ -27,14 +23,10 @@ export async function GET(
 }
 
 export async function PUT(
-    request: NextRequest,
+    request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await verifySession()
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
         const { id } = await params
         const body = await request.json()
         const { name, sections } = body
@@ -55,14 +47,10 @@ export async function PUT(
 }
 
 export async function DELETE(
-    request: NextRequest,
+    request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await verifySession()
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
         const { id } = await params
         await prisma.pageTemplate.delete({
             where: { id },

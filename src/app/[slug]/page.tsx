@@ -654,7 +654,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                         <div className="flex text-yellow-500">
                                             {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
                                         </div>
-                                        <span className="text-[10px] font-bold text-gray-900 uppercase tracking-tight">Google Business Review 5.0</span>
+                                        <span className="text-[10px] font-bold text-gray-900 tracking-tight">Google Business Review 5.0</span>
                                     </div>
                                 </div>
                                 <div className="flex-1 bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-center gap-3">
@@ -665,7 +665,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                         <div className="flex gap-0.5">
                                             {[...Array(5)].map((_, i) => <div key={i} className="w-3 h-3 bg-[#00b67a] rounded-sm flex items-center justify-center text-[8px] font-bold text-white">★</div>)}
                                         </div>
-                                        <span className="text-[10px] font-bold text-gray-900 uppercase tracking-tight">Trustpilot Excellent</span>
+                                        <span className="text-[10px] font-bold text-gray-900 tracking-tight">Trustpilot Excellent</span>
                                     </div>
                                 </div>
                             </div>
@@ -675,7 +675,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                         <div className="lg:col-span-7 space-y-6">
                             <div className="space-y-4">
                                 <div>
-                                    {product.category && <span className="text-yellow-600 font-bold tracking-wide text-xs uppercase mb-1 block">{product.category.name}</span>}
+                                    {product.category && <span className="text-yellow-600 font-bold tracking-wide text-xs mb-1 block">{product.category.name}</span>}
                                     <h1 className="text-3xl md:text-5xl font-black text-gray-900 leading-[1.1] tracking-tight">{product.name}</h1>
                                 </div>
 
@@ -683,7 +683,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                     <div className="flex items-baseline gap-2 mb-4">
                                         <span className="text-4xl font-black text-blue-600">${product.ecommercePrice.toFixed(2)}</span>
                                         <span className="text-sm text-gray-500 line-through">${(product.ecommercePrice * 1.2).toFixed(2)}</span>
-                                        <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter ml-2">Save 20%</span>
+                                        <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full tracking-tighter ml-2">Save 20%</span>
                                     </div>
                                 ) : (
                                     <div className="bg-blue-50/50 border border-blue-100/50 p-4 rounded-xl mb-4">

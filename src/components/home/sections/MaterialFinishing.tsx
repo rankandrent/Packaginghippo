@@ -27,7 +27,7 @@ export function MaterialFinishing({ data }: { data: MaterialFinishingData }) {
 
                 {data.heading && (
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tight relative inline-block">
+                        <h2 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight relative inline-block">
                             {data.heading}
                             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-primary rounded-full"></div>
                         </h2>

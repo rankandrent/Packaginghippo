@@ -107,11 +107,11 @@ export function QuoteForm({
                         <CheckCircle2 className="w-10 h-10 text-green-500" />
                     </div>
                 </div>
-                <h3 className="text-2xl font-bold uppercase tracking-tight">Quote Requested Successfully!</h3>
+                <h3 className="text-2xl font-bold tracking-tight">Quote Requested Successfully!</h3>
                 <p className={cn("text-sm max-w-xs mx-auto", theme === "dark" ? "text-gray-300" : "text-gray-500")}>
                     Our team of packaging experts will review your requirements and reach out within 24 hours.
                 </p>
-                <Button onClick={() => setIsSuccess(false)} variant="yellow" className="w-full mt-4 font-bold uppercase rounded-lg py-6">
+                <Button onClick={() => setIsSuccess(false)} variant="yellow" className="w-full mt-4 font-bold rounded-lg py-6">
                     Request Another Quote
                 </Button>
             </div>
@@ -124,7 +124,7 @@ export function QuoteForm({
     )
 
     const labelClasses = cn(
-        "text-xs font-bold uppercase tracking-wider block mb-1.5",
+        "text-xs font-bold tracking-wider block mb-1.5",
         theme === "dark" ? "text-gray-300" : "text-gray-700"
     )
 
@@ -135,7 +135,7 @@ export function QuoteForm({
         )}>
             {showTitle && (
                 <div className={cn("p-6 text-center border-b", theme === "dark" ? "border-white/10" : "border-gray-100")}>
-                    <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight mb-2">{title}</h2>
+                    <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-2">{title}</h2>
                     <p className={cn("text-sm", theme === "dark" ? "text-gray-400" : "text-gray-500")}>{subtitle}</p>
                 </div>
             )}
@@ -145,32 +145,32 @@ export function QuoteForm({
                     <div className="grid md:grid-cols-2 gap-6">
                         {/* Contact Info */}
                         <div className="space-y-4">
-                            <h4 className={cn("text-sm font-black uppercase tracking-widest border-l-4 border-yellow-500 pl-3 mb-4", theme === "dark" ? "text-white" : "text-gray-900")}>Contact Details</h4>
+                            <h4 className={cn("text-sm font-black tracking-widest border-l-4 border-yellow-500 pl-3 mb-4", theme === "dark" ? "text-white" : "text-gray-900")}>Contact Details</h4>
                             <div className="space-y-1.5">
                                 <label className={labelClasses}>Full Name <span className="text-red-500">*</span></label>
                                 <input {...form.register("name")} className={inputClasses} placeholder="John Doe" />
-                                {form.formState.errors.name && <p className="text-red-400 text-[10px] font-bold mt-1 uppercase">{form.formState.errors.name.message}</p>}
+                                {form.formState.errors.name && <p className="text-red-400 text-[10px] font-bold mt-1">{form.formState.errors.name.message}</p>}
                             </div>
                             <div className="space-y-1.5">
                                 <label className={labelClasses}>Email Address <span className="text-red-500">*</span></label>
                                 <input {...form.register("email")} className={inputClasses} placeholder="email@company.com" />
-                                {form.formState.errors.email && <p className="text-red-400 text-[10px] font-bold mt-1 uppercase">{form.formState.errors.email.message}</p>}
+                                {form.formState.errors.email && <p className="text-red-400 text-[10px] font-bold mt-1">{form.formState.errors.email.message}</p>}
                             </div>
                             <div className="space-y-1.5">
                                 <label className={labelClasses}>Phone Number <span className="text-red-500">*</span></label>
                                 <input {...form.register("phone")} className={inputClasses} placeholder="+1 (000) 000-0000" />
-                                {form.formState.errors.phone && <p className="text-red-400 text-[10px] font-bold mt-1 uppercase">{form.formState.errors.phone.message}</p>}
+                                {form.formState.errors.phone && <p className="text-red-400 text-[10px] font-bold mt-1">{form.formState.errors.phone.message}</p>}
                             </div>
                             <div className="space-y-1.5">
                                 <label className={labelClasses}>Quantity <span className="text-red-500">*</span></label>
                                 <input {...form.register("quantity")} type="number" className={inputClasses} placeholder="Min 100 units" />
-                                {form.formState.errors.quantity && <p className="text-red-400 text-[10px] font-bold mt-1 uppercase">{form.formState.errors.quantity.message}</p>}
+                                {form.formState.errors.quantity && <p className="text-red-400 text-[10px] font-bold mt-1">{form.formState.errors.quantity.message}</p>}
                             </div>
                         </div>
 
                         {/* Product Info */}
                         <div className="space-y-4">
-                            <h4 className={cn("text-sm font-black uppercase tracking-widest border-l-4 border-yellow-500 pl-3 mb-4", theme === "dark" ? "text-white" : "text-gray-900")}>Specifications</h4>
+                            <h4 className={cn("text-sm font-black tracking-widest border-l-4 border-yellow-500 pl-3 mb-4", theme === "dark" ? "text-white" : "text-gray-900")}>Specifications</h4>
                             <div className="grid grid-cols-3 gap-3">
                                 <div className="space-y-1.5">
                                     <label className={labelClasses}>Width</label>
@@ -241,12 +241,12 @@ export function QuoteForm({
                             type="submit"
                             disabled={isSubmitting}
                             variant="yellow"
-                            className="w-full py-7 text-lg font-black uppercase tracking-widest shadow-2xl hover:bg-yellow-400 hover:scale-[1.01] transition-all group"
+                            className="w-full py-7 text-lg font-black tracking-widest shadow-2xl hover:bg-yellow-400 hover:scale-[1.01] transition-all group"
                         >
                             {isSubmitting ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : null}
                             Send My Custom Quote <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </Button>
-                        <p className={cn("text-[10px] text-center mt-4 font-bold uppercase tracking-widest opacity-50", theme === "dark" ? "text-white" : "text-gray-900")}>
+                        <p className={cn("text-[10px] text-center mt-4 font-bold tracking-widest opacity-50", theme === "dark" ? "text-white" : "text-gray-900")}>
                             Secure Submission & Instant Processing
                         </p>
                     </div>

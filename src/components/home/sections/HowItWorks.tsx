@@ -10,7 +10,7 @@ export function HowItWorks({ data }: { data: any }) {
         <section className="bg-yellow-500 py-24 text-black">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16 max-w-3xl mx-auto">
-                    <h2 className="text-4xl font-black mb-4 uppercase tracking-tight">{data.heading}</h2>
+                    <h2 className="text-4xl font-black mb-4 tracking-tight">{data.heading}</h2>
                     <p className="text-lg font-medium opacity-80">{data.text}</p>
                 </div>
 
