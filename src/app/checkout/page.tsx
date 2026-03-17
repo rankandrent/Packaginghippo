@@ -1,4 +1,4 @@
-3/////////////÷÷÷÷÷/////////////////////////////"use client"
+"use client"
 
 import React, { useState } from 'react'
 import { useCart } from '@/context/CartContext'
@@ -105,7 +105,7 @@ export default function CheckoutPage() {
               <ArrowLeft className="w-4 h-4" />
               Back to Store
             </Link>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">Checkout</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Checkout</h1>
           </div>
 
           <div className="grid lg:grid-cols-12 gap-12 items-start">
@@ -118,15 +118,15 @@ export default function CheckoutPage() {
                 </h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2 flex flex-col">
-                    <Label htmlFor="name" className="text-xs font-bold text-gray-500 uppercase tracking-widest">Full Name</Label>
+                    <Label htmlFor="name" className="text-xs font-bold text-gray-500 tracking-widest">Full Name</Label>
                     <Input id="name" name="name" required value={formData.name} onChange={handleInputChange} placeholder="John Doe" className="h-12 bg-gray-50 border-gray-100 focus:bg-white rounded-xl" />
                   </div>
                   <div className="space-y-2 flex flex-col">
-                    <Label htmlFor="email" className="text-xs font-bold text-gray-500 uppercase tracking-widest">Email Address</Label>
+                    <Label htmlFor="email" className="text-xs font-bold text-gray-500 tracking-widest">Email Address</Label>
                     <Input id="email" type="email" name="email" required value={formData.email} onChange={handleInputChange} placeholder="john@example.com" className="h-12 bg-gray-50 border-gray-100 focus:bg-white rounded-xl" />
                   </div>
                   <div className="space-y-2 flex flex-col md:col-span-2">
-                    <Label htmlFor="phone" className="text-xs font-bold text-gray-500 uppercase tracking-widest">Phone Number</Label>
+                    <Label htmlFor="phone" className="text-xs font-bold text-gray-500 tracking-widest">Phone Number</Label>
                     <Input id="phone" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+1 (555) 000-0000" className="h-12 bg-gray-50 border-gray-100 focus:bg-white rounded-xl" />
                   </div>
                 </div>
@@ -139,23 +139,23 @@ export default function CheckoutPage() {
                 </h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2 flex flex-col md:col-span-2">
-                    <Label htmlFor="address" className="text-xs font-bold text-gray-500 uppercase tracking-widest">Street Address</Label>
+                    <Label htmlFor="address" className="text-xs font-bold text-gray-500 tracking-widest">Street Address</Label>
                     <Input id="address" name="address" required value={formData.address} onChange={handleInputChange} placeholder="123 Packaging St" className="h-12 bg-gray-50 border-gray-100 focus:bg-white rounded-xl" />
                   </div>
                   <div className="space-y-2 flex flex-col">
-                    <Label htmlFor="city" className="text-xs font-bold text-gray-500 uppercase tracking-widest">City</Label>
+                    <Label htmlFor="city" className="text-xs font-bold text-gray-500 tracking-widest">City</Label>
                     <Input id="city" name="city" required value={formData.city} onChange={handleInputChange} placeholder="New York" className="h-12 bg-gray-50 border-gray-100 focus:bg-white rounded-xl" />
                   </div>
                   <div className="space-y-2 flex flex-col">
-                    <Label htmlFor="state" className="text-xs font-bold text-gray-500 uppercase tracking-widest">State / Province</Label>
+                    <Label htmlFor="state" className="text-xs font-bold text-gray-500 tracking-widest">State / Province</Label>
                     <Input id="state" name="state" required value={formData.state} onChange={handleInputChange} placeholder="NY" className="h-12 bg-gray-50 border-gray-100 focus:bg-white rounded-xl" />
                   </div>
                   <div className="space-y-2 flex flex-col">
-                    <Label htmlFor="zip" className="text-xs font-bold text-gray-500 uppercase tracking-widest">ZIP / Postal Code</Label>
+                    <Label htmlFor="zip" className="text-xs font-bold text-gray-500 tracking-widest">ZIP / Postal Code</Label>
                     <Input id="zip" name="zip" required value={formData.zip} onChange={handleInputChange} placeholder="10001" className="h-12 bg-gray-50 border-gray-100 focus:bg-white rounded-xl" />
                   </div>
                   <div className="space-y-2 flex flex-col">
-                    <Label htmlFor="country" className="text-xs font-bold text-gray-500 uppercase tracking-widest">Country</Label>
+                    <Label htmlFor="country" className="text-xs font-bold text-gray-500 tracking-widest">Country</Label>
                     <Input id="country" name="country" required value={formData.country} onChange={handleInputChange} className="h-12 bg-gray-50 border-gray-100 focus:bg-white rounded-xl" />
                   </div>
                 </div>
@@ -177,7 +177,7 @@ export default function CheckoutPage() {
             {/* Right Column - Summary */}
             <div className="lg:col-span-5">
               <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 sticky top-32">
-                <h2 className="text-xl font-black text-gray-900 mb-6 uppercase tracking-tight italic">Order Summary</h2>
+                <h2 className="text-xl font-black text-gray-900 mb-6 tracking-tight italic">Order Summary</h2>
 
                 <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 mb-6 scrollbar-hide">
                   {cart.map((item) => (
@@ -205,7 +205,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-gray-600 font-medium">
                     <span>Shipping</span>
-                    <span className="text-green-600 font-bold uppercase text-[10px] tracking-widest bg-green-50 px-2 py-1 rounded">Calculated at production</span>
+                    <span className="text-green-600 font-bold text-[10px] tracking-widest bg-green-50 px-2 py-1 rounded">Calculated at production</span>
                   </div>
                   <div className="flex justify-between text-2xl font-black text-gray-900 pt-3 border-t">
                     <span>Total</span>
@@ -236,7 +236,7 @@ export default function CheckoutPage() {
                   )}
                 </Button>
 
-                <p className="text-center text-[10px] text-gray-400 mt-4 uppercase tracking-tighter">
+                <p className="text-center text-[10px] text-gray-400 mt-4 tracking-tighter">
                   Secure Checkout — SSL Encrypted
                 </p>
               </div>
