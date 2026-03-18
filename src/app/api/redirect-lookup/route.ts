@@ -10,12 +10,33 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const redirect = await prisma.redirect.findUnique({
-            where: { sourceUrl },
-            select: { targetUrl: true, type: true, isActive: true }
+        // Normalize: remove trailing slash and lowercase
+        const normalized = sourceUrl.length > 1 && sourceUrl.endsWith('/')
+            ? sourceUrl.slice(0, -1)
+            : sourceUrl
+        const normalizedLower = normalized.toLowerCase()
+
+        // Try exact match first (case-insensitive via stored normalized URLs)
+        let redirect = await prisma.redirect.findFirst({
+            where: {
+                sourceUrl: { equals: normalizedLower, mode: 'insensitive' },
+                isActive: true
+            },
+            select: { targetUrl: true, type: true }
         })
 
-        if (!redirect || !redirect.isActive) {
+        // If not found, also try with trailing slash variant
+        if (!redirect) {
+            redirect = await prisma.redirect.findFirst({
+                where: {
+                    sourceUrl: { equals: normalizedLower + '/', mode: 'insensitive' },
+                    isActive: true
+                },
+                select: { targetUrl: true, type: true }
+            })
+        }
+
+        if (!redirect) {
             return NextResponse.json({ found: false })
         }
 

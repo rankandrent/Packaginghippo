@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Trash2, Link as LinkIcon, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react"
+import { Trash2, Link as LinkIcon, AlertCircle, CheckCircle2, ArrowRight, Power, ExternalLink } from "lucide-react"
 
 interface Redirect {
     id: string
@@ -19,6 +19,7 @@ interface Redirect {
 export default function RedirectsPage() {
     const [redirects, setRedirects] = useState<Redirect[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("")
     const [formData, setFormData] = useState({
         sourceUrl: "",
         targetUrl: "",
@@ -45,6 +46,7 @@ export default function RedirectsPage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         setSubmitting(true)
+        setError("")
         try {
             const res = await fetch('/api/redirects', {
                 method: 'POST',
@@ -55,11 +57,32 @@ export default function RedirectsPage() {
             if (res.ok) {
                 setFormData({ sourceUrl: "", targetUrl: "", type: "301" })
                 fetchRedirects()
+            } else {
+                const data = await res.json()
+                setError(data.error || "Failed to create redirect")
             }
         } catch (error) {
             console.error(error)
+            setError("Failed to create redirect")
         } finally {
             setSubmitting(false)
+        }
+    }
+
+    async function handleToggle(id: string, currentStatus: boolean) {
+        try {
+            const res = await fetch('/api/redirects', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, isActive: !currentStatus })
+            })
+            if (res.ok) {
+                setRedirects(prev => prev.map(r =>
+                    r.id === id ? { ...r, isActive: !currentStatus } : r
+                ))
+            }
+        } catch (error) {
+            console.error(error)
         }
     }
 
@@ -107,7 +130,7 @@ export default function RedirectsPage() {
                     <div className="md:col-span-1">
                         <label className="text-sm font-medium mb-1 block">New URL (Target)</label>
                         <Input
-                            placeholder="/new-page"
+                            placeholder="/new-page or https://example.com"
                             value={formData.targetUrl}
                             onChange={(e) => setFormData({ ...formData, targetUrl: e.target.value })}
                             required
@@ -124,7 +147,7 @@ export default function RedirectsPage() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="301">301 (Permanent)</SelectItem>
-                                <SelectItem value="302">302 ( Temporary)</SelectItem>
+                                <SelectItem value="302">302 (Temporary)</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -134,9 +157,15 @@ export default function RedirectsPage() {
                         </Button>
                     </div>
                 </form>
+                {error && (
+                    <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {error}
+                    </p>
+                )}
                 <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
-                    Redirects propagate instantly. Make sure to use relative paths (e.g., /about-us).
+                    Use relative paths for internal pages (e.g., /about-us) or full URLs for external redirects (e.g., https://example.com).
                 </p>
             </div>
 
@@ -145,6 +174,7 @@ export default function RedirectsPage() {
                 <Table>
                     <TableHeader>
                         <TableRow>
+                            <TableHead>Status</TableHead>
                             <TableHead>Source URL</TableHead>
                             <TableHead>Target URL</TableHead>
                             <TableHead>Type</TableHead>
@@ -155,19 +185,37 @@ export default function RedirectsPage() {
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8">Loading redirects...</TableCell>
+                                <TableCell colSpan={6} className="text-center py-8">Loading redirects...</TableCell>
                             </TableRow>
                         ) : redirects.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8 text-gray-500">No redirects found.</TableCell>
+                                <TableCell colSpan={6} className="text-center py-8 text-gray-500">No redirects found.</TableCell>
                             </TableRow>
                         ) : (
                             redirects.map((redirect) => (
-                                <TableRow key={redirect.id}>
+                                <TableRow key={redirect.id} className={!redirect.isActive ? 'opacity-50' : ''}>
+                                    <TableCell>
+                                        <button
+                                            onClick={() => handleToggle(redirect.id, redirect.isActive)}
+                                            className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-bold transition-colors ${
+                                                redirect.isActive
+                                                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            <Power className="w-3 h-3" />
+                                            {redirect.isActive ? 'Active' : 'Inactive'}
+                                        </button>
+                                    </TableCell>
                                     <TableCell className="font-medium text-red-600">{redirect.sourceUrl}</TableCell>
-                                    <TableCell className="text-green-600 flex items-center gap-2">
-                                        <ArrowRight className="w-4 h-4 text-gray-300" />
-                                        {redirect.targetUrl}
+                                    <TableCell className="text-green-600">
+                                        <span className="flex items-center gap-2">
+                                            <ArrowRight className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                                            {redirect.targetUrl}
+                                            {redirect.targetUrl.startsWith('http') && (
+                                                <ExternalLink className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                                            )}
+                                        </span>
                                     </TableCell>
                                     <TableCell>
                                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${redirect.type === 301 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>

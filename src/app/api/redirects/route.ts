@@ -22,9 +22,30 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Source and Target URLs are required" }, { status: 400 })
         }
 
-        // Ensure source starts with /
-        const formattedSource = sourceUrl.startsWith('/') ? sourceUrl : `/${sourceUrl}`
-        const formattedTarget = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`
+        // Normalize source URL: ensure it starts with / and is lowercased
+        let formattedSource = sourceUrl.trim()
+        if (!formattedSource.startsWith('/')) {
+            formattedSource = `/${formattedSource}`
+        }
+        // Remove trailing slash (except root)
+        if (formattedSource.length > 1 && formattedSource.endsWith('/')) {
+            formattedSource = formattedSource.slice(0, -1)
+        }
+        formattedSource = formattedSource.toLowerCase()
+
+        // Format target URL: keep external URLs as-is, only add / prefix for relative paths
+        let formattedTarget = targetUrl.trim()
+        if (!formattedTarget.startsWith('http') && !formattedTarget.startsWith('/')) {
+            formattedTarget = `/${formattedTarget}`
+        }
+
+        // Check for duplicate source URL
+        const existing = await prisma.redirect.findFirst({
+            where: { sourceUrl: { equals: formattedSource, mode: 'insensitive' } }
+        })
+        if (existing) {
+            return NextResponse.json({ error: "A redirect for this source URL already exists" }, { status: 409 })
+        }
 
         const redirect = await prisma.redirect.create({
             data: {
@@ -36,7 +57,48 @@ export async function POST(req: Request) {
         })
         return NextResponse.json(redirect)
     } catch (error) {
+        console.error('Failed to create redirect:', error)
         return NextResponse.json({ error: 'Failed to create redirect' }, { status: 500 })
+    }
+}
+
+export async function PUT(req: Request) {
+    try {
+        const body = await req.json()
+        const { id, sourceUrl, targetUrl, type, isActive } = body
+
+        if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 })
+
+        const updateData: any = {}
+
+        if (sourceUrl !== undefined) {
+            let formattedSource = sourceUrl.trim()
+            if (!formattedSource.startsWith('/')) formattedSource = `/${formattedSource}`
+            if (formattedSource.length > 1 && formattedSource.endsWith('/')) {
+                formattedSource = formattedSource.slice(0, -1)
+            }
+            updateData.sourceUrl = formattedSource.toLowerCase()
+        }
+
+        if (targetUrl !== undefined) {
+            let formattedTarget = targetUrl.trim()
+            if (!formattedTarget.startsWith('http') && !formattedTarget.startsWith('/')) {
+                formattedTarget = `/${formattedTarget}`
+            }
+            updateData.targetUrl = formattedTarget
+        }
+
+        if (type !== undefined) updateData.type = parseInt(type) || 301
+        if (isActive !== undefined) updateData.isActive = isActive
+
+        const redirect = await prisma.redirect.update({
+            where: { id },
+            data: updateData
+        })
+        return NextResponse.json(redirect)
+    } catch (error) {
+        console.error('Failed to update redirect:', error)
+        return NextResponse.json({ error: 'Failed to update redirect' }, { status: 500 })
     }
 }
 

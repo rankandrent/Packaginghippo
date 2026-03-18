@@ -15,6 +15,14 @@ async function verifyTokenEdge(token: string) {
     }
 }
 
+// Normalize source URL for consistent matching
+function normalizeSourceUrl(url: string): string {
+    // Remove trailing slash (except for root "/")
+    let normalized = url.length > 1 && url.endsWith('/') ? url.slice(0, -1) : url;
+    // Lowercase for case-insensitive matching
+    return normalized.toLowerCase();
+}
+
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
@@ -39,26 +47,45 @@ export async function middleware(request: NextRequest) {
     }
 
     // --- Dynamic Redirect Logic (SEO) ---
-    // Only check for redirects on page requests (not static, api, or internal)
-    // EXCEPTION: Allow .html files to be checked for legacy blog redirects
-    const isStaticPath = (pathname.includes('.') && !pathname.endsWith('.html')) || pathname.startsWith('/_next') || pathname.startsWith('/api')
+    // Skip static files, _next, api routes, and dashboard
+    const shouldCheckRedirect = !pathname.startsWith('/_next') &&
+        !pathname.startsWith('/api') &&
+        !pathname.startsWith('/dashboard') &&
+        (!pathname.includes('.') || pathname.endsWith('.html'));
 
-    if (!isStaticPath) {
+    if (shouldCheckRedirect) {
         try {
-            // Check for custom redirects in the database
-            const redirectCheckUrl = new URL(`/api/redirect-lookup?sourceUrl=${encodeURIComponent(pathname)}`, request.url)
-            const redirectRes = await fetch(redirectCheckUrl)
+            // Normalize the pathname for matching
+            const normalizedPath = normalizeSourceUrl(pathname);
+
+            // Use request.nextUrl.origin for reliable internal API calls
+            // This works correctly in Docker/production environments
+            const origin = request.nextUrl.origin;
+            const redirectCheckUrl = `${origin}/api/redirect-lookup?sourceUrl=${encodeURIComponent(normalizedPath)}`;
+            
+            const redirectRes = await fetch(redirectCheckUrl, {
+                headers: {
+                    // Pass along the host header to ensure proper routing
+                    'x-forwarded-host': request.headers.get('host') || '',
+                },
+            });
 
             if (redirectRes.ok) {
-                const redirectData = await redirectRes.json()
+                const redirectData = await redirectRes.json();
                 if (redirectData.found && redirectData.targetUrl) {
-                    // Use the status code from the database (default 301)
-                    const statusCode = redirectData.type === 302 ? 302 : 301
-                    return NextResponse.redirect(new URL(redirectData.targetUrl, request.url), statusCode)
+                    const statusCode = redirectData.type === 302 ? 302 : 301;
+
+                    // Handle both absolute URLs (https://...) and relative paths (/page)
+                    const targetUrl = redirectData.targetUrl.startsWith('http')
+                        ? redirectData.targetUrl
+                        : new URL(redirectData.targetUrl, request.url).toString();
+
+                    return NextResponse.redirect(targetUrl, statusCode);
                 }
             }
         } catch (error) {
-            console.error('Middleware redirect error:', error)
+            // Silently fail - don't block page loading if redirect check fails
+            console.error('Middleware redirect lookup failed:', error);
         }
     }
 
@@ -68,5 +95,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+    matcher: ['/((?!_next/static|_next/image|icon.svg).*)'],
 };
