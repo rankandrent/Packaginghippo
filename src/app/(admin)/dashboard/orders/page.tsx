@@ -8,13 +8,11 @@ import { Package, Eye, Trash2, Loader2 } from "lucide-react"
 interface Order {
     id: string
     orderNumber: string
-    customer: {
-        name: string
-        email: string
-        phone: string
-    }
+    customerName: string
+    customerEmail: string
+    customerPhone?: string
     items: any[]
-    total: number
+    totalAmount: number
     status: string
     createdAt: string
 }
@@ -97,12 +95,12 @@ export default function OrdersPage() {
                                     <TableCell className="font-bold text-blue-600">#{order.orderNumber}</TableCell>
                                     <TableCell>
                                         <div>
-                                            <p className="font-medium text-gray-900">{order.customer?.name}</p>
-                                            <p className="text-xs text-gray-500">{order.customer?.email}</p>
+                                            <p className="font-medium text-gray-900">{order.customerName}</p>
+                                            <p className="text-xs text-gray-500">{order.customerEmail}</p>
                                         </div>
                                     </TableCell>
                                     <TableCell>{order.items?.length || 0} items</TableCell>
-                                    <TableCell className="font-bold">${order.total?.toFixed(2)}</TableCell>
+                                    <TableCell className="font-bold">${order.totalAmount?.toFixed(2)}</TableCell>
                                     <TableCell>
                                         <span className="px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">
                                             {order.status || 'Pending'}

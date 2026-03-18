@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useEffect, useState, use } from "react"
+import { useEffect, useState, use, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -19,7 +19,7 @@ type Template = {
     sections: any[]
 }
 
-export default function TemplateEditor({ params }: { params: Promise<{ id: string }> }) {
+function TemplateEditorContent({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
     const isNew = id === 'new'
     const router = useRouter()
@@ -168,5 +168,13 @@ export default function TemplateEditor({ params }: { params: Promise<{ id: strin
                 </div>
             </div>
         </form>
+    )
+}
+
+export default function TemplateEditor({ params }: { params: Promise<{ id: string }> }) {
+    return (
+        <Suspense fallback={<div className="p-20 flex justify-center"><Loader2 className="animate-spin" /></div>}>
+            <TemplateEditorContent params={params} />
+        </Suspense>
     )
 }
