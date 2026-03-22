@@ -1,14 +1,55 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
-import Link from "next/link"
+import { ShoppingCart, Check } from "lucide-react"
 import { getSeoImageUrl, getAltFromUrl } from "@/lib/image-seo"
+import { useCart } from "@/context/CartContext"
 
 type MerchantProduct = {
     image: string
     name: string
     price: string
     link: string
+}
+
+function AddToCartButton({ product, index }: { product: MerchantProduct, index: number }) {
+    const { addItem } = useCart()
+    const [added, setAdded] = useState(false)
+
+    const handleAddToCart = () => {
+        const slug = product.link?.replace(/^\//, '') || `product-${index}`
+        const parsedPrice = parseFloat(product.price?.replace(/[^0-9.]/g, '') || '0') || 0
+
+        addItem({
+            id: slug,
+            name: product.name || "Custom Packaging",
+            slug,
+            price: parsedPrice,
+            quantity: 1,
+            image: product.image || '',
+        })
+
+        setAdded(true)
+        setTimeout(() => setAdded(false), 2000)
+    }
+
+    return (
+        <button
+            onClick={handleAddToCart}
+            className={`flex items-center justify-center gap-1.5 w-full text-xs font-bold py-2 px-3 rounded-lg transition-all duration-200 ${
+                added
+                    ? 'bg-green-600 text-white'
+                    : 'bg-blue-900 hover:bg-blue-800 text-white'
+            }`}
+        >
+            {added ? (
+                <><Check className="w-3.5 h-3.5" /> Added!</>
+            ) : (
+                <><ShoppingCart className="w-3.5 h-3.5" /> Add to Cart</>
+            )}
+        </button>
+    )
 }
 
 export function MerchantProductsSection({ data }: { data: any }) {
@@ -64,12 +105,7 @@ export function MerchantProductsSection({ data }: { data: any }) {
                                     </p>
                                 )}
                                 <div className="mt-auto pt-1">
-                                    <Link
-                                        href={product.link || "/"}
-                                        className="block w-full text-center bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors duration-200"
-                                    >
-                                        Get a Quote
-                                    </Link>
+                                    <AddToCartButton product={product} index={index} />
                                 </div>
                             </div>
                         </div>
