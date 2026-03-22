@@ -66,7 +66,10 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
 
     if (isSuccess) {
         return (
-            <div className="bg-white border-2 border-green-400 rounded-2xl p-10 text-center space-y-4 shadow-xl">
+            <div className="relative">
+            <div className="absolute -inset-[3px] bg-gradient-to-br from-green-400 to-emerald-500 rounded-[1.4rem] blur-md opacity-50 animate-pulse" />
+            <div className="relative bg-gradient-to-br from-green-400 to-emerald-500 p-[2.5px] rounded-[1.3rem]">
+            <div className="bg-white rounded-[1.1rem] p-10 text-center space-y-4">
                 <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto ring-4 ring-green-100">
                     <CheckCircle2 className="w-9 h-9 text-green-500" />
                 </div>
@@ -78,18 +81,28 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                     Submit Another Request
                 </Button>
             </div>
+            </div>
+            </div>
         )
     }
 
-    const inputClass = "w-full bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 text-sm py-3 px-3 pl-10 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+    const inputClass = "w-full bg-white border border-gray-200 text-gray-900 placeholder:text-gray-400 text-sm py-3 px-3 pl-10 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all outline-none shadow-sm"
     const labelClass = "text-xs font-semibold text-gray-700 mb-1.5 block"
     const iconClass = "absolute left-3 top-[34px] w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors pointer-events-none"
 
     return (
-        <div className="bg-white rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.10)] border border-gray-100 overflow-hidden">
+        <div className="relative">
+            {/* Animated glow behind form */}
+            <div className="absolute -inset-[3px] bg-gradient-to-br from-blue-500 via-indigo-500 to-blue-600 rounded-[1.4rem] blur-md opacity-60 animate-pulse" />
+
+            {/* Gradient border ring */}
+            <div className="relative bg-gradient-to-br from-blue-500 via-indigo-500 to-blue-600 p-[2.5px] rounded-[1.3rem] shadow-[0_20px_60px_rgba(59,130,246,0.45)]">
+
+            {/* Inner white card */}
+            <div className="bg-white rounded-[1.1rem] overflow-hidden">
 
             {/* Header */}
-            <div className="bg-blue-600 px-6 py-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 flex items-center justify-between">
                 <div>
                     <h2 className="text-white font-black text-lg leading-tight">Get Your Free Quote</h2>
                     <p className="text-blue-200 text-xs mt-0.5">No commitment · 100% free · Fast turnaround</p>
@@ -100,7 +113,7 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                 </div>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="p-6 bg-gray-50/60 space-y-4">
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 
                     {/* Name + Email */}
@@ -212,7 +225,7 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                     <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-7 rounded-xl shadow-lg hover:shadow-blue-500/25 active:scale-[0.99] transition-all text-base border-b-4 border-blue-800 hover:border-blue-900"
+                        className="w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-black py-7 rounded-xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-[0.99] transition-all text-base border-b-4 border-orange-700"
                     >
                         {isSubmitting ? (
                             <Loader2 className="animate-spin h-5 w-5" />
@@ -226,6 +239,8 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                     </p>
                 </form>
             </div>
+            </div>{/* end inner white card */}
+            </div>{/* end gradient border */}
         </div>
     )
 }
