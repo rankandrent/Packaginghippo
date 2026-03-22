@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 
-// GET all products
-export async function GET() {
+// GET all products or single product by ?id=
+export async function GET(request: NextRequest) {
     try {
+        const { searchParams } = new URL(request.url)
+        const id = searchParams.get('id')
+
+        if (id) {
+            const product = await prisma.product.findUnique({
+                where: { id },
+                include: { category: { select: { name: true, slug: true } } }
+            })
+            if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+            return NextResponse.json({ product })
+        }
+
         const products = await prisma.product.findMany({
             include: {
                 category: {

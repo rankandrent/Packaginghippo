@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Suspense } from "react";
 import { headers } from "next/headers";
 import "./globals.css";
 import { Navbar } from "@/components/layout/navbar";
@@ -142,9 +141,7 @@ export default async function RootLayout({
           }}
         />
         <CartProvider>
-          <Suspense fallback={<div className="h-24 bg-white border-b" />}>
-            <Navbar settings={generalSettings} menuData={menuSettings} />
-          </Suspense>
+          <Navbar settings={generalSettings} menuData={menuSettings} />
           <main>{children}</main>
           <Footer />
         </CartProvider>
