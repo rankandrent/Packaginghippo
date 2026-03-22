@@ -38,6 +38,45 @@ export function getSeoAltText(data: any, fallback: string = 'Custom Packaging Bo
 }
 
 /**
+ * Extracts a human-readable alt text from an image URL.
+ * e.g. https://i.ibb.co/abc/custom-medicine-boxes-png.webp -> "Custom Medicine Boxes Png"
+ * e.g. /images/v123/products/kraft-box.jpg -> "Kraft Box"
+ */
+export function getAltFromUrl(url: string | null | undefined, fallback: string = 'Custom Packaging Box'): string {
+    if (!url) return fallback
+
+    try {
+        // Decode percent-encoded characters first
+        const decoded = decodeURIComponent(url)
+
+        // Get last path segment (filename)
+        let filename = decoded.split('/').pop() || ''
+
+        // Strip query string
+        filename = filename.split('?')[0]
+
+        // Remove extension (.jpg, .webp, .png, etc.)
+        filename = filename.replace(/\.[^.]+$/, '')
+
+        // Remove version prefixes like v1234567890
+        filename = filename.replace(/^v\d+$/, '')
+
+        // If empty, too short, or looks like a hash/random ID, use fallback
+        if (!filename || filename.length < 3 || /^[a-f0-9]{8,}$/i.test(filename)) {
+            return fallback
+        }
+
+        // Convert hyphens and underscores to spaces, then title-case
+        return filename
+            .replace(/[-_]/g, ' ')
+            .replace(/\b\w/g, c => c.toUpperCase())
+            .trim()
+    } catch {
+        return fallback
+    }
+}
+
+/**
  * Converts a filename or keyword into an SEO-friendly slug
  * e.g. "What Are Bagged Packaged Goods" -> "what-are-bagged-packaged-goods"
  */

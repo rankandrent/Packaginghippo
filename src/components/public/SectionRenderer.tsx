@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowRight, CheckCircle, ChevronDown, Package, Star, Leaf, Box, Quote, Clock, DollarSign, Truck, Palette, Pen, Sparkles, Shield, Zap, Check } from "lucide-react"
 import { PopularProducts } from "@/components/category/PopularProducts"
-import { getSeoImageUrl } from "@/lib/image-seo"
+import { getSeoImageUrl, getAltFromUrl } from "@/lib/image-seo"
 
 // Types matching SectionBuilder
 export type Section = {
@@ -199,7 +199,7 @@ export function HeroSection({ content, breadcrumbs }: { content: any, breadcrumb
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/20 via-zinc-950 to-zinc-950"></div>
             {content.bgImage && (
                 <div className="absolute inset-0 opacity-20">
-                    <Image src={getSeoImageUrl(content.bgImage)} alt="Background" fill sizes="100vw" className="object-cover" />
+                    <Image src={getSeoImageUrl(content.bgImage)} alt={getAltFromUrl(content.bgImage, 'Background')} fill sizes="100vw" className="object-cover" />
                 </div>
             )}
             <div className="container mx-auto px-4 relative z-10">
@@ -228,7 +228,7 @@ export function HeroSection({ content, breadcrumbs }: { content: any, breadcrumb
                         <div className="relative z-10 w-full max-w-lg mx-auto aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl transform rotate-[-3deg] border-4 border-white/10">
                             <Image 
                                 src={getSeoImageUrl(content.image)} 
-                                alt={content.heading} 
+                                alt={content.heading || getAltFromUrl(content.image)}
                                 fill 
                                 sizes="(max-width: 768px) 100vw, 600px"
                                 className="object-cover" 
@@ -566,7 +566,7 @@ function GallerySection({ content }: { content: any }) {
                         <div key={i} className="relative aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group">
                             <Image 
                                 src={getSeoImageUrl(img)} 
-                                alt={`Gallery ${i}`} 
+                                alt={getAltFromUrl(img, `Gallery Image ${i + 1}`)}
                                 fill 
                                 sizes="(max-width: 768px) 50vw, 300px"
                                 className="object-cover group-hover:scale-105 transition-transform duration-500" 
