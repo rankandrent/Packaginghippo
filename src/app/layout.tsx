@@ -83,64 +83,6 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
-        <JsonLd
-          data={{
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Packaging Hippo",
-            "url": "https://packaginghippo.com",
-            "logo": "https://packaginghippo.com/logo.png",
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "telephone": "+1-445-447-7678",
-              "contactType": "customer service",
-              "email": "sales@packaginghippo.com"
-            },
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": "1946 W 3rd Street 1st Floor",
-              "addressLocality": "Brooklyn",
-              "addressRegion": "NY",
-              "postalCode": "11223",
-              "addressCountry": "US"
-            }
-          }}
-        />
-        <JsonLd
-          data={{
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "name": "Packaging Hippo",
-            "url": "https://packaginghippo.com",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "https://packaginghippo.com/products?q={search_term_string}"
-              },
-              "query-input": "required name=search_term_string"
-            }
-          }}
-        />
-        <JsonLd
-          data={{
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "Packaging Hippo",
-            "image": "https://packaginghippo.com/logo.png",
-            "url": "https://packaginghippo.com",
-            "telephone": "+1-445-447-7678",
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": "1946 W 3rd Street 1st Floor",
-              "addressLocality": "Brooklyn",
-              "addressRegion": "NY",
-              "postalCode": "11223",
-              "addressCountry": "US"
-            },
-            "priceRange": "$$"
-          }}
-        />
         <CartProvider>
           <Suspense fallback={null}>
             <Navbar settings={generalSettings} menuData={menuSettings} />

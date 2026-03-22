@@ -327,11 +327,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     "name": category.name,
                     "url": `https://packaginghippo.com/${slug}`,
                     "description": category.seoDesc || category.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
-                    "isPartOf": {
-                        "@type": "WebSite",
-                        "name": "Packaging Hippo",
-                        "url": "https://packaginghippo.com/"
-                    },
+                    "isPartOf": { "@id": "https://packaginghippo.com/#website" },
                     "aggregateRating": {
                         "@type": "AggregateRating",
                         "ratingValue": "4.9",
@@ -597,11 +593,10 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                         "bestRating": "5"
                     },
                     "offers": {
-                        "@type": "AggregateOffer",
+                        "@type": "Offer",
                         "availability": "https://schema.org/InStock",
                         "priceCurrency": "USD",
-                        "lowPrice": product.price || "1.00",
-                        "offerCount": "1",
+                        "price": product.price || "1.00",
                         "url": `https://packaginghippo.com/${product.slug}`,
                         "seller": {
                             "@type": "Organization",
@@ -621,16 +616,6 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                             "value": product.dimensions
                         }] : [])
                     ]
-                }}
-            />
-            {/* 3. WebPage Schema */}
-            <JsonLd
-                data={{
-                    "@context": "https://schema.org",
-                    "@type": "WebPage",
-                    "name": product.name,
-                    "description": product.seoDesc || product.shortDesc || product.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
-                    "url": `https://packaginghippo.com/${product.slug}`
                 }}
             />
             <section className="pt-6 pb-12 bg-white">

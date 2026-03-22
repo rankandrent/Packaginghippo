@@ -17,8 +17,9 @@ export default function TestimonialsSection({ testimonials }: { testimonials: Te
     const schema = {
         "@context": "https://schema.org",
         "@type": "Organization",
-        "name": "Packaging Hippo", // You might want to make this dynamic or pass it in
-        "url": "https://packaginghippo.com", // Replace with actual URL or make dynamic
+        "@id": "https://packaginghippo.com/#organization",
+        "name": "Packaging Hippo",
+        "url": "https://packaginghippo.com",
         "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": (testimonials.reduce((acc, t) => acc + t.rating, 0) / testimonials.length).toFixed(1),
