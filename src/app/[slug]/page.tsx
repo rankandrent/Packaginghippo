@@ -671,11 +671,17 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                         <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full tracking-tighter ml-2">Save 20%</span>
                                     </div>
                                 ) : (
-                                    <div className="bg-blue-50/50 border border-blue-100/50 p-4 rounded-xl mb-4">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-sm font-bold text-blue-900">Custom Quote Required</span>
-                                        </div>
-                                        <p className="text-xs text-blue-700/70 italic">Please fill out the form below to get exact pricing for your specific requirements.</p>
+                                    <div className="flex flex-wrap gap-3 mb-4">
+                                        {[
+                                            { icon: "⚡", label: "Quote in 2 Hours" },
+                                            { icon: "🎁", label: "Free of Charge" },
+                                            { icon: "✅", label: "No Commitment" },
+                                        ].map(({ icon, label }) => (
+                                            <div key={label} className="flex items-center gap-1.5 bg-green-50 border border-green-100 rounded-full px-3 py-1.5">
+                                                <span className="text-sm">{icon}</span>
+                                                <span className="text-xs font-bold text-green-800">{label}</span>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
 

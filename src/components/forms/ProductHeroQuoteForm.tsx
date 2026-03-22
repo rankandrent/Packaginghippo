@@ -4,20 +4,20 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import { Loader2, CheckCircle2, ChevronRight, User, Mail, Phone, Maximize2, Layers, Briefcase, FileText } from "lucide-react"
+import { Loader2, CheckCircle2, ChevronRight, User, Mail, Phone, Package, MessageSquare, ChevronDown, Zap, Shield, Clock } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
-    name: z.string().min(2, "Name required"),
-    email: z.string().email("Invalid email"),
-    phone: z.string().min(10, "Invalid phone"),
-    width: z.string().min(1, "W required"),
-    length: z.string().min(1, "L required"),
-    depth: z.string().min(1, "D required"),
+    name: z.string().min(2, "Name is required"),
+    email: z.string().email("Enter a valid email"),
+    phone: z.string().optional(),
+    quantity: z.string().min(1, "Quantity is required"),
+    width: z.string().optional(),
+    length: z.string().optional(),
+    depth: z.string().optional(),
     unit: z.string(),
     stock: z.string().optional(),
-    quantity: z.string().min(1, "Qty required"),
     message: z.string().optional(),
     hp_field: z.string().optional(),
 })
@@ -25,14 +25,11 @@ const formSchema = z.object({
 export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
+    const [showDetails, setShowDetails] = useState(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            unit: "Inches",
-            stock: "12pt Cardboard",
-            quantity: "100"
-        }
+        defaultValues: { unit: "Inches", stock: "12pt Cardboard", quantity: "100" }
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -44,14 +41,14 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                 body: JSON.stringify({
                     name: values.name,
                     email: values.email,
-                    phone: values.phone,
+                    phone: values.phone || '',
                     type: 'quote',
                     message: values.message,
                     hp_field: values.hp_field,
                     sourceUrl: window.location.href,
                     sourcePage: `Product: ${productSlug}`,
                     details: {
-                        dimensions: `${values.width}x${values.length}x${values.depth} ${values.unit}`,
+                        dimensions: values.width ? `${values.width}x${values.length}x${values.depth} ${values.unit}` : 'Not specified',
                         material: values.stock,
                         quantity: values.quantity
                     }
@@ -60,7 +57,7 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
             if (!res.ok) throw new Error('Failed')
             setIsSuccess(true)
             form.reset()
-        } catch (error) {
+        } catch {
             alert("Submission failed. Please try again.")
         } finally {
             setIsSubmitting(false)
@@ -69,132 +66,164 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
 
     if (isSuccess) {
         return (
-            <div className="bg-white border-2 border-green-500 rounded-[2rem] p-10 text-center space-y-4 shadow-2xl animate-in fade-in zoom-in duration-500">
-                <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto ring-4 ring-green-100">
-                    <CheckCircle2 className="w-12 h-12 text-green-500" />
+            <div className="bg-white border-2 border-green-400 rounded-2xl p-10 text-center space-y-4 shadow-xl">
+                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto ring-4 ring-green-100">
+                    <CheckCircle2 className="w-9 h-9 text-green-500" />
                 </div>
                 <div>
-                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Success!</h3>
-                    <p className="text-gray-500 font-medium">Your quote request has been sent.</p>
+                    <h3 className="text-xl font-black text-gray-900">Quote Request Sent!</h3>
+                    <p className="text-gray-500 text-sm mt-1">We'll email your pricing within 2 hours.</p>
                 </div>
-                <Button onClick={() => setIsSuccess(false)} variant="outline" className="w-full border-gray-200 text-gray-600 hover:bg-gray-50 font-black rounded-xl py-6 tracking-widest">
-                    Request Another
+                <Button onClick={() => setIsSuccess(false)} variant="outline" className="w-full rounded-xl py-5 font-bold text-gray-600">
+                    Submit Another Request
                 </Button>
             </div>
         )
     }
 
-    const inputClass = "w-full bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 text-xs py-3 px-3 pl-10 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
-    const labelClass = "text-[10px] font-black tracking-widest text-gray-400 mb-1.5 ml-1 block"
-    const iconClass = "absolute left-3.5 top-[36px] w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors"
+    const inputClass = "w-full bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 text-sm py-3 px-3 pl-10 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+    const labelClass = "text-xs font-semibold text-gray-700 mb-1.5 block"
+    const iconClass = "absolute left-3 top-[34px] w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors pointer-events-none"
 
     return (
-        <div className="bg-white rounded-[2.5rem] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.08)] border border-gray-100 select-none relative overflow-visible">
-            {/* Attractive Floating Badge */}
-            <div className="absolute -top-4 -right-2 bg-gradient-to-r from-orange-400 to-yellow-400 text-white text-[10px] font-black px-5 py-2 rounded-full shadow-lg tracking-wider animate-pulse z-10 border border-white/20">
-                ⭐ Top Rated Service
+        <div className="bg-white rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.10)] border border-gray-100 overflow-hidden">
+
+            {/* Header */}
+            <div className="bg-blue-600 px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h2 className="text-white font-black text-lg leading-tight">Get Your Free Quote</h2>
+                    <p className="text-blue-200 text-xs mt-0.5">No commitment · 100% free · Fast turnaround</p>
+                </div>
+                <div className="flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1.5 shrink-0">
+                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                    <span className="text-white text-xs font-bold">Reply in 2hrs</span>
+                </div>
             </div>
 
-            <div className="relative">
-                <div className="mb-8">
-                    <h2 className="text-gray-900 font-black text-3xl tracking-tighter leading-none mb-2">
-                        Get Your Quote
-                    </h2>
-                    <div className="flex items-center gap-2">
-                        <span className="w-8 h-1 bg-blue-500 rounded-full" />
-                        <p className="text-gray-400 text-[10px] font-bold tracking-widest">Personalized Pricing in 24h</p>
-                    </div>
-                </div>
-
+            <div className="p-6 space-y-4">
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+
+                    {/* Name + Email */}
+                    <div className="grid grid-cols-2 gap-3">
                         <div className="relative group">
-                            <label className={labelClass}>Full Name *</label>
+                            <label className={labelClass}>Full Name <span className="text-red-400">*</span></label>
                             <User className={iconClass} />
-                            <input {...form.register("name")} placeholder="Your Name" className={inputClass} />
+                            <input {...form.register("name")} placeholder="John Smith" className={inputClass} />
+                            {form.formState.errors.name && (
+                                <p className="text-red-500 text-[10px] mt-0.5 ml-0.5">{form.formState.errors.name.message}</p>
+                            )}
                         </div>
                         <div className="relative group">
-                            <label className={labelClass}>Email Address *</label>
+                            <label className={labelClass}>Email Address <span className="text-red-400">*</span></label>
                             <Mail className={iconClass} />
-                            <input {...form.register("email")} placeholder="email@company.com" className={inputClass} />
+                            <input {...form.register("email")} placeholder="you@company.com" className={inputClass} />
+                            {form.formState.errors.email && (
+                                <p className="text-red-500 text-[10px] mt-0.5 ml-0.5">{form.formState.errors.email.message}</p>
+                            )}
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Phone + Quantity */}
+                    <div className="grid grid-cols-2 gap-3">
                         <div className="relative group">
-                            <label className={labelClass}>Phone *</label>
+                            <label className={labelClass}>
+                                Phone <span className="text-gray-400 font-normal text-[10px]">(optional)</span>
+                            </label>
                             <Phone className={iconClass} />
                             <input {...form.register("phone")} placeholder="+1 (000) 000-0000" className={inputClass} />
                         </div>
                         <div className="relative group">
-                            <label className={labelClass}>Quantity *</label>
-                            <Briefcase className={iconClass} />
-                            <input {...form.register("quantity")} placeholder="Min 100" type="number" className={inputClass} />
+                            <label className={labelClass}>Quantity <span className="text-red-400">*</span></label>
+                            <Package className={iconClass} />
+                            <input {...form.register("quantity")} type="number" min="1" placeholder="e.g. 500" className={inputClass} />
+                            {form.formState.errors.quantity && (
+                                <p className="text-red-500 text-[10px] mt-0.5 ml-0.5">{form.formState.errors.quantity.message}</p>
+                            )}
                         </div>
                     </div>
 
-                    <div className="relative group">
-                        <label className={labelClass}>Dimensions (Width, Length, Depth)</label>
-                        <Maximize2 className={iconClass} />
-                        <div className="grid grid-cols-4 gap-2">
-                            <div className="col-span-1">
-                                <input {...form.register("width")} placeholder="W" className="w-full bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 text-xs py-3 px-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none pl-10" />
+                    {/* Optional Details Toggle */}
+                    <button
+                        type="button"
+                        onClick={() => setShowDetails(!showDetails)}
+                        className="w-full flex items-center justify-between text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors px-4 py-2.5 rounded-xl border border-blue-100"
+                    >
+                        <span>
+                            + Add Dimensions & Material
+                            <span className="text-blue-400 font-normal ml-1">(optional — helps us quote faster)</span>
+                        </span>
+                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", showDetails && "rotate-180")} />
+                    </button>
+
+                    {showDetails && (
+                        <div className="space-y-3 border border-gray-100 rounded-xl p-4 bg-gray-50/50">
+                            <div>
+                                <label className={labelClass}>Box Dimensions (W × L × D)</label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    <input {...form.register("width")} placeholder="W" className="w-full bg-white border border-gray-200 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-gray-400" />
+                                    <input {...form.register("length")} placeholder="L" className="w-full bg-white border border-gray-200 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-gray-400" />
+                                    <input {...form.register("depth")} placeholder="D" className="w-full bg-white border border-gray-200 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-gray-400" />
+                                    <select {...form.register("unit")} className="w-full bg-white border border-gray-200 text-sm py-2.5 px-2 rounded-xl outline-none cursor-pointer text-gray-700">
+                                        <option value="Inches">in</option>
+                                        <option value="CM">cm</option>
+                                    </select>
+                                </div>
                             </div>
-                            <input {...form.register("length")} placeholder="L" className="w-full bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 text-xs py-3 px-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none" />
-                            <input {...form.register("depth")} placeholder="D" className="w-full bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 text-xs py-3 px-3 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none" />
-                            <select {...form.register("unit")} className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-xs py-3 px-1 rounded-xl focus:bg-white outline-none cursor-pointer">
-                                <option value="Inches">Inches</option>
-                                <option value="CM">CM</option>
-                            </select>
+                            <div>
+                                <label className={labelClass}>Material Stock</label>
+                                <select {...form.register("stock")} className="w-full bg-white border border-gray-200 text-gray-700 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer">
+                                    <option value="12pt Cardboard">12pt Cardboard (Standard)</option>
+                                    <option value="14pt Cardboard">14pt Cardboard (Premium)</option>
+                                    <option value="Rigid">Luxury Rigid</option>
+                                    <option value="Kraft">Eco-Kraft</option>
+                                </select>
+                            </div>
                         </div>
+                    )}
+
+                    {/* Message */}
+                    <div className="relative group">
+                        <label className={labelClass}>
+                            Special Requirements <span className="text-gray-400 font-normal text-[10px]">(optional)</span>
+                        </label>
+                        <MessageSquare className={iconClass} />
+                        <input {...form.register("message")} placeholder="Printing style, finish, custom artwork..." className={inputClass} />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="relative group">
-                            <label className={labelClass}>Material Stock</label>
-                            <Layers className={iconClass} />
-                            <select {...form.register("stock")} className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-xs py-3 px-3 pl-10 rounded-xl focus:bg-white outline-none cursor-pointer appearance-none">
-                                <option value="12pt Cardboard">12pt Cardboard Stock</option>
-                                <option value="14pt Cardboard">14pt Cardboard Stock</option>
-                                <option value="Rigid">Luxury Rigid Stock</option>
-                                <option value="Kraft">Eco-Kraft Stock</option>
-                            </select>
-                        </div>
-                        <div className="relative group">
-                            <label className={labelClass}>Additional Info</label>
-                            <FileText className={iconClass} />
-                            <input {...form.register("message")} placeholder="Any specific requirements?" className={inputClass} />
-                        </div>
-                    </div>
-
-                    {/* Honeypot field (hidden) */}
+                    {/* Honeypot */}
                     <div className="hidden" aria-hidden="true">
                         <input {...form.register("hp_field")} type="text" tabIndex={-1} autoComplete="off" />
+                    </div>
+
+                    {/* Trust pills */}
+                    <div className="grid grid-cols-3 gap-2">
+                        {[
+                            { icon: Zap, label: "2hr Response" },
+                            { icon: Shield, label: "100% Free" },
+                            { icon: Clock, label: "10–12 Day Lead" },
+                        ].map(({ icon: Icon, label }) => (
+                            <div key={label} className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-2 justify-center border border-gray-100">
+                                <Icon className="w-3 h-3 text-blue-500 shrink-0" />
+                                <span className="text-[10px] font-semibold text-gray-600">{label}</span>
+                            </div>
+                        ))}
                     </div>
 
                     <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-8 rounded-2xl shadow-xl hover:shadow-blue-500/30 active:scale-[0.98] transition-all mt-6 tracking-[0.1em] flex items-center justify-center gap-3 text-base border-b-4 border-blue-800 hover:border-blue-900 active:border-b-0"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-7 rounded-xl shadow-lg hover:shadow-blue-500/25 active:scale-[0.99] transition-all text-base border-b-4 border-blue-800 hover:border-blue-900"
                     >
-                        {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : (
-                            <>
-                                Claim My Free Quote
-                                <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                            </>
+                        {isSubmitting ? (
+                            <Loader2 className="animate-spin h-5 w-5" />
+                        ) : (
+                            <>Get My Free Quote <ChevronRight className="w-5 h-5 ml-1" /></>
                         )}
                     </Button>
 
-                    <div className="flex flex-col items-center justify-center gap-3 mt-6 pt-6 border-t border-gray-50">
-                        <div className="flex items-center gap-1.5">
-                            {[...Array(5)].map((_, i) => (
-                                <svg key={i} className="w-3 h-3 text-yellow-500 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                            ))}
-                        </div>
-                        <p className="text-[10px] text-gray-400 font-bold tracking-widest flex items-center gap-2">
-                            Trusted by 5,000+ businesses worldwide
-                        </p>
-                    </div>
+                    <p className="text-center text-[10px] text-gray-400">
+                        ⭐⭐⭐⭐⭐ Trusted by 5,000+ businesses · No spam, ever
+                    </p>
                 </form>
             </div>
         </div>
