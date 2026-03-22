@@ -17,6 +17,7 @@ import {
 import { Loader2, Save, Eye, EyeOff, RefreshCw, Plus, Trash2, ArrowUp, ArrowDown, Video, Image as ImageIcon } from "lucide-react"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
+import { getAltFromUrl } from "@/lib/image-seo"
 
 type HomepageSection = {
     id: string
@@ -694,7 +695,7 @@ function SectionEditor({ section, onUpdate }: { section: HomepageSection, onUpda
         const addImages = (urls: string[]) => {
             const newItems = urls.map(url => ({
                 url,
-                alt: '',
+                alt: getAltFromUrl(url, ''),
                 title: ''
             }))
             onUpdate('items', [...items, ...newItems])
