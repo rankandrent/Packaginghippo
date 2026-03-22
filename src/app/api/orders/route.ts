@@ -4,7 +4,14 @@ import prisma from '@/lib/db'
 export async function GET() {
     try {
         const orders = await prisma.order.findMany({
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
+            include: {
+                items: {
+                    include: {
+                        product: { select: { name: true, slug: true } }
+                    }
+                }
+            }
         })
         return NextResponse.json(orders)
     } catch (error) {
