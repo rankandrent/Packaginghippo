@@ -27,6 +27,7 @@ import { VideoSection } from "./sections/VideoSection"
 import { GallerySection } from "./sections/GallerySection"
 import { CategoriesSection } from "./CategoriesSection"
 import { FeaturedBlogs } from "./sections/FeaturedBlogs"
+import { MerchantProductsSection } from "./sections/MerchantProductsSection"
 
 type HomepageData = Record<string, any>
 
@@ -58,6 +59,7 @@ const SECTION_COMPONENTS: Record<string, React.FC<{ data: any }>> = {
     custom_quote_form: (props: { data: any }) => <CustomQuoteFormSection image={props.data?.image} />,
     video_section: VideoSection,
     gallery_section: GallerySection,
+    merchant_products: MerchantProductsSection,
 }
 
 export default function HomePageClient({

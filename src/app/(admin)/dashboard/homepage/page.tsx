@@ -309,6 +309,14 @@ export default function HomepageEditor() {
                         items: [] // Array of { url, alt, title }
                     }
                     break
+                case 'merchant_products':
+                    title = 'Merchant Products'
+                    content = {
+                        heading: 'Featured Products',
+                        subheading: 'Premium custom packaging solutions for every need.',
+                        products: [] // Array of { image, name, price, link }
+                    }
+                    break
                 default:
                     title = `New ${key.replace(/_/g, ' ')}`
                     content = { heading: 'New Section' }
@@ -428,6 +436,9 @@ export default function HomepageEditor() {
                 </Button>
                 <Button onClick={() => createSection('gallery_section')} className="bg-purple-600 hover:bg-purple-700">
                     <ImageIcon className="w-4 h-4 mr-2" /> Add Gallery
+                </Button>
+                <Button onClick={() => createSection('merchant_products')} className="bg-green-700 hover:bg-green-800">
+                    <Plus className="w-4 h-4 mr-2" /> Add Merchant Products
                 </Button>
             </div>
 
@@ -683,6 +694,120 @@ function SectionEditor({ section, onUpdate }: { section: HomepageSection, onUpda
                         onChange={e => onUpdate('videoUrl', e.target.value)}
                         placeholder="https://www.youtube.com/watch?v=..."
                     />
+                </div>
+            </div>
+        )
+    }
+
+    // Merchant Products Section Editor
+    if (section.sectionKey === 'merchant_products') {
+        const products = Array.isArray(content.products) ? content.products : []
+
+        const addProduct = (imageUrl: string) => {
+            const newProduct = {
+                image: imageUrl,
+                name: getAltFromUrl(imageUrl, ''),
+                price: '',
+                link: '/'
+            }
+            onUpdate('products', [...products, newProduct])
+        }
+
+        const updateProduct = (index: number, field: string, value: string) => {
+            const updated = [...products]
+            updated[index] = { ...updated[index], [field]: value }
+            onUpdate('products', updated)
+        }
+
+        const removeProduct = (index: number) => {
+            onUpdate('products', products.filter((_: any, i: number) => i !== index))
+        }
+
+        return (
+            <div className="space-y-4">
+                <div className="bg-green-50 p-4 rounded text-sm text-green-800">
+                    Add up to 7 products for Google Merchant Center. Each product needs an image, name, price, and link.
+                </div>
+                <div className="space-y-2">
+                    <Label>Section Heading</Label>
+                    <Input
+                        value={content.heading || ''}
+                        onChange={e => onUpdate('heading', e.target.value)}
+                        placeholder="e.g. Featured Products"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Subheading</Label>
+                    <Input
+                        value={content.subheading || ''}
+                        onChange={e => onUpdate('subheading', e.target.value)}
+                        placeholder="e.g. Premium custom packaging solutions..."
+                    />
+                </div>
+
+                <div className="space-y-4 border p-4 rounded-md">
+                    <Label>Products ({products.length}/7)</Label>
+
+                    <div className="space-y-3">
+                        {products.map((product: any, idx: number) => (
+                            <div key={idx} className="border rounded-md p-3 flex gap-3 bg-gray-50 relative group">
+                                <div className="w-20 h-20 flex-shrink-0 bg-white border rounded overflow-hidden">
+                                    {product.image && (
+                                        <img src={product.image} alt={product.name} className="w-full h-full object-contain p-1" />
+                                    )}
+                                </div>
+                                <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    <div className="space-y-1">
+                                        <Label className="text-[10px] uppercase text-muted-foreground">Product Name</Label>
+                                        <Input
+                                            value={product.name || ''}
+                                            onChange={e => updateProduct(idx, 'name', e.target.value)}
+                                            placeholder="e.g. Custom Kraft Boxes"
+                                            className="h-8 text-xs"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label className="text-[10px] uppercase text-muted-foreground">Price (Display)</Label>
+                                        <Input
+                                            value={product.price || ''}
+                                            onChange={e => updateProduct(idx, 'price', e.target.value)}
+                                            placeholder="e.g. Starting at $0.50"
+                                            className="h-8 text-xs"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label className="text-[10px] uppercase text-muted-foreground">Page Link</Label>
+                                        <Input
+                                            value={product.link || ''}
+                                            onChange={e => updateProduct(idx, 'link', e.target.value)}
+                                            placeholder="e.g. /custom-kraft-boxes"
+                                            className="h-8 text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => removeProduct(idx)}
+                                    className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+
+                    {products.length < 7 && (
+                        <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">Add Product Image</Label>
+                            <ImageUploader
+                                value={[]}
+                                bucket="products"
+                                onChange={(urls) => {
+                                    urls.forEach(url => addProduct(url))
+                                }}
+                                maxFiles={7 - products.length}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         )
