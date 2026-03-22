@@ -149,12 +149,12 @@ async function getLayoutSettings() {
         })
         // Default layout matching requested best structure
         return {
-            product: ['product_tabs', 'material_finishing', 'testimonials', 'faqs', 'content', 'related_products'],
+            product: ['product_tabs', 'material_finishing', 'testimonials', 'content', 'faqs', 'related_products'],
             category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_products']
         }
     } catch (error) {
         return {
-            product: ['product_tabs', 'material_finishing', 'testimonials', 'faqs', 'content', 'related_products'],
+            product: ['product_tabs', 'material_finishing', 'testimonials', 'content', 'faqs', 'related_products'],
             category: ['testimonials', 'cta', 'quote_form', 'content', 'faqs', 'related_products']
         }
     }
