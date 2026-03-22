@@ -58,17 +58,12 @@ export async function middleware(request: NextRequest) {
             // Normalize the pathname for matching
             const normalizedPath = normalizeSourceUrl(pathname);
 
-            // Use request.nextUrl.origin for reliable internal API calls
-            // This works correctly in Docker/production environments
-            const origin = request.nextUrl.origin;
-            const redirectCheckUrl = `${origin}/api/redirect-lookup?sourceUrl=${encodeURIComponent(normalizedPath)}`;
-            
-            const redirectRes = await fetch(redirectCheckUrl, {
-                headers: {
-                    // Pass along the host header to ensure proper routing
-                    'x-forwarded-host': request.headers.get('host') || '',
-                },
-            });
+            // In Docker/Coolify production, the public URL can't be reached internally.
+            // Always use localhost:3000 for internal API calls to avoid container networking issues.
+            const internalOrigin = process.env.INTERNAL_API_URL || 'http://localhost:3000';
+            const redirectCheckUrl = `${internalOrigin}/api/redirect-lookup?sourceUrl=${encodeURIComponent(normalizedPath)}`;
+
+            const redirectRes = await fetch(redirectCheckUrl, { cache: 'no-store' });
 
             if (redirectRes.ok) {
                 const redirectData = await redirectRes.json();
