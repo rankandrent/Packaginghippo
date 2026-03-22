@@ -16,12 +16,35 @@ export async function GET() {
 export async function POST(req: Request) {
     try {
         const body = await req.json()
-        const { 
+        const {
             customerName, customerEmail, customerPhone,
             addressLine1, addressLine2, city, state, zipCode, country,
             subtotal, shippingCost, taxAmount, totalAmount,
-            status, paymentStatus, items 
+            status, paymentStatus, items
         } = body
+
+        // Resolve product IDs from slugs
+        const resolvedItems: { productId: string, quantity: number, priceAtTime: number }[] = []
+        if (Array.isArray(items)) {
+            for (const item of items) {
+                const slug = item.slug || item.productId
+                let productId = item.productId
+
+                // If slug provided (not a MongoDB ObjectId), look up the real ID
+                if (slug && !/^[a-f\d]{24}$/i.test(slug)) {
+                    const product = await prisma.product.findFirst({ where: { slug }, select: { id: true } })
+                    if (product) productId = product.id
+                }
+
+                if (productId && /^[a-f\d]{24}$/i.test(productId)) {
+                    resolvedItems.push({
+                        productId,
+                        quantity: parseInt(item.quantity) || 1,
+                        priceAtTime: parseFloat(item.price) || 0,
+                    })
+                }
+            }
+        }
 
         const order = await prisma.order.create({
             data: {
@@ -41,13 +64,9 @@ export async function POST(req: Request) {
                 totalAmount: parseFloat(totalAmount) || 0,
                 status: status || 'PENDING',
                 paymentStatus: paymentStatus || 'UNPAID',
-                items: {
-                    create: items?.map((item: any) => ({
-                        productId: item.productId,
-                        quantity: parseInt(item.quantity) || 1,
-                        priceAtTime: parseFloat(item.price) || 0
-                    }))
-                }
+                ...(resolvedItems.length > 0 && {
+                    items: { create: resolvedItems }
+                }),
             },
             include: {
                 items: true
