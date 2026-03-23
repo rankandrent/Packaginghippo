@@ -52,10 +52,39 @@ function AddToCartButton({ product, index }: { product: MerchantProduct, index: 
     )
 }
 
+function PlaceholderCard() {
+    return (
+        <div className="bg-white rounded-2xl border border-dashed border-gray-200 overflow-hidden flex flex-col">
+            <div className="aspect-square bg-gray-100 animate-pulse" />
+            <div className="p-3 flex flex-col gap-2">
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4" />
+                <div className="h-3 bg-gray-100 rounded animate-pulse w-1/2" />
+                <div className="h-7 bg-gray-200 rounded-lg animate-pulse mt-1" />
+            </div>
+        </div>
+    )
+}
+
 export function MerchantProductsSection({ data }: { data: any }) {
     if (!data) return null
     const products: MerchantProduct[] = Array.isArray(data.products) ? data.products : []
-    if (products.length === 0) return null
+
+    // Show placeholder skeleton when no products added yet
+    if (products.length === 0) {
+        return (
+            <section className="py-16 bg-gray-50">
+                <div className="container mx-auto px-4">
+                    <div className="text-center mb-12">
+                        <div className="h-10 bg-gray-200 rounded-xl animate-pulse max-w-xs mx-auto mb-4" />
+                        <div className="h-4 bg-gray-100 rounded animate-pulse max-w-sm mx-auto" />
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                        {Array.from({ length: 5 }).map((_, i) => <PlaceholderCard key={i} />)}
+                    </div>
+                </div>
+            </section>
+        )
+    }
 
     return (
         <section className="py-16 bg-gray-50">
