@@ -19,8 +19,7 @@ export const metadata: Metadata = {
     },
 }
 
-// Revalidate every minute
-export const revalidate = 0
+export const revalidate = 60
 
 async function getCategories() {
     try {

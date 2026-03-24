@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { getSeoImageUrl } from "@/lib/image-seo"
 import { Metadata } from "next"
+
+export const revalidate = 3600
 import { Calendar, User, ArrowRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn, constructMetadataTitle } from "@/lib/utils"

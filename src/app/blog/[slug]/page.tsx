@@ -9,6 +9,10 @@ import { QuoteForm } from "@/components/forms/QuoteForm"
 import { JsonLd } from "@/components/seo/JsonLd"
 import { getSeoImageUrl } from "@/lib/image-seo"
 
+export const revalidate = 3600
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://packaginghippo.com"
+
 async function getBlogPost(slug: string) {
     const post = await prisma.blogPost.findUnique({
         where: { slug },
@@ -78,23 +82,23 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                 data={{
                     "@context": "https://schema.org",
                     "@type": "BlogPosting",
-                    "@id": `https://packaginghippo.com/blog/${post.slug}`,
+                    "@id": `${SITE_URL}/blog/${post.slug}`,
                     "headline": post.seoTitle || post.title,
                     "description": post.seoDesc || post.excerpt,
                     "image": post.mainImage ? [getSeoImageUrl(post.mainImage)] : [],
                     "author": {
                         "@type": "Person",
                         "name": post.author?.name || "Admin",
-                        "url": post.author?.slug ? `https://packaginghippo.com/blog/author/${post.author.slug}` : undefined
+                        "url": post.author?.slug ? `${SITE_URL}/blog/author/${post.author.slug}` : undefined
                     },
                     "publisher": {
-                        "@id": "https://packaginghippo.com/#organization"
+                        "@id": `${SITE_URL}/#organization`
                     },
                     "datePublished": post.publishedAt || post.createdAt,
                     "dateModified": post.updatedAt || post.publishedAt || post.createdAt,
                     "mainEntityOfPage": {
                         "@type": "WebPage",
-                        "@id": `https://packaginghippo.com/blog/${post.slug}`
+                        "@id": `${SITE_URL}/blog/${post.slug}`
                     }
                 }}
             />
@@ -106,7 +110,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                     "itemListElement": [
                         { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://packaginghippo.com" },
                         { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://packaginghippo.com/blog" },
-                        { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://packaginghippo.com/blog/${post.slug}` }
+                        { "@type": "ListItem", "position": 3, "name": post.title, "item": `${SITE_URL}/blog/${post.slug}` }
                     ]
                 }}
             />

@@ -34,6 +34,8 @@ import {
     getHomepageSections
 } from "@/lib/cms"
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://packaginghippo.com"
+
 export const revalidate = 60
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -325,9 +327,9 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     "@context": "https://schema.org",
                     "@type": "CollectionPage",
                     "name": category.name,
-                    "url": `https://packaginghippo.com/${slug}`,
+                    "url": `${SITE_URL}/${slug}`,
                     "description": category.seoDesc || category.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
-                    "isPartOf": { "@id": "https://packaginghippo.com/#website" },
+                    "isPartOf": { "@id": `${SITE_URL}/#website` },
                     "aggregateRating": {
                         "@type": "AggregateRating",
                         "ratingValue": "4.9",
@@ -349,7 +351,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                             "item": {
                                 "@type": "Product",
                                 "name": product.name,
-                                "url": `https://packaginghippo.com/${product.slug}`
+                                "url": `${SITE_URL}/${product.slug}`
                             }
                         }))
                     }}
@@ -385,7 +387,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                         "@type": "ListItem",
                         "position": index + 1,
                         "name": item.label,
-                        "item": item.href ? `https://packaginghippo.com${item.href}` : undefined
+                        "item": item.href ? `${SITE_URL}${item.href}` : undefined
                     }))
                 }}
             />
@@ -566,7 +568,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                         "@type": "ListItem",
                         "position": index + 1,
                         "name": item.label,
-                        "item": item.href ? `https://packaginghippo.com${item.href}` : undefined
+                        "item": item.href ? `${SITE_URL}${item.href}` : undefined
                     }))
                 }}
             />
@@ -575,7 +577,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                 data={{
                     "@context": "https://schema.org",
                     "@type": "Product",
-                    "@id": `https://packaginghippo.com/${product.slug}`,
+                    "@id": `${SITE_URL}/${product.slug}`,
                     "name": product.name,
                     "image": product.images ? product.images.map((img: string) => getSeoImageUrl(img)) : [],
                     "description": product.shortDesc || product.seoDesc || product.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
@@ -584,7 +586,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     "brand": {
                         "@type": "Brand",
                         "name": "Packaging Hippo",
-                        "@id": "https://packaginghippo.com/#organization"
+                        "@id": `${SITE_URL}/#organization`
                     },
                     "aggregateRating": {
                         "@type": "AggregateRating",
@@ -597,11 +599,11 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                         "availability": "https://schema.org/InStock",
                         "priceCurrency": "USD",
                         "price": product.price || "1.00",
-                        "url": `https://packaginghippo.com/${product.slug}`,
+                        "url": `${SITE_URL}/${product.slug}`,
                         "seller": {
                             "@type": "Organization",
                             "name": "Packaging Hippo",
-                            "@id": "https://packaginghippo.com/#organization"
+                            "@id": `${SITE_URL}/#organization`
                         }
                     },
                     "additionalProperty": [
@@ -771,7 +773,7 @@ async function PageView({ page, slug }: { page: any, slug: string }) {
                     "@type": "WebPage",
                     "name": page.title,
                     "description": page.seoDesc,
-                    "url": `https://packaginghippo.com/${slug}`
+                    "url": `${SITE_URL}/${slug}`
                 }}
             />
 

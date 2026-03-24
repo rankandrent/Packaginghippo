@@ -48,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: seo.defaultDescription || "Premium custom packaging boxes with your logo. Get a free quote today.",
     keywords: seo.defaultKeywords,
     alternates: {
-      canonical: './',
+      canonical: baseUrl,
     },
     openGraph: {
       type: 'website',

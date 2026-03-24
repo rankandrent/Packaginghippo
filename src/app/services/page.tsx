@@ -6,7 +6,7 @@ import { constructMetadataTitle } from "@/lib/utils"
 import { QuoteForm } from "@/components/forms/QuoteForm"
 import { JsonLd } from "@/components/seo/JsonLd"
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 
 async function getServicesPage() {
     return await prisma.page.findUnique({
@@ -21,6 +21,9 @@ export async function generateMetadata(): Promise<Metadata> {
         title: constructMetadataTitle(page?.seoTitle || "All Packaging Categories | Packaging Hippo"),
         description: page?.seoDesc || "Browse our complete range of custom packaging categories. From corrugated boxes to luxury rigid packaging.",
         keywords: page?.seoKeywords || undefined,
+        alternates: {
+            canonical: '/services',
+        },
     }
 }
 
