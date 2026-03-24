@@ -105,7 +105,8 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json()
-        const { id, ...data } = body
+        // Strip non-schema fields that come from include() in GET (e.g. nested category object)
+        const { id, category, createdAt, ...data } = body
 
         const updated = await prisma.product.update({
             where: { id },
