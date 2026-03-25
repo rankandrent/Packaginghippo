@@ -11,7 +11,7 @@ import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
 import { LayoutSorter } from "@/components/admin/LayoutSorter"
-import { Loader2, ArrowLeft, Save, Sparkles, RotateCcw, X } from "lucide-react"
+import { Loader2, ArrowLeft, Save, Sparkles, RotateCcw, X, ExternalLink } from "lucide-react"
 import { useDraftSave, formatDraftAge } from "@/hooks/useDraftSave"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -264,6 +264,11 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                             Draft auto-saved {lastSavedAt.toLocaleTimeString()}
                         </span>
                     )}
+                    <a href={`/${category.slug}`} target="_blank" rel="noopener noreferrer">
+                        <Button type="button" variant="outline">
+                            <ExternalLink className="mr-2 h-4 w-4" /> View Page
+                        </Button>
+                    </a>
                     <Button type="submit" disabled={saving}>
                         {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <Save className="mr-2 h-4 w-4" /> Save Changes
