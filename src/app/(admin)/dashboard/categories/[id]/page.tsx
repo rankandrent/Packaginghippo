@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, use } from "react"
+import { useEffect, useState, useRef, use } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,8 @@ import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUploader } from "@/components/admin/ImageUploader"
 import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
 import { LayoutSorter } from "@/components/admin/LayoutSorter"
-import { Loader2, ArrowLeft, Save, Sparkles } from "lucide-react"
+import { Loader2, ArrowLeft, Save, Sparkles, RotateCcw, X } from "lucide-react"
+import { useDraftSave, formatDraftAge } from "@/hooks/useDraftSave"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -43,6 +44,23 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
     const [layout, setLayout] = useState<string[]>(['testimonials', 'quote_form', 'content', 'faqs', 'related_categories'])
     const router = useRouter()
     const [categories, setCategories] = useState<{ id: string, name: string }[]>([])
+
+    // Draft system
+    const draftKey = `draft_category_${id}`
+    const { saveDraft, getDraft, clearDraft, lastSavedAt } = useDraftSave<{ category: Category, sections: Section[], layout: string[] }>(draftKey)
+    const [draftEnabled, setDraftEnabled] = useState(false)
+    const [draftBanner, setDraftBanner] = useState<{ savedAt: string } | null>(null)
+    const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+    // Auto-save on any state change (debounced 3s)
+    useEffect(() => {
+        if (!draftEnabled || !category) return
+        if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
+        autoSaveTimer.current = setTimeout(() => {
+            saveDraft({ category, sections, layout })
+        }, 3000)
+        return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current) }
+    }, [category, sections, layout, draftEnabled])
 
     const [scrapeUrl, setScrapeUrl] = useState("")
     const [scraping, setScraping] = useState(false)
@@ -109,6 +127,19 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
             if (data.category.layout && Array.isArray(data.category.layout) && data.category.layout.length > 0) {
                 setLayout(data.category.layout)
             }
+
+            // Check for existing draft
+            const draft = getDraft()
+            if (draft) {
+                const draftTime = new Date(draft.savedAt).getTime()
+                const dbTime = new Date(data.category.updatedAt || 0).getTime()
+                if (draftTime > dbTime) {
+                    setDraftBanner({ savedAt: draft.savedAt })
+                } else {
+                    clearDraft()
+                }
+            }
+            setDraftEnabled(true)
         } catch (error) {
             console.error("Error fetching category:", error)
             router.push('/dashboard/categories')
@@ -164,6 +195,8 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
             const data = await res.json()
             if (!res.ok) throw new Error(data.error)
 
+            clearDraft()
+            setDraftBanner(null)
             alert("Category saved successfully!")
             router.refresh()
         } catch (error) {
@@ -184,8 +217,35 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
 
     if (!category) return <div>Category not found</div>
 
+    function restoreDraft() {
+        const draft = getDraft()
+        if (!draft) return
+        setCategory(draft.data.category)
+        setSections(draft.data.sections)
+        setLayout(draft.data.layout)
+        setDraftBanner(null)
+    }
+
     return (
         <form onSubmit={saveCategory} className="max-w-[1600px] mx-auto space-y-6">
+            {/* Draft restore banner */}
+            {draftBanner && (
+                <div className="flex items-center justify-between gap-4 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+                    <div className="flex items-center gap-2">
+                        <RotateCcw className="h-4 w-4 shrink-0" />
+                        <span>Unsaved draft found from <strong>{formatDraftAge(draftBanner.savedAt)}</strong>. Restore it?</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                        <Button type="button" size="sm" variant="outline" className="border-yellow-400 text-yellow-800 hover:bg-yellow-100" onClick={restoreDraft}>
+                            Restore Draft
+                        </Button>
+                        <Button type="button" size="sm" variant="ghost" className="text-yellow-700 hover:bg-yellow-100" onClick={() => { clearDraft(); setDraftBanner(null) }}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <Link href="/dashboard/categories">
@@ -198,10 +258,17 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                         <p className="text-muted-foreground">Manage category details and content</p>
                     </div>
                 </div>
-                <Button type="submit" disabled={saving}>
-                    {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    <Save className="mr-2 h-4 w-4" /> Save Changes
-                </Button>
+                <div className="flex items-center gap-3">
+                    {lastSavedAt && (
+                        <span className="text-xs text-green-600 hidden sm:block">
+                            Draft auto-saved {lastSavedAt.toLocaleTimeString()}
+                        </span>
+                    )}
+                    <Button type="submit" disabled={saving}>
+                        {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Save className="mr-2 h-4 w-4" /> Save Changes
+                    </Button>
+                </div>
             </div>
 
             <Card className="border-blue-200 bg-blue-50/30">

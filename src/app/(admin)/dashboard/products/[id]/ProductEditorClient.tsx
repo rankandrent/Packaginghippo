@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, use } from "react"
+import { useEffect, useState, useRef, use } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -12,7 +12,8 @@ import { ImageUploader } from "@/components/admin/ImageUploader"
 import { SectionBuilder, Section } from "@/components/admin/SectionBuilder"
 import { ProductTabsEditor } from "@/components/admin/ProductTabsEditor"
 import { LayoutSorter } from "@/components/admin/LayoutSorter"
-import { Loader2, ArrowLeft, Save, Plus, Trash2 } from "lucide-react"
+import { Loader2, ArrowLeft, Save, Plus, Trash2, RotateCcw, X } from "lucide-react"
+import { useDraftSave, formatDraftAge } from "@/hooks/useDraftSave"
 
 type Category = {
     id: string
@@ -73,6 +74,23 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
     const [tabs, setTabs] = useState<any>({})
     const [layout, setLayout] = useState<string[]>(['product_tabs', 'quote_form', 'content', 'faqs', 'related_products'])
 
+    // Draft system
+    const draftKey = `draft_product_${id}`
+    const { saveDraft, getDraft, clearDraft, lastSavedAt } = useDraftSave<{ product: Product, sections: Section[], tabs: any, layout: string[] }>(draftKey)
+    const [draftEnabled, setDraftEnabled] = useState(false)
+    const [draftBanner, setDraftBanner] = useState<{ savedAt: string } | null>(null)
+    const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+    // Auto-save on any state change (debounced 3s)
+    useEffect(() => {
+        if (!draftEnabled || !product) return
+        if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
+        autoSaveTimer.current = setTimeout(() => {
+            saveDraft({ product, sections, tabs, layout })
+        }, 3000)
+        return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current) }
+    }, [product, sections, tabs, layout, draftEnabled])
+
     useEffect(() => {
         const init = async () => {
             await Promise.all([fetchProduct(), fetchCategories()])
@@ -88,20 +106,30 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
             if (data.error) throw new Error(data.error)
 
             setProduct(data.product)
-            // Parse sections if existing
             if (data.product.sections && Array.isArray(data.product.sections)) {
                 setSections(data.product.sections)
             }
-            // Parse tabs if existing
             if (data.product.tabs) {
                 setTabs(data.product.tabs)
             }
             if (data.product.layout && Array.isArray(data.product.layout) && data.product.layout.length > 0) {
                 setLayout(data.product.layout)
             }
+
+            // Check for existing draft (newer than last DB save)
+            const draft = getDraft()
+            if (draft) {
+                const draftTime = new Date(draft.savedAt).getTime()
+                const dbTime = new Date(data.product.updatedAt || 0).getTime()
+                if (draftTime > dbTime) {
+                    setDraftBanner({ savedAt: draft.savedAt })
+                } else {
+                    clearDraft() // draft is older than DB — discard silently
+                }
+            }
+            setDraftEnabled(true)
         } catch (error) {
             console.error("Error fetching product:", error)
-            // router.push('/dashboard/products')
         }
     }
 
@@ -135,6 +163,8 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
             const data = await res.json()
             if (!res.ok) throw new Error(data.error)
 
+            clearDraft()
+            setDraftBanner(null)
             alert("Product saved successfully!")
             router.refresh()
         } catch (error) {
@@ -155,8 +185,36 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
 
     if (!product) return <div>Product not found</div>
 
+    function restoreDraft() {
+        const draft = getDraft()
+        if (!draft) return
+        setProduct(draft.data.product)
+        setSections(draft.data.sections)
+        setTabs(draft.data.tabs)
+        setLayout(draft.data.layout)
+        setDraftBanner(null)
+    }
+
     return (
         <form onSubmit={saveProduct} className="max-w-6xl mx-auto space-y-8 pb-20">
+            {/* Draft restore banner */}
+            {draftBanner && (
+                <div className="flex items-center justify-between gap-4 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+                    <div className="flex items-center gap-2">
+                        <RotateCcw className="h-4 w-4 shrink-0" />
+                        <span>Unsaved draft found from <strong>{formatDraftAge(draftBanner.savedAt)}</strong>. Restore it?</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                        <Button type="button" size="sm" variant="outline" className="border-yellow-400 text-yellow-800 hover:bg-yellow-100" onClick={restoreDraft}>
+                            Restore Draft
+                        </Button>
+                        <Button type="button" size="sm" variant="ghost" className="text-yellow-700 hover:bg-yellow-100" onClick={() => { clearDraft(); setDraftBanner(null) }}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             <div className="flex items-center justify-between sticky top-0 bg-background/95 backdrop-blur z-10 py-4 border-b">
                 <div className="flex items-center gap-4">
                     <Link href="/dashboard/products">
@@ -169,10 +227,17 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                         <p className="text-sm text-muted-foreground">ID: {product.id}</p>
                     </div>
                 </div>
-                <Button type="submit" disabled={saving}>
-                    {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    <Save className="mr-2 h-4 w-4" /> Save Changes
-                </Button>
+                <div className="flex items-center gap-3">
+                    {lastSavedAt && (
+                        <span className="text-xs text-green-600 hidden sm:block">
+                            Draft auto-saved {lastSavedAt.toLocaleTimeString()}
+                        </span>
+                    )}
+                    <Button type="submit" disabled={saving}>
+                        {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Save className="mr-2 h-4 w-4" /> Save Changes
+                    </Button>
+                </div>
             </div>
 
             <div className="grid gap-8 md:grid-cols-3">
