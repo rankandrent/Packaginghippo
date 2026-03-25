@@ -688,7 +688,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                 )}
 
                                 <div className="prose prose-sm text-gray-600 max-w-none">
-                                    <p className="line-clamp-4">{product.shortDesc}</p>
+                                    <p>{product.shortDesc}</p>
                                 </div>
 
                                 {/* Compact Form Injection or Add to Cart */}
