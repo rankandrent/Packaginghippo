@@ -45,10 +45,10 @@ export default function BlogAuthorsPage() {
         if (!newAuthor.name) return
         setLoading(true)
         try {
-            const slug = newAuthor.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+            const slug = newAuthor.slug || newAuthor.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
             const url = '/api/cms/authors'
             const method = editingId ? 'PUT' : 'POST'
-            const body = editingId ? { ...newAuthor, id: editingId } : { ...newAuthor, slug }
+            const body = editingId ? { ...newAuthor, slug, id: editingId } : { ...newAuthor, slug }
 
             const res = await fetch(url, {
                 method,
@@ -142,6 +142,18 @@ export default function BlogAuthorsPage() {
                             <div className="space-y-2">
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Full Name</label>
                                 <Input value={newAuthor.name} onChange={(e) => setNewAuthor({ ...newAuthor, name: e.target.value })} placeholder="e.g. John Doe" className="font-bold" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Profile URL Slug</label>
+                                <div className="flex items-center gap-1">
+                                    <span className="text-xs text-gray-400 whitespace-nowrap">/blog/author/</span>
+                                    <Input
+                                        value={newAuthor.slug}
+                                        onChange={(e) => setNewAuthor({ ...newAuthor, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}
+                                        placeholder="e.g. john-doe"
+                                    />
+                                </div>
+                                <p className="text-[10px] text-muted-foreground italic">Leave blank to auto-generate from name.</p>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Professional Role</label>
