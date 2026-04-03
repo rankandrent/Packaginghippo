@@ -32,13 +32,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             }).catch(() => [])
         ])
 
+        const staticLastMod = new Date('2025-01-01')
         const staticRoutes: MetadataRoute.Sitemap = [
-            { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
-            { url: `${baseUrl}/services`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-            { url: `${baseUrl}/products`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-            { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
-            { url: `${baseUrl}/quote`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-            { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+            { url: baseUrl, lastModified: staticLastMod, changeFrequency: 'daily', priority: 1 },
+            { url: `${baseUrl}/services`, lastModified: staticLastMod, changeFrequency: 'weekly', priority: 0.9 },
+            { url: `${baseUrl}/products`, lastModified: staticLastMod, changeFrequency: 'weekly', priority: 0.9 },
+            { url: `${baseUrl}/blog`, lastModified: staticLastMod, changeFrequency: 'daily', priority: 0.8 },
+            { url: `${baseUrl}/quote`, lastModified: staticLastMod, changeFrequency: 'monthly', priority: 0.7 },
+            { url: `${baseUrl}/contact-us`, lastModified: staticLastMod, changeFrequency: 'monthly', priority: 0.6 },
         ]
 
         const productEntries: MetadataRoute.Sitemap = products.map((p) => ({
