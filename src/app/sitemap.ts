@@ -1,15 +1,12 @@
 import { MetadataRoute } from 'next'
 import prisma from '@/lib/db'
-import { headers } from 'next/headers'
+import { getSiteUrl } from '@/lib/utils'
 
 // Revalidate every hour
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const headersList = await headers()
-    const host = headersList.get('host') || 'localhost:3000'
-    const protocol = host.includes('localhost') ? 'http' : 'https'
-    const baseUrl = `${protocol}://${host}`
+    const baseUrl = getSiteUrl()
 
     try {
         // Fetch everything in parallel

@@ -14,41 +14,8 @@ type Testimonial = {
 export default function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
     if (!testimonials || testimonials.length === 0) return null
 
-    const schema = {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "@id": "https://packaginghippo.com/#organization",
-        "name": "Packaging Hippo",
-        "url": "https://packaginghippo.com",
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": (testimonials.reduce((acc, t) => acc + t.rating, 0) / testimonials.length).toFixed(1),
-            "reviewCount": testimonials.length,
-            "bestRating": "5",
-            "worstRating": "1"
-        },
-        "review": testimonials.map(t => ({
-            "@type": "Review",
-            "reviewRating": {
-                "@type": "Rating",
-                "ratingValue": t.rating,
-                "bestRating": "5",
-                "worstRating": "1"
-            },
-            "author": {
-                "@type": "Person",
-                "name": t.name
-            },
-            "reviewBody": t.content
-        }))
-    }
-
     return (
         <section className="py-16 bg-white">
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-            />
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">

@@ -1,5 +1,4 @@
-
-import prisma from "@/lib/db"
+import { getSiteUrl } from "@/lib/utils"
 
 interface PageSchemaProps {
     page: {
@@ -10,7 +9,7 @@ interface PageSchemaProps {
 }
 
 export async function PageSchema({ page }: PageSchemaProps) {
-    const siteUrl = "https://packaginghippo.com"
+    const siteUrl = getSiteUrl()
     const isAbout = page.slug === 'about-us' || page.slug === 'about'
     const isContact = page.slug === 'contact-us' || page.slug === 'contact'
 
@@ -36,25 +35,31 @@ export async function PageSchema({ page }: PageSchemaProps) {
     const webpageSchema = {
         "@context": "https://schema.org",
         "@type": isAbout ? "AboutPage" : isContact ? "ContactPage" : "WebPage",
+        "@id": `${siteUrl}/${page.slug}#webpage`,
         "name": page.title,
         "description": page.seoDesc || `Read about ${page.title} at Packaging Hippo.`,
         "url": `${siteUrl}/${page.slug}`,
-        "breadcrumb": breadcrumbSchema,
+        "isPartOf": {
+            "@id": `${siteUrl}/#website`
+        },
+        "breadcrumb": {
+            "@id": `${siteUrl}/${page.slug}#breadcrumb`
+        },
         "publisher": {
-            "@type": "Organization",
-            "name": "Packaging Hippo",
-            "logo": {
-                "@type": "ImageObject",
-                "url": `${siteUrl}/logo.png`
-            }
+            "@id": `${siteUrl}/#organization`
         }
+    }
+
+    const enrichedBreadcrumbSchema = {
+        ...breadcrumbSchema,
+        "@id": `${siteUrl}/${page.slug}#breadcrumb`
     }
 
     return (
         <>
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(enrichedBreadcrumbSchema) }}
             />
             <script
                 type="application/ld+json"

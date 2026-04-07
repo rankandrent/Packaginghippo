@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Calendar, User, ChevronRight, Clock } from "lucide-react"
 import { notFound } from "next/navigation"
 import prisma from "@/lib/db"
-import { constructMetadataTitle } from "@/lib/utils"
+import { constructMetadataTitle, getSiteUrl } from "@/lib/utils"
 import { DynamicTOC } from "@/components/blog/DynamicTOC"
 import { ShareButtons } from "@/components/blog/ShareButtons"
 import { QuoteForm } from "@/components/forms/QuoteForm"
@@ -11,7 +11,7 @@ import { getSeoImageUrl } from "@/lib/image-seo"
 
 export const revalidate = 3600
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://packaginghippo.com"
+const SITE_URL = getSiteUrl()
 
 async function getBlogPost(slug: string) {
     const post = await prisma.blogPost.findUnique({
@@ -92,10 +92,17 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                         "url": post.author?.slug ? `${SITE_URL}/blog/author/${post.author.slug}` : undefined
                     },
                     "publisher": {
-                        "@id": `${SITE_URL}/#organization`
+                        "@type": "Organization",
+                        "@id": `${SITE_URL}/#organization`,
+                        "name": "Packaging Hippo",
+                        "logo": {
+                            "@type": "ImageObject",
+                            "url": `${SITE_URL}/logo.png`
+                        }
                     },
                     "datePublished": post.publishedAt || post.createdAt,
                     "dateModified": post.updatedAt || post.publishedAt || post.createdAt,
+                    ...(post.category?.name ? { "articleSection": post.category.name } : {}),
                     "mainEntityOfPage": {
                         "@type": "WebPage",
                         "@id": `${SITE_URL}/blog/${post.slug}`

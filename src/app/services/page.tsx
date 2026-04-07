@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import prisma from "@/lib/db"
-import { constructMetadataTitle } from "@/lib/utils"
+import { constructMetadataTitle, getSiteUrl } from "@/lib/utils"
 import { QuoteForm } from "@/components/forms/QuoteForm"
 import { JsonLd } from "@/components/seo/JsonLd"
 
@@ -48,6 +48,7 @@ function ArrowRight({ className }: { className?: string }) {
 
 export default async function ServicesPage() {
     const page = await getServicesPage()
+    const siteUrl = getSiteUrl()
     const categories = await prisma.productCategory.findMany({
         where: { isActive: true },
         orderBy: { order: 'asc' },
@@ -66,17 +67,19 @@ export default async function ServicesPage() {
                 data={{
                     "@context": "https://schema.org",
                     "@type": "CollectionPage",
-                    "@id": "https://packaginghippo.com/services",
+                    "@id": `${siteUrl}/services#collection`,
                     "name": page?.title || "All Packaging Categories",
                     "description": page?.seoDesc || "Browse our complete range of custom packaging categories. From corrugated boxes to luxury rigid packaging.",
-                    "url": "https://packaginghippo.com/services",
+                    "url": `${siteUrl}/services`,
+                    "isPartOf": { "@id": `${siteUrl}/#website` },
                     "mainEntity": {
                         "@type": "ItemList",
+                        "@id": `${siteUrl}/services#itemlist`,
                         "numberOfItems": categories.length,
                         "itemListElement": categories.map((item, index) => ({
                             "@type": "ListItem",
                             "position": index + 1,
-                            "url": `https://packaginghippo.com/services/${item.slug}`,
+                            "url": `${siteUrl}/${item.slug}`,
                             "name": item.name
                         }))
                     }
@@ -87,7 +90,8 @@ export default async function ServicesPage() {
                     "@context": "https://schema.org",
                     "@type": "BreadcrumbList",
                     "itemListElement": [
-                        { "@type": "ListItem", "position": 1, "name": "Services", "item": "https://packaginghippo.com/services" }
+                        { "@type": "ListItem", "position": 1, "name": "Home", "item": siteUrl },
+                        { "@type": "ListItem", "position": 2, "name": "Services", "item": `${siteUrl}/services` }
                     ]
                 }}
             />

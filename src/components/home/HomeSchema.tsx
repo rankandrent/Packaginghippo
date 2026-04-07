@@ -1,5 +1,5 @@
-
 import prisma from "@/lib/db"
+import { getSiteUrl } from "@/lib/utils"
 
 async function getSettings() {
     try {
@@ -18,14 +18,11 @@ async function getSettings() {
 export async function HomeSchema() {
     const general = await getSettings()
 
-    // Fallbacks or real values
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://packaginghippo.com"
+    const siteUrl = getSiteUrl()
     const siteName = general.siteName || "Packaging Hippo"
     const phone = general.phone || "+1 (510) 500-9533"
     const email = general.email || "sales@packaginghippo.com"
     const logoUrl = `${siteUrl}/logo.png`
-
-    // Extract address details if possible
     const rawAddress = general.address || "123 Packaging Street, Industrial District, NY 10001"
 
     const organizationSchema = {
@@ -47,6 +44,7 @@ export async function HomeSchema() {
             "areaServed": "US",
             "availableLanguage": "en"
         },
+        "email": email,
         "sameAs": [
             "https://www.facebook.com/packaginghippo",
             "https://twitter.com/packaginghippo",
@@ -58,7 +56,7 @@ export async function HomeSchema() {
     const localBusinessSchema = {
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
-        "@id": siteUrl,
+        "@id": `${siteUrl}/#localbusiness`,
         "name": siteName,
         "image": [
             `${siteUrl}/images/packaging-hero.webp`,
@@ -75,7 +73,7 @@ export async function HomeSchema() {
             "addressCountry": "US"
         },
         "description": "Premium custom packaging boxes with logo at wholesale prices. Packaging Hippo offers high-quality custom made boxes with fast turnaround across the USA.",
-        "brand": { "@id": `${siteUrl}/#organization` }
+        "parentOrganization": { "@id": `${siteUrl}/#organization` }
     }
 
     const websiteSchema = {
@@ -87,8 +85,26 @@ export async function HomeSchema() {
         "publisher": { "@id": `${siteUrl}/#organization` },
         "potentialAction": {
             "@type": "SearchAction",
-            "target": `${siteUrl}/search?q={search_term_string}`,
+            "target": `${siteUrl}/products?search={search_term_string}`,
             "query-input": "required name=search_term_string"
+        }
+    }
+
+    const homePageSchema = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "@id": `${siteUrl}/#webpage`,
+        "url": siteUrl,
+        "name": siteName,
+        "description": "Premium custom packaging boxes with logo.",
+        "isPartOf": {
+            "@id": `${siteUrl}/#website`
+        },
+        "about": {
+            "@id": `${siteUrl}/#organization`
+        },
+        "breadcrumb": {
+            "@id": `${siteUrl}/#breadcrumb`
         }
     }
 
@@ -134,6 +150,7 @@ export async function HomeSchema() {
     const breadcrumbSchema = {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
+        "@id": `${siteUrl}/#breadcrumb`,
         "itemListElement": [
             {
                 "@type": "ListItem",
@@ -157,6 +174,10 @@ export async function HomeSchema() {
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(homePageSchema) }}
             />
             <script
                 type="application/ld+json"

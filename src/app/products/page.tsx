@@ -4,6 +4,8 @@ import { ArrowRight, Package, ShieldCheck, Truck, Leaf, Palette } from "lucide-r
 import Link from "next/link"
 import prisma from "@/lib/db"
 import { BreadcrumbSchema } from "@/components/schema/BreadcrumbSchema"
+import { JsonLd } from "@/components/seo/JsonLd"
+import { getSiteUrl, stripHtml } from "@/lib/utils"
 
 export const metadata: Metadata = {
     title: "Custom Packaging Products | Mailer, Rigid & Gift Boxes",
@@ -39,6 +41,7 @@ interface ProductsPageProps {
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+    const siteUrl = getSiteUrl()
     const query = searchParams.search
     let categories: any[] = []
     let products: any[] = []
@@ -84,6 +87,48 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
     return (
         <div className="min-h-screen bg-gray-50">
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": isSearching ? "SearchResultsPage" : "CollectionPage",
+                    "@id": `${siteUrl}/products#webpage`,
+                    "name": isSearching ? `Search Results for ${query}` : "Custom Packaging Products",
+                    "url": isSearching ? `${siteUrl}/products?search=${encodeURIComponent(query || "")}` : `${siteUrl}/products`,
+                    "description": isSearching
+                        ? `Search results for ${query} across products and categories.`
+                        : "Explore our wide range of custom packaging solutions including mailer boxes, rigid boxes, gift boxes, and eco-friendly packaging.",
+                    "isPartOf": {
+                        "@id": `${siteUrl}/#website`
+                    },
+                    "mainEntity": {
+                        "@type": "ItemList",
+                        "@id": `${siteUrl}/products#itemlist`,
+                        "numberOfItems": isSearching ? products.length + categories.length : categories.length,
+                        "itemListElement": isSearching
+                            ? [
+                                ...products.map((product, index) => ({
+                                    "@type": "ListItem",
+                                    "position": index + 1,
+                                    "url": `${siteUrl}/${product.slug}`,
+                                    "name": product.name
+                                })),
+                                ...categories.map((category, index) => ({
+                                    "@type": "ListItem",
+                                    "position": products.length + index + 1,
+                                    "url": `${siteUrl}/${category.slug}`,
+                                    "name": category.name
+                                }))
+                            ]
+                            : categories.map((category, index) => ({
+                                "@type": "ListItem",
+                                "position": index + 1,
+                                "url": `${siteUrl}/${category.slug}`,
+                                "name": category.name,
+                                ...(stripHtml(category.description, 160) ? { description: stripHtml(category.description, 160) } : {})
+                            }))
+                    }
+                }}
+            />
             <BreadcrumbSchema items={[
                 { name: "Home", url: "/" },
                 { name: "Products", url: "/products" }
@@ -210,4 +255,3 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         </div>
     )
 }
-

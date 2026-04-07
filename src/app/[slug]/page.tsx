@@ -9,6 +9,7 @@ import { SectionRenderer, Section } from "@/components/public/SectionRenderer"
 import { Breadcrumbs } from "@/components/public/Breadcrumbs"
 import { CollapsibleText } from "@/components/public/CollapsibleText"
 import { JsonLd } from "@/components/seo/JsonLd"
+import { PageSchema } from "@/components/schema/PageSchema"
 import TestimonialsSection from "@/components/home/TestimonialsSection"
 import { RelatedCategories } from "@/components/category/RelatedCategories"
 import { PopularProducts } from "@/components/category/PopularProducts"
@@ -18,7 +19,7 @@ import { ProductTabs } from "@/components/product/ProductTabs"
 import { ProductImageGallery } from "@/components/product/ProductImageGallery"
 import { AddToCartButton } from "@/components/cart/AddToCartButton"
 import { Button } from "@/components/ui/button"
-import { cn, constructMetadataTitle } from "@/lib/utils"
+import { cn, constructMetadataTitle, getSiteUrl, stripHtml } from "@/lib/utils"
 import { getSeoImageUrl } from "@/lib/image-seo"
 import prisma from "@/lib/db"
 
@@ -34,7 +35,7 @@ import {
     getHomepageSections
 } from "@/lib/cms"
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://packaginghippo.com"
+const SITE_URL = getSiteUrl()
 
 export const revalidate = 60
 
@@ -326,16 +327,11 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 data={{
                     "@context": "https://schema.org",
                     "@type": "CollectionPage",
+                    "@id": `${SITE_URL}/${slug}#collection`,
                     "name": category.name,
                     "url": `${SITE_URL}/${slug}`,
-                    "description": category.seoDesc || category.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
-                    "isPartOf": { "@id": `${SITE_URL}/#website` },
-                    "aggregateRating": {
-                        "@type": "AggregateRating",
-                        "ratingValue": "4.9",
-                        "reviewCount": "190",
-                        "bestRating": "5"
-                    }
+                    "description": category.seoDesc || stripHtml(category.description, 160),
+                    "isPartOf": { "@id": `${SITE_URL}/#website` }
                 }}
             />
             {/* 2. ItemList (Category Products) */}
@@ -344,6 +340,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     data={{
                         "@context": "https://schema.org",
                         "@type": "ItemList",
+                        "@id": `${SITE_URL}/${slug}#itemlist`,
                         "name": category.name,
                         "itemListElement": category.products.map((product: any, index: number) => ({
                             "@type": "ListItem",
@@ -557,6 +554,19 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
         }
     }
 
+    const offerPrice =
+        typeof product.ecommercePrice === "number" && product.ecommercePrice > 0
+            ? product.ecommercePrice
+            : typeof product.price === "number" && product.price > 0
+                ? product.price
+                : null
+
+    const availabilityMap: Record<string, string> = {
+        IN_STOCK: "https://schema.org/InStock",
+        OUT_OF_STOCK: "https://schema.org/OutOfStock",
+        PRE_ORDER: "https://schema.org/PreOrder",
+    }
+
     return (
         <main className="min-h-screen bg-white">
             {/* 1. Breadcrumb Schema */}
@@ -580,32 +590,31 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     "@id": `${SITE_URL}/${product.slug}`,
                     "name": product.name,
                     "image": product.images ? product.images.map((img: string) => getSeoImageUrl(img)) : [],
-                    "description": product.shortDesc || product.seoDesc || product.description?.replace(/<[^>]*>?/gm, '').slice(0, 160),
+                    "description": product.shortDesc || product.seoDesc || stripHtml(product.description, 160),
                     "sku": product.id.substring(0, 8).toUpperCase(),
                     "mpn": product.id.substring(0, 8).toUpperCase(),
+                    "url": `${SITE_URL}/${product.slug}`,
                     "brand": {
                         "@type": "Brand",
                         "name": "Packaging Hippo",
                         "@id": `${SITE_URL}/#organization`
                     },
-                    "aggregateRating": {
-                        "@type": "AggregateRating",
-                        "ratingValue": "4.9",
-                        "reviewCount": "210",
-                        "bestRating": "5"
-                    },
-                    "offers": {
-                        "@type": "Offer",
-                        "availability": "https://schema.org/InStock",
-                        "priceCurrency": "USD",
-                        "price": product.price || "1.00",
-                        "url": `${SITE_URL}/${product.slug}`,
-                        "seller": {
-                            "@type": "Organization",
-                            "name": "Packaging Hippo",
-                            "@id": `${SITE_URL}/#organization`
+                    ...(offerPrice
+                        ? {
+                            "offers": {
+                                "@type": "Offer",
+                                "priceCurrency": "USD",
+                                "price": offerPrice.toFixed(2),
+                                "availability": availabilityMap[product.stockStatus] || availabilityMap.IN_STOCK,
+                                "url": `${SITE_URL}/${product.slug}`,
+                                "seller": {
+                                    "@type": "Organization",
+                                    "name": "Packaging Hippo",
+                                    "@id": `${SITE_URL}/#organization`
+                                }
+                            }
                         }
-                    },
+                        : {}),
                     "additionalProperty": [
                         ...(product.materials ? [{
                             "@type": "PropertyValue",
@@ -767,15 +776,7 @@ async function PageView({ page, slug }: { page: any, slug: string }) {
 
     return (
         <main className="min-h-screen bg-gray-50 pt-24 pb-12 md:pt-32">
-            <JsonLd
-                data={{
-                    "@context": "https://schema.org",
-                    "@type": "WebPage",
-                    "name": page.title,
-                    "description": page.seoDesc,
-                    "url": `${SITE_URL}/${slug}`
-                }}
-            />
+            <PageSchema page={page} />
 
             {/* Header Area */}
             <div className="bg-gray-50 border-b pb-12">
