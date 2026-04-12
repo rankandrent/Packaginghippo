@@ -1,3 +1,4 @@
+import { getSeoImageUrl } from "@/lib/image-seo"
 import { cn } from "@/lib/utils"
 
 type BrandLogoProps = {
@@ -29,6 +30,14 @@ function BrandMark({ color = "#123B9F", className }: { color?: string, className
     )
 }
 
+function resolveLogoUrl(logoUrl?: string | null) {
+    if (!logoUrl || logoUrl === "/logo.png") {
+        return "/logo-horizontal.svg"
+    }
+
+    return getSeoImageUrl(logoUrl)
+}
+
 export function BrandLogo({
     siteName = "Packaging Hippo",
     logoUrl,
@@ -46,12 +55,13 @@ export function BrandLogo({
     const words = siteName.trim().split(/\s+/)
     const firstLine = words[0] || "Packaging"
     const secondLine = words.slice(1).join(" ") || "Hippo"
+    const resolvedLogoUrl = resolveLogoUrl(logoUrl)
 
-    if (logoUrl) {
+    if (resolvedLogoUrl) {
         return (
             <div className={cn("inline-flex items-center", className)}>
                 <img
-                    src={logoUrl}
+                    src={resolvedLogoUrl}
                     alt={siteName}
                     className={cn(
                         "h-auto w-auto object-contain",

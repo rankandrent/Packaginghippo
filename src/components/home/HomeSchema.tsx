@@ -1,4 +1,5 @@
 import prisma from "@/lib/db"
+import { getSeoImageUrl } from "@/lib/image-seo"
 import { getSiteUrl } from "@/lib/utils"
 
 async function getSettings() {
@@ -22,7 +23,9 @@ export async function HomeSchema() {
     const siteName = general.siteName || "Packaging Hippo"
     const phone = general.phone || "+1 (510) 500-9533"
     const email = general.email || "sales@packaginghippo.com"
-    const logoUrl = general.logoUrl || `${siteUrl}/logo-horizontal.svg`
+    const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
+        ? getSeoImageUrl(general.logoUrl)
+        : `${siteUrl}/logo-horizontal.svg`
     const rawAddress = general.address || "123 Packaging Street, Industrial District, NY 10001"
 
     const organizationSchema = {
