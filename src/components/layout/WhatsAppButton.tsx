@@ -1,33 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { MessageCircle } from "lucide-react"
 
-export function WhatsAppButton() {
-    const [whatsappNumber, setWhatsappNumber] = useState<string | null>(null)
-
-    useEffect(() => {
-        // Fetch settings to context or just fetch here if it's not available globally
-        // For simplicity and to avoid prop drilling if layout is server component, 
-        // we can fetch or better yet, read from a context provider if one exists.
-        // Assuming no global settings context yet, let's fetch. 
-        // Ideally this should be passed from the server layout.
-
-        async function fetchSettings() {
-            try {
-                const res = await fetch('/api/cms/settings')
-                const data = await res.json()
-                const general = data.settings?.find((s: any) => s.key === 'general')?.value
-                if (general?.whatsapp) {
-                    setWhatsappNumber(general.whatsapp)
-                }
-            } catch (error) {
-                console.error("Error fetching whatsapp settings:", error)
-            }
-        }
-
-        fetchSettings()
-    }, [])
+export function WhatsAppButton({ whatsappNumber }: { whatsappNumber?: string | null }) {
 
     if (!whatsappNumber) return null
 

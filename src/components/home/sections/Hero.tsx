@@ -1,8 +1,5 @@
-"use client"
-
 import Link from "next/link"
 import Image from "next/image"
-import { motion } from "framer-motion"
 import { ArrowRight, Box, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -10,6 +7,7 @@ import { getSeoImageUrl, getSeoAltText } from "@/lib/image-seo"
 
 export function Hero({ data }: { data: any }) {
     if (!data) return null
+    const headingLines = String(data.heading || "Custom Packaging").split("\n").filter(Boolean)
 
     // SEO Data Preparation
     const seoValues = {
@@ -22,14 +20,13 @@ export function Hero({ data }: { data: any }) {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/20 via-zinc-950 to-zinc-950"></div>
             <div className="container mx-auto px-4 relative z-10">
                 <div className="grid md:grid-cols-2 gap-8 items-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="space-y-6"
-                    >
+                    <div className="space-y-6">
                         <h1 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
-                            <div dangerouslySetInnerHTML={{ __html: (data.heading || "Custom Packaging").replace(/\n/g, "<br/>") }} />
+                            {headingLines.map((line, index) => (
+                                <span key={index} className="block">
+                                    {line}
+                                </span>
+                            ))}
                         </h1>
                         <p className="text-lg text-gray-400 max-w-lg leading-relaxed">
                             {data.subheading || "Elevate your brand with premium custom boxes."}
@@ -46,14 +43,9 @@ export function Hero({ data }: { data: any }) {
                             <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-500" /> No Die & Plate Charges</div>
                             <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-500" /> Fast Turnaround</div>
                         </div>
-                    </motion.div>
+                    </div>
 
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative flex justify-center md:justify-end"
-                    >
+                    <div className="relative flex justify-center md:justify-end">
                         <div className="relative z-10 w-full max-w-md aspect-square bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-3xl shadow-2xl shadow-yellow-500/20 transform rotate-[-5deg] flex items-center justify-center border-t border-white/20">
                             {data.hero_image ? (
                                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
@@ -65,7 +57,6 @@ export function Hero({ data }: { data: any }) {
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                                         className="object-cover"
                                         priority={true}
-                                        quality={90}
                                     />
                                 </div>
                             ) : (
@@ -83,7 +74,7 @@ export function Hero({ data }: { data: any }) {
                                 <p className="text-xs text-gray-500">{data.badge_subtext || "\"Best packaging service we've used!\""}</p>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </section>

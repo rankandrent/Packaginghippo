@@ -1,5 +1,3 @@
-"use client"
-
 import { Leaf } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 

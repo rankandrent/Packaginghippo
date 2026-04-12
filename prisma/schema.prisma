@@ -88,6 +88,9 @@ model ProductCategory {
   seoTitle    String?
   seoDesc     String?
   seoKeywords String?
+  ratingValue Float?
+  bestRating  Float?
+  ratingCount Int?
   descriptionCollapsedHeight Int @default(300)
   sections    Json?    // List of dynamic sections
   layout      Json?    // Custom order: ['content', 'related_categories', 'quote_form', 'testimonials']
@@ -126,6 +129,9 @@ model Product {
   seoTitle    String?
   seoDesc     String?
   seoKeywords String?
+  ratingValue Float?
+  bestRating  Float?
+  ratingCount Int?
   descriptionCollapsedHeight Int @default(300)
   tabs        Json?    // Tabbed content: specification, box_features, materials, printing_methods, inks, finishing, addons
 

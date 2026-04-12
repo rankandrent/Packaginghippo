@@ -1,6 +1,3 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
@@ -17,27 +14,7 @@ function PackageIcon({ className }: { className?: string }) {
     )
 }
 
-export function PopularProducts({ data }: { data: any }) {
-    const [categories, setCategories] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        async function fetchCategories() {
-            try {
-                const res = await fetch('/api/categories?limit=6')
-                if (res.ok) {
-                    const json = await res.json()
-                    setCategories(json.categories || [])
-                }
-            } catch (err) {
-                console.error("Error fetching categories for homepage:", err)
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetchCategories()
-    }, [])
-
+export function PopularProducts({ data, categories = [] }: { data: any, categories?: any[] }) {
     if (!data) return null
 
     return (
@@ -53,13 +30,7 @@ export function PopularProducts({ data }: { data: any }) {
                     </Link>
                 </div>
 
-                {loading ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
-                            <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-2xl" />
-                        ))}
-                    </div>
-                ) : (
+                {categories.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                         {categories.map((item: any, i: number) => (
                             <Link href={`/${item.slug}`} key={i}>
@@ -84,6 +55,12 @@ export function PopularProducts({ data }: { data: any }) {
                                     </CardContent>
                                 </Card>
                             </Link>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-2xl" />
                         ))}
                     </div>
                 )}

@@ -1,5 +1,3 @@
-"use client"
-
 import Image from "next/image"
 import { getSeoImageUrl } from "@/lib/image-seo"
 import { CheckCircle } from "lucide-react"
@@ -30,11 +28,15 @@ export function Benefits({ data }: { data: any }) {
                     </div>
                     <div className="bg-gray-100 rounded-3xl aspect-square flex items-center justify-center p-4 overflow-hidden">
                         {data.image ? (
-                            <img
-                                src={getSeoImageUrl(data.image)}
-                                alt={data.heading || "Benefits"}
-                                className="w-full h-full object-cover rounded-xl"
-                            />
+                            <div className="relative h-full w-full">
+                                <Image
+                                    src={getSeoImageUrl(data.image)}
+                                    alt={data.heading || "Benefits"}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    className="object-cover rounded-xl"
+                                />
+                            </div>
                         ) : (
                             <div className="w-full h-full bg-gray-200 rounded-xl flex items-center justify-center text-gray-400">
                                 Placeholder Image

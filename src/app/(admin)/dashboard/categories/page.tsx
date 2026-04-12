@@ -35,6 +35,9 @@ export default function CategoriesPage() {
     const [loading, setLoading] = useState(true)
     const [createDialogOpen, setCreateDialogOpen] = useState(false)
     const [newName, setNewName] = useState("")
+    const [newRatingValue, setNewRatingValue] = useState("")
+    const [newBestRating, setNewBestRating] = useState("")
+    const [newRatingCount, setNewRatingCount] = useState("")
     const [searchQuery, setSearchQuery] = useState("")
     const router = useRouter()
 
@@ -82,7 +85,14 @@ export default function CategoriesPage() {
             const res = await fetch('/api/cms/categories', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newName, slug, templateId: selectedTemplateId === 'none' ? undefined : selectedTemplateId }),
+                body: JSON.stringify({
+                    name: newName,
+                    slug,
+                    templateId: selectedTemplateId === 'none' ? undefined : selectedTemplateId,
+                    ratingValue: newRatingValue,
+                    bestRating: newBestRating,
+                    ratingCount: newRatingCount,
+                }),
             })
 
             if (!res.ok) throw new Error('Failed to create')
@@ -195,6 +205,35 @@ export default function CategoriesPage() {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Schema Rating (Optional)</Label>
+                                <div className="grid grid-cols-3 gap-3">
+                                    <Input
+                                        type="number"
+                                        step="0.1"
+                                        min="0"
+                                        placeholder="4.9"
+                                        value={newRatingValue}
+                                        onChange={(e) => setNewRatingValue(e.target.value)}
+                                    />
+                                    <Input
+                                        type="number"
+                                        step="0.1"
+                                        min="1"
+                                        placeholder="5"
+                                        value={newBestRating}
+                                        onChange={(e) => setNewBestRating(e.target.value)}
+                                    />
+                                    <Input
+                                        type="number"
+                                        min="1"
+                                        placeholder="101"
+                                        value={newRatingCount}
+                                        onChange={(e) => setNewRatingCount(e.target.value)}
+                                    />
+                                </div>
+                                <p className="text-xs text-muted-foreground">Blank chhoro to default 4.9 / 5 / 101 use hoga.</p>
                             </div>
                             <DialogFooter>
                                 <Button type="submit" className="w-full sm:w-auto">Create & Edit</Button>

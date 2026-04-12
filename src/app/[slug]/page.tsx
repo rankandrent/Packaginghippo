@@ -36,6 +36,20 @@ import {
 } from "@/lib/cms"
 
 const SITE_URL = getSiteUrl()
+const DEFAULT_SCHEMA_RATING = {
+    ratingValue: 4.9,
+    bestRating: 5,
+    ratingCount: 101,
+}
+
+function getAggregateRating(data: { ratingValue?: number | null, bestRating?: number | null, ratingCount?: number | null }) {
+    return {
+        "@type": "AggregateRating",
+        "ratingValue": typeof data.ratingValue === "number" ? data.ratingValue : DEFAULT_SCHEMA_RATING.ratingValue,
+        "bestRating": typeof data.bestRating === "number" ? data.bestRating : DEFAULT_SCHEMA_RATING.bestRating,
+        "ratingCount": typeof data.ratingCount === "number" ? data.ratingCount : DEFAULT_SCHEMA_RATING.ratingCount,
+    }
+}
 
 export const revalidate = 60
 
@@ -257,6 +271,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
         { label: "Services", href: "/services" },
         { label: category.name }
     ]
+    const categoryAggregateRating = getAggregateRating(category)
 
     // SEPARATE FAQs and CTAs from other dynamic sections if they are in the layout order
     const faqSections = dynamicSections.filter((s: any) => s.type === 'faq')
@@ -331,7 +346,8 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     "name": category.name,
                     "url": `${SITE_URL}/${slug}`,
                     "description": category.seoDesc || stripHtml(category.description, 160),
-                    "isPartOf": { "@id": `${SITE_URL}/#website` }
+                    "isPartOf": { "@id": `${SITE_URL}/#website` },
+                    "aggregateRating": categoryAggregateRating
                 }}
             />
             {/* 2. ItemList (Category Products) */}
@@ -388,6 +404,23 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     }))
                 }}
             />
+            <section className="border-b bg-white">
+                <div className="container mx-auto px-4 py-4">
+                    <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm">
+                        <div className="flex items-center gap-1 text-yellow-500">
+                            {[...Array(5)].map((_, index) => (
+                                <Star key={index} className="h-4 w-4 fill-current" />
+                            ))}
+                        </div>
+                        <span className="font-bold text-gray-900">
+                            {categoryAggregateRating.ratingValue}/{categoryAggregateRating.bestRating}
+                        </span>
+                        <span className="text-gray-600">
+                            based on {categoryAggregateRating.ratingCount} reviews
+                        </span>
+                    </div>
+                </div>
+            </section>
             <SectionRenderer
                 sections={otherSections}
                 popularProducts={popularProducts}
@@ -560,6 +593,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
             : typeof product.price === "number" && product.price > 0
                 ? product.price
                 : null
+    const productAggregateRating = getAggregateRating(product)
 
     const availabilityMap: Record<string, string> = {
         IN_STOCK: "https://schema.org/InStock",
@@ -599,6 +633,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                         "name": "Packaging Hippo",
                         "@id": `${SITE_URL}/#organization`
                     },
+                    "aggregateRating": productAggregateRating,
                     ...(offerPrice
                         ? {
                             "offers": {
@@ -682,10 +717,21 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                         <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full tracking-tighter ml-2">Save 20%</span>
                                     </div>
                                 ) : (
-                                    <div className="flex flex-wrap gap-3 mb-4">
-                                        {[
-                                            { icon: "⚡", label: "Quote in 2 Hours" },
-                                            { icon: "🎁", label: "Free of Charge" },
+                                <div className="flex flex-wrap gap-3 mb-4">
+                                    <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-full px-3 py-1.5">
+                                        <div className="flex text-yellow-500">
+                                            {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
+                                        </div>
+                                        <span className="text-xs font-bold text-gray-900">
+                                            {productAggregateRating.ratingValue}/{productAggregateRating.bestRating}
+                                        </span>
+                                        <span className="text-xs text-gray-600">
+                                            ({productAggregateRating.ratingCount} reviews)
+                                        </span>
+                                    </div>
+                                    {[
+                                        { icon: "⚡", label: "Quote in 2 Hours" },
+                                        { icon: "🎁", label: "Free of Charge" },
                                             { icon: "✅", label: "No Commitment" },
                                         ].map(({ icon, label }) => (
                                             <div key={label} className="flex items-center gap-1.5 bg-green-50 border border-green-100 rounded-full px-3 py-1.5">

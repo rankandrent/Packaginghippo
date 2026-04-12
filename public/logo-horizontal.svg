@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 160" role="img" aria-label="Packaging Hippo logo">
+  <polygon points="70,12 115,38 115,94 70,120 25,94 25,38" fill="none" stroke="#123B9F" stroke-width="12" stroke-linejoin="round"/>
+  <path fill="#123B9F" d="M44 66L69 44L101 57L79 73L67 64L52 75Z"/>
+  <path fill="#123B9F" d="M50 82L67 72L67 102L50 92Z"/>
+  <path fill="#123B9F" d="M73 82L95 63L109 71L98 80L107 88L89 103L79 95L87 87L73 91Z"/>
+  <polygon fill="#FFFFFF" points="52,70 67,60 80,68 65,77"/>
+  <polygon fill="#FFFFFF" points="52,82 65,74 65,98 52,90"/>
+  <polygon fill="#FFFFFF" points="79,83 94,70 99,74 90,80 98,86 83,97 79,93 86,87 79,88"/>
+  <text x="145" y="68" fill="#123B9F" font-size="44" font-family="Arial, Helvetica, sans-serif" font-weight="800" letter-spacing="1">PACKAGING</text>
+  <text x="145" y="116" fill="#E7B11E" font-size="44" font-family="Arial, Helvetica, sans-serif" font-weight="800" letter-spacing="1">HIPPO</text>
+</svg>

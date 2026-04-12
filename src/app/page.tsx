@@ -12,8 +12,6 @@ async function getHomepageData() {
       orderBy: { order: 'asc' },
     })
 
-    console.log(`[Home] Fetched ${sections.length} active sections:`, sections.map(s => s.sectionKey))
-
     // Return array directly to preserve order
     return sections.map(s => ({
       key: s.sectionKey,
@@ -145,12 +143,14 @@ async function getFeaturedBlogs() {
 }
 
 export default async function Home() {
-  const sections = await getHomepageData()
-  const settings = await getSiteSettings()
-  const topProducts = await getTopProducts()
-  const testimonials = await getTestimonials()
-  const categories = await getCategories()
-  const featuredBlogs = await getFeaturedBlogs()
+  const [sections, settings, topProducts, testimonials, categories, featuredBlogs] = await Promise.all([
+    getHomepageData(),
+    getSiteSettings(),
+    getTopProducts(),
+    getTestimonials(),
+    getCategories(),
+    getFeaturedBlogs(),
+  ])
 
   return (
     <main>

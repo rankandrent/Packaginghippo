@@ -1,5 +1,3 @@
-"use client"
-
 export function Intro({ data }: { data: any }) {
     if (!data) return null
 

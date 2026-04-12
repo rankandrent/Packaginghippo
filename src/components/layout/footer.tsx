@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react"
 import prisma from "@/lib/db"
 import { getSeoImageUrl } from "@/lib/image-seo"
-
+import { BrandLogo } from "@/components/brand/BrandLogo"
 
 async function getSettings() {
     try {
@@ -21,8 +21,15 @@ async function getSettings() {
     }
 }
 
-export async function Footer() {
-    const { general, footer } = await getSettings()
+export async function Footer({
+    general: providedGeneral,
+    footer: providedFooter,
+}: {
+    general?: any
+    footer?: any
+} = {}) {
+    const settings = providedGeneral || providedFooter ? { general: providedGeneral || {}, footer: providedFooter || {} } : await getSettings()
+    const { general, footer } = settings
 
     const siteName = general.siteName || "PackagingHippo"
     const phone = general.phone || "(510) 500-9533"
@@ -41,7 +48,7 @@ export async function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     {/* Brand */}
                     <div className="space-y-4">
-                        <h3 className="text-2xl font-black text-yellow-500">{siteName}</h3>
+                        <BrandLogo siteName={siteName} logoUrl={general.logoUrl || null} theme="light" size="md" />
                         <p className="text-gray-400 text-sm leading-relaxed">
                             {tagline}
                         </p>

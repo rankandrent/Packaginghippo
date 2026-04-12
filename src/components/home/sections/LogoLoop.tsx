@@ -1,6 +1,3 @@
-"use client"
-
-import { motion } from "framer-motion"
 import Image from "next/image"
 import { getSeoImageUrl } from "@/lib/image-seo"
 
@@ -28,15 +25,7 @@ export function LogoLoop({ data }: { data: any }) {
                 <div className="absolute left-0 top-0 z-10 h-full w-20 md:w-32 bg-gradient-to-r from-white to-transparent" />
                 <div className="absolute right-0 top-0 z-10 h-full w-20 md:w-32 bg-gradient-to-l from-white to-transparent" />
 
-                <motion.div
-                    animate={{ x: ["0%", "-33.33%"] }}
-                    transition={{
-                        duration: 30,
-                        ease: "linear",
-                        repeat: Infinity,
-                    }}
-                    className="flex flex-none gap-6 md:gap-12 items-center py-2"
-                >
+                <div className="animate-logo-loop flex flex-none gap-6 md:gap-12 items-center py-2">
                     {[...logos, ...logos, ...logos].map((logo: string | any, index: number) => (
                         <div key={index} className="flex items-center justify-center min-w-[140px] md:min-w-[200px] transition-all duration-500 hover:scale-110">
                             {typeof logo === 'string' && logo.startsWith('http') ? (
@@ -56,7 +45,7 @@ export function LogoLoop({ data }: { data: any }) {
                             )}
                         </div>
                     ))}
-                </motion.div>
+                </div>
             </div>
         </section>
     )

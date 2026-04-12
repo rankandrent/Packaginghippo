@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 
+function parseOptionalFloat(value: unknown) {
+    if (value === "" || value === null || value === undefined) return null
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+}
+
+function parseOptionalInt(value: unknown) {
+    if (value === "" || value === null || value === undefined) return null
+    const parsed = Number.parseInt(String(value), 10)
+    return Number.isFinite(parsed) ? parsed : null
+}
+
 // GET all categories or single by ID
 export async function GET(request: NextRequest) {
     try {
@@ -42,7 +54,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, description, templateId, layout, cloneFromId } = body
+        const { name, slug, description, templateId, layout, cloneFromId, ratingValue, bestRating, ratingCount } = body
 
         if (cloneFromId) {
             const sourceCat = await prisma.productCategory.findUnique({
@@ -60,6 +72,9 @@ export async function POST(request: NextRequest) {
                     seoTitle: sourceCat.seoTitle,
                     seoDesc: sourceCat.seoDesc,
                     seoKeywords: sourceCat.seoKeywords,
+                    ratingValue: sourceCat.ratingValue,
+                    bestRating: sourceCat.bestRating,
+                    ratingCount: sourceCat.ratingCount,
                     descriptionCollapsedHeight: sourceCat.descriptionCollapsedHeight,
                     isActive: false, // Default to draft
                     sections: sourceCat.sections ?? [],
@@ -86,6 +101,9 @@ export async function POST(request: NextRequest) {
                 name,
                 slug,
                 description,
+                ratingValue: parseOptionalFloat(ratingValue),
+                bestRating: parseOptionalFloat(bestRating),
+                ratingCount: parseOptionalInt(ratingCount),
                 isActive: false,
                 sections: initialSections,
                 layout: layout || null,
@@ -103,7 +121,25 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json()
-        const { id, name, slug, description, imageUrl, seoTitle, seoDesc, seoKeywords, descriptionCollapsedHeight, order, isActive, sections, layout, relatedCategoryIds } = body
+        const {
+            id,
+            name,
+            slug,
+            description,
+            imageUrl,
+            seoTitle,
+            seoDesc,
+            seoKeywords,
+            ratingValue,
+            bestRating,
+            ratingCount,
+            descriptionCollapsedHeight,
+            order,
+            isActive,
+            sections,
+            layout,
+            relatedCategoryIds
+        } = body
 
         const updated = await prisma.productCategory.update({
             where: { id },
@@ -115,6 +151,9 @@ export async function PUT(request: NextRequest) {
                 seoTitle,
                 seoDesc,
                 seoKeywords,
+                ratingValue: parseOptionalFloat(ratingValue),
+                bestRating: parseOptionalFloat(bestRating),
+                ratingCount: parseOptionalInt(ratingCount),
                 descriptionCollapsedHeight,
                 order,
                 isActive,

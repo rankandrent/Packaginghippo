@@ -8,15 +8,21 @@ import { Menu, X, Phone, Search, ShoppingCart, ChevronDown, Package } from "luci
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRouter, useSearchParams } from "next/navigation"
-import { cn } from "@/lib/utils"
 import { useCart } from "@/context/CartContext"
-import { CartDrawer } from "@/components/cart/CartDrawer"
+import dynamic from "next/dynamic"
+import { BrandLogo } from "@/components/brand/BrandLogo"
+
+const CartDrawer = dynamic(
+    () => import("@/components/cart/CartDrawer").then((mod) => mod.CartDrawer),
+    { ssr: false }
+)
 
 type NavbarProps = {
     settings?: {
         siteName?: string
         phone?: string
         email?: string
+        logoUrl?: string
     }
     menuData?: { id: string; label: string; href: string }[] | null
 }
@@ -44,6 +50,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
     const { totalItems } = useCart()
     const siteName = settings?.siteName || "PackagingHippo"
     const phone = settings?.phone || "+1 845 379 9277"
+    const logoUrl = settings?.logoUrl || null
 
     const navItems = menuData || DEFAULT_MENU;
 
@@ -139,18 +146,8 @@ export function Navbar({ settings, menuData }: NavbarProps) {
             <div className="border-b">
                 <div className="container mx-auto px-4 h-24 flex items-center justify-between gap-8">
                     {/* Logo */}
-                    <Link href="/" className="flex-shrink-0 flex items-center gap-2">
-                        <div className="w-10 h-10 bg-primary flex items-center justify-center rounded text-white">
-                            <Package className="w-6 h-6" />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-2xl font-black text-primary tracking-tighter uppercase leading-none">
-                                {siteName.replace("Hippo", "")}
-                            </span>
-                            <span className="text-xl font-bold text-accent uppercase leading-none tracking-widest">
-                                Hippo
-                            </span>
-                        </div>
+                    <Link href="/" className="flex-shrink-0">
+                        <BrandLogo siteName={siteName} logoUrl={logoUrl} size="md" />
                     </Link>
 
                     {/* Search Bar */}

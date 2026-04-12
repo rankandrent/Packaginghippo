@@ -1,6 +1,3 @@
-"use client"
-
-import { motion } from "framer-motion"
 import Image from "next/image"
 import { getSeoImageUrl, getAltFromUrl } from "@/lib/image-seo"
 
@@ -32,12 +29,8 @@ export function GallerySection({ data }: { data: any }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {items.map((item, index) => (
-                        <motion.div
+                        <div
                             key={index}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.3, delay: index * 0.05 }}
                             className="relative group aspect-square overflow-hidden rounded-xl bg-gray-100 cursor-pointer"
                         >
                             <Image
@@ -52,7 +45,7 @@ export function GallerySection({ data }: { data: any }) {
                                     {item.title || item.alt || "View Image"}
                                 </p>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
             </div>

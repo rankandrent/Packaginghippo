@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 
+function parseOptionalFloat(value: unknown) {
+    if (value === "" || value === null || value === undefined) return null
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+}
+
+function parseOptionalInt(value: unknown) {
+    if (value === "" || value === null || value === undefined) return null
+    const parsed = Number.parseInt(String(value), 10)
+    return Number.isFinite(parsed) ? parsed : null
+}
+
 // GET all products or single product by ?id=
 export async function GET(request: NextRequest) {
     try {
@@ -35,7 +47,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, categoryId, templateId, cloneFromId } = body
+        const { name, slug, categoryId, templateId, cloneFromId, ratingValue, bestRating, ratingCount } = body
 
         if (cloneFromId) {
             const source = await prisma.product.findUnique({
@@ -64,6 +76,9 @@ export async function POST(request: NextRequest) {
                     seoTitle: source.seoTitle,
                     seoDesc: source.seoDesc,
                     seoKeywords: source.seoKeywords,
+                    ratingValue: source.ratingValue,
+                    bestRating: source.bestRating,
+                    ratingCount: source.ratingCount,
                     tabs: source.tabs,
                     isEcommerce: source.isEcommerce,
                     ecommercePrice: source.ecommercePrice,
@@ -89,6 +104,9 @@ export async function POST(request: NextRequest) {
                 name,
                 slug,
                 categoryId,
+                ratingValue: parseOptionalFloat(ratingValue),
+                bestRating: parseOptionalFloat(bestRating),
+                ratingCount: parseOptionalInt(ratingCount),
                 sections: initialSections,
                 isActive: false,
             },
@@ -106,12 +124,23 @@ export async function PUT(request: NextRequest) {
     try {
         const body = await request.json()
         // Strip non-schema fields that come from include() in GET (e.g. nested category object)
-        const { id, category, createdAt, ...data } = body
+        const {
+            id,
+            category,
+            createdAt,
+            ratingValue,
+            bestRating,
+            ratingCount,
+            ...data
+        } = body
 
         const updated = await prisma.product.update({
             where: { id },
             data: {
                 ...data,
+                ratingValue: parseOptionalFloat(ratingValue),
+                bestRating: parseOptionalFloat(bestRating),
+                ratingCount: parseOptionalInt(ratingCount),
                 updatedAt: new Date(),
             },
         })

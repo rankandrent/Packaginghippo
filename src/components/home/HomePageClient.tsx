@@ -1,6 +1,3 @@
-"use client"
-
-import { DEFAULT_HOME_DATA } from "@/lib/data/home-content"
 import { Hero } from "./sections/Hero"
 import { Intro } from "./sections/Intro"
 import { ServicesList } from "./sections/ServicesList"
@@ -28,9 +25,6 @@ import { GallerySection } from "./sections/GallerySection"
 import { CategoriesSection } from "./CategoriesSection"
 import { FeaturedBlogs } from "./sections/FeaturedBlogs"
 import { MerchantProductsSection } from "./sections/MerchantProductsSection"
-
-type HomepageData = Record<string, any>
-
 type Section = {
     key: string
     content: any
@@ -81,15 +75,6 @@ export default function HomePageClient({
     // If no sections from DB, you might want to show defaults or nothing.
     // Ideally we seed the DB. If strictly nothing, page will be empty.
 
-    // Fallback? If strict CMS, no fallback. But for dev experience let's keep it safe.
-    // If sections is empty, maybe we should render defaults? 
-    // The user said "Remove existing sections... Develop new". 
-    // Let's assume the DB is/will be populated.
-
-    console.log("[HomePageClient] Sections:", sections.map(s => s.key))
-    console.log("[HomePageClient] Featured Blogs Count:", featuredBlogs?.length)
-    console.log("[HomePageClient] First Blog:", featuredBlogs?.[0])
-
     return (
         <div className="flex flex-col min-h-screen">
             {sections.map((section, index) => {
@@ -99,6 +84,16 @@ export default function HomePageClient({
                         <TopProductsSection
                             key={`${section.key}-${index}`}
                             products={topProducts}
+                        />
+                    )
+                }
+
+                if (section.key === 'popular_products') {
+                    return (
+                        <PopularProducts
+                            key={`${section.key}-${index}`}
+                            data={section.content}
+                            categories={categories.slice(0, 6)}
                         />
                     )
                 }
@@ -132,7 +127,6 @@ export default function HomePageClient({
 
                 const Component = SECTION_COMPONENTS[section.key]
                 if (!Component) {
-                    console.warn(`No component found for section key: ${section.key}`)
                     return null
                 }
 

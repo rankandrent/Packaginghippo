@@ -1,6 +1,3 @@
-"use client"
-
-import { motion } from "framer-motion"
 import { Star } from "lucide-react"
 
 export function HowItWorks({ data }: { data: any }) {
@@ -16,12 +13,8 @@ export function HowItWorks({ data }: { data: any }) {
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {data.subsections?.map((item: any, i: number) => (
-                        <motion.div
+                        <div
                             key={i}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: i * 0.1 }}
                             className="bg-yellow-400/50 border-2 border-black/10 p-8 rounded-2xl relative group hover:bg-white hover:shadow-xl transition-all duration-300"
                         >
                             <div className="bg-black text-white w-12 h-12 rounded-xl flex items-center justify-center mb-6">
@@ -29,7 +22,7 @@ export function HowItWorks({ data }: { data: any }) {
                             </div>
                             <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                             <p className="text-sm font-medium opacity-70 leading-relaxed">{item.desc}</p>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
             </div>

@@ -42,6 +42,9 @@ type Product = {
     seoTitle: string | null
     seoDesc: string | null
     seoKeywords: string | null
+    ratingValue: number | null
+    bestRating: number | null
+    ratingCount: number | null
     descriptionCollapsedHeight: number
     isActive: boolean
     isTopProduct: boolean
@@ -426,6 +429,47 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                                 onChange={(e) => setProduct({ ...product, seoKeywords: e.target.value })}
                                 placeholder="Keywords separated by commas"
                             />
+                        </div>
+                        <div className="space-y-3 border-t pt-4">
+                            <Label className="text-base font-medium">Schema Rating</Label>
+                            <div className="grid gap-3 md:grid-cols-3">
+                                <div className="space-y-2">
+                                    <Label htmlFor="rating_value">Rating Value</Label>
+                                    <Input
+                                        id="rating_value"
+                                        type="number"
+                                        step="0.1"
+                                        min="0"
+                                        value={product.ratingValue ?? ""}
+                                        onChange={(e) => setProduct({ ...product, ratingValue: e.target.value === "" ? null : parseFloat(e.target.value) })}
+                                        placeholder="4.9"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="best_rating">Best Rating</Label>
+                                    <Input
+                                        id="best_rating"
+                                        type="number"
+                                        step="0.1"
+                                        min="1"
+                                        value={product.bestRating ?? ""}
+                                        onChange={(e) => setProduct({ ...product, bestRating: e.target.value === "" ? null : parseFloat(e.target.value) })}
+                                        placeholder="5"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="rating_count">Rating Count</Label>
+                                    <Input
+                                        id="rating_count"
+                                        type="number"
+                                        min="1"
+                                        value={product.ratingCount ?? ""}
+                                        onChange={(e) => setProduct({ ...product, ratingCount: e.target.value === "" ? null : parseInt(e.target.value, 10) })}
+                                        placeholder="101"
+                                    />
+                                </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground">Agar blank chhor do to page schema me default 4.9 / 5 / 101 use hoga.</p>
                         </div>
                     </div>
                 </div>

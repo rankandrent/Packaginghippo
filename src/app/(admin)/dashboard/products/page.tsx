@@ -57,6 +57,9 @@ export default function ProductsPage() {
     const [createDialogOpen, setCreateDialogOpen] = useState(false)
     const [newName, setNewName] = useState("")
     const [newCategoryId, setNewCategoryId] = useState("")
+    const [newRatingValue, setNewRatingValue] = useState("")
+    const [newBestRating, setNewBestRating] = useState("")
+    const [newRatingCount, setNewRatingCount] = useState("")
     const [categories, setCategories] = useState<{ id: string, name: string }[]>([])
 
     // Fetch categories when component mounts (or when dialog opens)
@@ -88,7 +91,15 @@ export default function ProductsPage() {
             const res = await fetch('/api/cms/products', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newName, slug, categoryId: newCategoryId, templateId: selectedTemplateId === 'none' ? undefined : selectedTemplateId }),
+                body: JSON.stringify({
+                    name: newName,
+                    slug,
+                    categoryId: newCategoryId,
+                    templateId: selectedTemplateId === 'none' ? undefined : selectedTemplateId,
+                    ratingValue: newRatingValue,
+                    bestRating: newBestRating,
+                    ratingCount: newRatingCount,
+                }),
             })
 
             if (!res.ok) {
@@ -223,6 +234,35 @@ export default function ProductsPage() {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Schema Rating (Optional)</Label>
+                                <div className="grid grid-cols-3 gap-3">
+                                    <Input
+                                        type="number"
+                                        step="0.1"
+                                        min="0"
+                                        placeholder="4.9"
+                                        value={newRatingValue}
+                                        onChange={(e) => setNewRatingValue(e.target.value)}
+                                    />
+                                    <Input
+                                        type="number"
+                                        step="0.1"
+                                        min="1"
+                                        placeholder="5"
+                                        value={newBestRating}
+                                        onChange={(e) => setNewBestRating(e.target.value)}
+                                    />
+                                    <Input
+                                        type="number"
+                                        min="1"
+                                        placeholder="101"
+                                        value={newRatingCount}
+                                        onChange={(e) => setNewRatingCount(e.target.value)}
+                                    />
+                                </div>
+                                <p className="text-xs text-muted-foreground">Blank chhoro to default 4.9 / 5 / 101 use hoga.</p>
                             </div>
                             <Button type="submit" className="w-full">Create Product</Button>
                         </form>

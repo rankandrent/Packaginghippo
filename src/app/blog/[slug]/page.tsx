@@ -97,7 +97,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                         "name": "Packaging Hippo",
                         "logo": {
                             "@type": "ImageObject",
-                            "url": `${SITE_URL}/logo.png`
+                            "url": `${SITE_URL}/logo-horizontal.svg`
                         }
                     },
                     "datePublished": post.publishedAt || post.createdAt,

@@ -240,6 +240,20 @@
   display: none;
 }
 
+@keyframes logo-loop {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-33.33%);
+  }
+}
+
+.animate-logo-loop {
+  animation: logo-loop 30s linear infinite;
+}
+
 .rich-text a {
   color: #2563eb;
   text-decoration: underline;
