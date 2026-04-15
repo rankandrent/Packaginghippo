@@ -29,7 +29,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                     </h2>
                     <Link
                         href="/services"
-                        className="hidden md:flex items-center gap-2 text-yellow-500 font-bold hover:text-yellow-600 transition-colors"
+                        className="hidden md:flex items-center gap-2 text-yellow-700 font-bold hover:text-yellow-800 transition-colors"
                     >
                         View All Categories <ArrowRight className="w-4 h-4" />
                     </Link>
@@ -46,7 +46,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                                 {category.imageUrl ? (
                                     <Image
                                         src={getSeoImageUrl(category.imageUrl)}
-                                        alt={category.name}
+                                        alt=""
                                         fill
                                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
@@ -64,7 +64,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                                 </div>
                             </div>
                             <div className="p-4 text-center">
-                                <span className="inline-flex items-center text-sm font-bold text-blue-600 group-hover:text-yellow-500 transition-colors">
+                                <span className="inline-flex items-center text-sm font-bold text-blue-700 group-hover:text-yellow-700 transition-colors">
                                     Explore <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                                 </span>
                             </div>
@@ -75,7 +75,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                 <div className="mt-8 text-center md:hidden">
                     <Link
                         href="/services"
-                        className="inline-flex items-center gap-2 text-yellow-500 font-bold hover:text-yellow-600 transition-colors"
+                        className="inline-flex items-center gap-2 text-yellow-700 font-bold hover:text-yellow-800 transition-colors"
                     >
                         View All Categories <ArrowRight className="w-4 h-4" />
                     </Link>

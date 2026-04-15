@@ -25,7 +25,7 @@ export function PopularProducts({ data, categories = [] }: { data: any, categori
                         <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">{data.heading || "Most Popular Custom Box Types We Offer"}</h2>
                         <p className="text-gray-600 text-lg">Choose from our wide range of premium packaging solutions tailored to your brand.</p>
                     </div>
-                    <Link href="/services" className="group flex items-center gap-2 text-yellow-600 font-bold text-lg hover:text-yellow-700 transition-colors">
+                    <Link href="/services" className="group flex items-center gap-2 text-yellow-700 font-bold text-lg hover:text-yellow-800 transition-colors">
                         View All Categories <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
@@ -40,7 +40,7 @@ export function PopularProducts({ data, categories = [] }: { data: any, categori
                                             <div className="relative w-full aspect-video mb-6 rounded-xl overflow-hidden bg-gray-100">
                                                 <Image
                                                     src={getSeoImageUrl(item.imageUrl)}
-                                                    alt={item.name}
+                                                    alt=""
                                                     fill
                                                     sizes="(max-width: 768px) 100vw, (max-width: 1210px) 33vw, 400px"
                                                     className="object-cover group-hover:scale-110 transition-transform duration-500"

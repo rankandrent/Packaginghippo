@@ -24,7 +24,7 @@ export function CategoriesSection({ categories = [] }: { categories: Category[] 
                         <p className="text-gray-600 text-sm md:text-base">Find the perfect packaging for your industry.</p>
                     </div>
 
-                    <Link href="/services" className="group flex items-center gap-1 text-green-600 font-bold text-sm hover:text-green-700 transition-colors whitespace-nowrap">
+                    <Link href="/services" className="group flex items-center gap-1 text-green-700 font-bold text-sm hover:text-green-800 transition-colors whitespace-nowrap">
                         View All Categories <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
@@ -36,7 +36,7 @@ export function CategoriesSection({ categories = [] }: { categories: Category[] 
                                 {category.imageUrl ? (
                                     <Image
                                         src={getSeoImageUrl(category.imageUrl)}
-                                        alt={category.name}
+                                        alt=""
                                         fill
                                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                                         sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
@@ -52,7 +52,7 @@ export function CategoriesSection({ categories = [] }: { categories: Category[] 
                                     </span>
                                 </div>
                             </div>
-                            <h3 className="font-bold text-gray-900 group-hover:text-green-600 transition-colors text-sm md:text-base px-2">
+                            <h3 className="font-bold text-gray-900 group-hover:text-green-700 transition-colors text-sm md:text-base px-2">
                                 {category.name}
                             </h3>
                         </Link>

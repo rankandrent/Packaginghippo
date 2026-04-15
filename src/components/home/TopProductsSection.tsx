@@ -23,7 +23,7 @@ export function TopProductsSection({ products = [] }: { products: Product[] }) {
                         <p className="text-gray-600 text-sm md:text-base">Find The Best Custom Packaging For Every Products!</p>
                     </div>
 
-                    <Link href="/products" className="group flex items-center gap-1 text-green-600 font-bold text-sm hover:text-green-700 transition-colors whitespace-nowrap">
+                    <Link href="/products" className="group flex items-center gap-1 text-green-700 font-bold text-sm hover:text-green-800 transition-colors whitespace-nowrap">
                         View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
@@ -35,7 +35,7 @@ export function TopProductsSection({ products = [] }: { products: Product[] }) {
                                 {product.images && product.images[0] ? (
                                     <Image
                                         src={getSeoImageUrl(product.images[0])}
-                                        alt={product.name}
+                                        alt=""
                                         fill
                                         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                                         className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
@@ -46,7 +46,7 @@ export function TopProductsSection({ products = [] }: { products: Product[] }) {
                                     </div>
                                 )}
                             </div>
-                            <h3 className="font-bold text-gray-900 group-hover:text-green-600 transition-colors text-sm md:text-base px-2">
+                            <h3 className="font-bold text-gray-900 group-hover:text-green-700 transition-colors text-sm md:text-base px-2">
                                 {product.name}
                             </h3>
                         </Link>

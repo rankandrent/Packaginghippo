@@ -27,9 +27,9 @@ export function LogoLoop({ data }: { data: any }) {
 
                 <div className="animate-logo-loop flex flex-none gap-6 md:gap-12 items-center py-2">
                     {[...logos, ...logos, ...logos].map((logo: string | any, index: number) => (
-                        <div key={index} className="flex items-center justify-center min-w-[140px] md:min-w-[200px] transition-all duration-500 hover:scale-110">
+                        <div key={index} className="flex items-center justify-center min-w-[140px] md:min-w-[200px] transition-transform duration-300 hover:scale-105">
                             {typeof logo === 'string' && logo.startsWith('http') ? (
-                                <div className="relative h-20 w-48 filter grayscale hover:grayscale-0 transition-all duration-500 opacity-50 hover:opacity-100">
+                                <div className="relative h-20 w-48">
                                     <Image
                                         src={getSeoImageUrl(logo)}
                                         alt="Client Logo"
@@ -39,7 +39,7 @@ export function LogoLoop({ data }: { data: any }) {
                                     />
                                 </div>
                             ) : (
-                                <span className="text-xl md:text-2xl font-black text-gray-300 hover:text-blue-900 transition-all duration-500 tracking-tighter opacity-50 hover:opacity-100 italic">
+                                <span className="text-xl md:text-2xl font-black text-blue-900 transition-colors duration-300 tracking-tighter italic">
                                     {typeof logo === 'string' ? logo : logo.name}
                                 </span>
                             )}

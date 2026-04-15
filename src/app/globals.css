@@ -273,11 +273,6 @@
 }
 
 
-/* Manual Overrides */
-.text-gray-300 {
-  color: lab(0 0 0);
-}
-
 /* Custom Scrollbar for sidebars and small scrollable areas */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;

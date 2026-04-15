@@ -29,6 +29,7 @@ type SeoSettings = {
 
 type FooterSettings = {
     description?: string
+    footerLogoUrl?: string
     social?: {
         facebook?: string
         instagram?: string
@@ -255,6 +256,18 @@ export default function SettingsPage() {
                             placeholder="Defaults to tagline if empty"
                             rows={2}
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Footer Logo URL</Label>
+                        <Input
+                            value={footer.footerLogoUrl ?? ''}
+                            onChange={(e) => setFooter({ ...footer, footerLogoUrl: e.target.value })}
+                            placeholder="https://example.com/footer-logo.png or /logo-horizontal.svg"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Agar blank chhoro to footer header wala main logo use karega.
+                        </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">

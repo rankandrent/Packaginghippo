@@ -41,7 +41,7 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                                 {product.images && product.images[0] ? (
                                     <Image
                                         src={getSeoImageUrl(product.images[0])}
-                                        alt={product.name}
+                                        alt=""
                                         fill
                                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
@@ -66,6 +66,7 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                                 <div className="flex items-center justify-end mt-auto">
                                     <Link
                                         href={`/${product.slug}`}
+                                        aria-label={`View ${product.name}`}
                                         className="bg-blue-600 text-white p-2 rounded-full hover:bg-yellow-500 hover:text-blue-900 transition-colors shadow-md group-hover:scale-110 transform duration-300"
                                     >
                                         <ArrowRight className="w-5 h-5" />

@@ -55,9 +55,12 @@ export const revalidate = 60
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params
+    const [category, product, page] = await Promise.all([
+        getCategory(slug),
+        getProduct(slug),
+        getPage(slug),
+    ])
 
-    // 1. Check if it's a Category
-    const category = await getCategory(slug)
     if (category) {
         return {
             title: constructMetadataTitle(category.seoTitle || category.name),
@@ -81,8 +84,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         }
     }
 
-    // 2. Check if it's a Product
-    const product = await getProduct(slug)
     if (product) {
         return {
             title: constructMetadataTitle(product.seoTitle || product.name),
@@ -106,8 +107,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         }
     }
 
-    // 3. Check if it's a Page
-    const page = await getPage(slug)
     if (page) {
         return {
             title: constructMetadataTitle(page.seoTitle || page.title),
@@ -124,30 +123,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
+    const [category, product, page, blogPost] = await Promise.all([
+        getCategory(slug),
+        getProduct(slug),
+        getPage(slug),
+        prisma.blogPost.findUnique({
+            where: { slug },
+            select: { id: true }
+        })
+    ])
 
-    // 1. Try Category
-    const category = await getCategory(slug)
     if (category) {
         return <CategoryView category={category} slug={slug} />
     }
 
-    // 2. Try Product
-    const product = await getProduct(slug)
     if (product) {
         return <ProductView product={product} slug={slug} />
     }
 
-    // 3. Try Page
-    const page = await getPage(slug)
     if (page) {
         return <PageView page={page} slug={slug} />
     }
 
-    // 4. Try Blog Post (Redirect to canonical /blog/[slug])
-    const blogPost = await prisma.blogPost.findUnique({
-        where: { slug },
-        select: { id: true }
-    })
     if (blogPost) {
         permanentRedirect(`/blog/${slug}`)
     }
@@ -181,13 +178,23 @@ async function getLayoutSettings() {
 // CATEGORY VIEW
 // ==========================================
 async function CategoryView({ category, slug }: { category: any, slug: string }) {
-    const testimonials = await getTestimonials(category.id)
-    const relatedCategories = await getRelatedCategories(slug, category.relatedCategoryIds || [])
-    const popularProducts = await getPopularProducts(category.id)
-    const quoteFormImage = await getQuoteFormImage()
-    const featuredBlogs = await getFeaturedBlogs()
-    const homepageSections = await getHomepageSections()
-    const layoutSettings = await getLayoutSettings()
+    const [
+        testimonials,
+        relatedCategories,
+        popularProducts,
+        quoteFormImage,
+        featuredBlogs,
+        homepageSections,
+        layoutSettings,
+    ] = await Promise.all([
+        getTestimonials(category.id),
+        getRelatedCategories(slug, category.relatedCategoryIds || []),
+        getPopularProducts(category.id),
+        getQuoteFormImage(),
+        getFeaturedBlogs(),
+        getHomepageSections(),
+        getLayoutSettings(),
+    ])
     let layoutOrder = layoutSettings.category
 
     if (category.layout && Array.isArray(category.layout) && category.layout.length > 0) {
@@ -311,7 +318,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
             case 'quote_form':
                 return <CustomQuoteFormSection key="quote" image={quoteFormImage} />
             case 'testimonials':
-                return <TestimonialsSection key="testimonials" testimonials={testimonials} />
+                return <TestimonialsSection key="testimonials" testimonials={testimonials} aggregateRating={categoryAggregateRating} />
             case 'cta':
                 return ctaSections.length > 0 && (
                     <SectionRenderer
@@ -404,23 +411,6 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     }))
                 }}
             />
-            <section className="border-b bg-white">
-                <div className="container mx-auto px-4 py-4">
-                    <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm">
-                        <div className="flex items-center gap-1 text-yellow-500">
-                            {[...Array(5)].map((_, index) => (
-                                <Star key={index} className="h-4 w-4 fill-current" />
-                            ))}
-                        </div>
-                        <span className="font-bold text-gray-900">
-                            {categoryAggregateRating.ratingValue}/{categoryAggregateRating.bestRating}
-                        </span>
-                        <span className="text-gray-600">
-                            based on {categoryAggregateRating.ratingCount} reviews
-                        </span>
-                    </div>
-                </div>
-            </section>
             <SectionRenderer
                 sections={otherSections}
                 popularProducts={popularProducts}
@@ -442,10 +432,13 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
 // PRODUCT VIEW
 // ==========================================
 async function ProductView({ product, slug }: { product: any, slug: string }) {
-    const featuredBlogs = await getFeaturedBlogs()
-    const testimonials = await getTestimonials(product.id)
-    const homepageSections = await getHomepageSections()
-    const layoutSettings = await getLayoutSettings()
+    const [featuredBlogs, testimonials, homepageSections, layoutSettings, quoteFormImage] = await Promise.all([
+        getFeaturedBlogs(),
+        getTestimonials(product.id),
+        getHomepageSections(),
+        getLayoutSettings(),
+        getQuoteFormImage(),
+    ])
     const layoutOrder = product.layout && Array.isArray(product.layout) && product.layout.length > 0
         ? product.layout
         : layoutSettings.product
@@ -464,7 +457,6 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
     if (popularProducts.length === 0) {
         popularProducts = await getPopularProducts(product.categoryId)
     }
-    const quoteFormImage = await getQuoteFormImage()
 
     const sections = (product.sections as unknown as Section[]) || []
 
@@ -567,7 +559,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
             case 'quote_form':
                 return <CustomQuoteFormSection key="quote" image={quoteFormImage} />
             case 'testimonials':
-                return <TestimonialsSection key="testimonials" testimonials={testimonials} />
+                return <TestimonialsSection key="testimonials" testimonials={testimonials} aggregateRating={productAggregateRating} />
             case 'faqs':
                 return faqSections.length > 0 ? <SectionRenderer key="faqs" sections={faqSections} /> : null
             case 'material_finishing':
@@ -718,17 +710,6 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                     </div>
                                 ) : (
                                 <div className="flex flex-wrap gap-3 mb-4">
-                                    <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-full px-3 py-1.5">
-                                        <div className="flex text-yellow-500">
-                                            {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
-                                        </div>
-                                        <span className="text-xs font-bold text-gray-900">
-                                            {productAggregateRating.ratingValue}/{productAggregateRating.bestRating}
-                                        </span>
-                                        <span className="text-xs text-gray-600">
-                                            ({productAggregateRating.ratingCount} reviews)
-                                        </span>
-                                    </div>
                                     {[
                                         { icon: "⚡", label: "Quote in 2 Hours" },
                                         { icon: "🎁", label: "Free of Charge" },

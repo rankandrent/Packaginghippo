@@ -162,7 +162,11 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                 placeholder="Search products, categories or blogs..."
                                 className="w-full bg-gray-50 border-gray-200 rounded-l-md rounded-r-none h-11 focus-visible:ring-0 focus-visible:ring-offset-0"
                             />
-                            <Button type="submit" className="h-11 rounded-l-none rounded-r-md bg-primary hover:bg-primary/90 px-6">
+                            <Button
+                                type="submit"
+                                aria-label="Search products, categories, or blogs"
+                                className="h-11 rounded-l-none rounded-r-md bg-primary hover:bg-primary/90 px-6"
+                            >
                                 {isSearching ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> : <Search className="w-5 h-5" />}
                             </Button>
                         </form>
@@ -258,7 +262,9 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                 <span className="text-sm font-bold text-gray-900">{phone}</span>
                             </div>
                         </a>
-                        <button 
+                        <button
+                            type="button"
+                            aria-label="Open cart"
                             onClick={() => setIsCartOpen(true)}
                             className="relative hover:opacity-80 transition-opacity"
                         >
@@ -272,7 +278,12 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <button className="lg:hidden text-gray-900" onClick={() => setIsOpen(!isOpen)}>
+                    <button
+                        type="button"
+                        aria-label={isOpen ? "Close menu" : "Open menu"}
+                        className="lg:hidden text-gray-900"
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
                         {isOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
                     </button>
                 </div>

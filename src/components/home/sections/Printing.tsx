@@ -8,11 +8,11 @@ export function Printing({ data }: { data: any }) {
             <div className="container mx-auto px-4 grid md:grid-cols-2 gap-16 items-center">
                 <div>
                     <h2 className="text-4xl font-black mb-6 leading-tight">{data.heading}</h2>
-                    <p className="text-gray-400 text-lg mb-8">{data.text}</p>
+                    <p className="text-gray-300 text-lg mb-8">{data.text}</p>
 
                     <div className="bg-zinc-800 p-8 rounded-2xl border border-zinc-700">
                         <h3 className="text-2xl font-bold mb-2 text-white">{data.subheading}</h3>
-                        <p className="text-gray-400">{data.subtext}</p>
+                        <p className="text-gray-300">{data.subtext}</p>
                     </div>
                 </div>
                 <div className="relative">

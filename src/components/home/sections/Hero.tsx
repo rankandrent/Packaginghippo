@@ -28,20 +28,20 @@ export function Hero({ data }: { data: any }) {
                                 </span>
                             ))}
                         </h1>
-                        <p className="text-lg text-gray-400 max-w-lg leading-relaxed">
+                        <p className="text-lg text-white/80 max-w-lg leading-relaxed">
                             {data.subheading || "Elevate your brand with premium custom boxes."}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 pt-4">
                             <Button variant="default" size="lg" className="text-base px-8 py-6 rounded-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold" asChild>
                                 <Link href={data.cta_link || "/quote"}>{data.cta_text || "Get Custom Quote"} <ArrowRight className="ml-2 w-5 h-5" /></Link>
                             </Button>
-                            <Button variant="outline" size="lg" className="text-base px-8 py-6 rounded-full border-gray-700 text-gray-300 hover:bg-gray-800" asChild>
+                            <Button variant="outline" size="lg" className="text-base px-8 py-6 rounded-full border-gray-500 bg-zinc-800 text-white hover:bg-zinc-700 hover:text-white" asChild>
                                 <Link href="/products">View All Products</Link>
                             </Button>
                         </div>
-                        <div className="flex items-center gap-6 pt-4 text-gray-500 text-sm font-medium">
-                            <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-500" /> No Die & Plate Charges</div>
-                            <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-500" /> Fast Turnaround</div>
+                        <div className="flex items-center gap-6 pt-4 text-gray-200 text-sm font-medium">
+                            <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> No Die & Plate Charges</div>
+                            <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> Fast Turnaround</div>
                         </div>
                     </div>
 

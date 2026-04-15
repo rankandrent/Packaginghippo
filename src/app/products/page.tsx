@@ -189,7 +189,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                                             {product.images && product.images[0] ? (
                                                 <img
                                                     src={product.images[0]}
-                                                    alt={product.name}
+                                                    alt=""
                                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                 />
                                             ) : (
@@ -217,7 +217,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                                     <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
                                         <div className="aspect-square bg-white relative flex items-center justify-center p-8 group-hover:bg-yellow-50 transition-colors">
                                             {cat.imageUrl ? (
-                                                <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-contain" />
+                                                <img src={cat.imageUrl} alt="" className="w-full h-full object-contain" />
                                             ) : (
                                                 <Package className="w-20 h-20 text-gray-200 group-hover:text-yellow-500 transition-colors" />
                                             )}

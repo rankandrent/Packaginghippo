@@ -5,6 +5,7 @@ import prisma from "@/lib/db"
 import { constructMetadataTitle, getSiteUrl } from "@/lib/utils"
 import { QuoteForm } from "@/components/forms/QuoteForm"
 import { JsonLd } from "@/components/seo/JsonLd"
+import { getSeoImageUrl } from "@/lib/image-seo"
 
 export const revalidate = 3600
 
@@ -127,8 +128,8 @@ export default async function ServicesPage() {
                                     <div className="relative aspect-[16/10] overflow-hidden">
                                         {item.imageUrl ? (
                                             <img
-                                                src={item.imageUrl}
-                                                alt={item.name}
+                                                src={getSeoImageUrl(item.imageUrl)}
+                                                alt=""
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             />
                                         ) : (
