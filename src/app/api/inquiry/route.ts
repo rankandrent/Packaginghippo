@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
+import { sendInquiryNotificationEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
     try {
@@ -80,6 +81,14 @@ export async function POST(request: NextRequest) {
                 status: isSpamSubmission ? 'SPAM' : 'PENDING'
             }
         })
+
+        if (!isSpamSubmission) {
+            try {
+                await sendInquiryNotificationEmail(inquiry)
+            } catch (emailError) {
+                console.error('Failed to send inquiry notification email:', emailError)
+            }
+        }
 
         return NextResponse.json({ success: true, inquiry })
     } catch (error: any) {

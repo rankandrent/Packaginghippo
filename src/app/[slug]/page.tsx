@@ -41,6 +41,23 @@ const DEFAULT_SCHEMA_RATING = {
     bestRating: 5,
     ratingCount: 101,
 }
+const DEFAULT_SCHEMA_PRICE = 1
+
+function getSchemaPrice(data: { schemaPrice?: number | null, ecommercePrice?: number | null, price?: number | null }) {
+    if (typeof data.schemaPrice === "number" && data.schemaPrice > 0) {
+        return data.schemaPrice
+    }
+
+    if (typeof data.ecommercePrice === "number" && data.ecommercePrice > 0) {
+        return data.ecommercePrice
+    }
+
+    if (typeof data.price === "number" && data.price > 0) {
+        return data.price
+    }
+
+    return DEFAULT_SCHEMA_PRICE
+}
 
 function getAggregateRating(data: { ratingValue?: number | null, bestRating?: number | null, ratingCount?: number | null }) {
     return {
@@ -48,6 +65,24 @@ function getAggregateRating(data: { ratingValue?: number | null, bestRating?: nu
         "ratingValue": typeof data.ratingValue === "number" ? data.ratingValue : DEFAULT_SCHEMA_RATING.ratingValue,
         "bestRating": typeof data.bestRating === "number" ? data.bestRating : DEFAULT_SCHEMA_RATING.bestRating,
         "ratingCount": typeof data.ratingCount === "number" ? data.ratingCount : DEFAULT_SCHEMA_RATING.ratingCount,
+    }
+}
+
+async function getStructuredDataSettings() {
+    try {
+        const settings = await prisma.siteSettings.findMany({
+            where: {
+                key: { in: ["general", "footer"] }
+            }
+        })
+
+        const general = settings.find((s) => s.key === "general")?.value as any || {}
+        const footer = settings.find((s) => s.key === "footer")?.value as any || {}
+
+        return { general, footer }
+    } catch (error) {
+        console.error("Failed to load structured data settings:", error)
+        return { general: {}, footer: {} }
     }
 }
 
@@ -195,6 +230,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
         getHomepageSections(),
         getLayoutSettings(),
     ])
+    const { general, footer } = await getStructuredDataSettings()
     let layoutOrder = layoutSettings.category
 
     if (category.layout && Array.isArray(category.layout) && category.layout.length > 0) {
@@ -279,6 +315,29 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
         { label: category.name }
     ]
     const categoryAggregateRating = getAggregateRating(category)
+    const categorySchemaPrice = getSchemaPrice(category)
+    const categorySchemaProducts =
+        popularProducts && popularProducts.length > 0
+            ? popularProducts
+            : category.products || []
+    const siteName = general.siteName || "Packaging Hippo"
+    const phone = general.phone || "+1 (510) 500-9533"
+    const email = general.email || "sales@packaginghippo.com"
+    const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
+        ? getSeoImageUrl(general.logoUrl)
+        : `${SITE_URL}/logo-horizontal.svg`
+    const socialLinks = [
+        footer?.social?.facebook,
+        footer?.social?.instagram,
+        footer?.social?.linkedin,
+        footer?.social?.twitter,
+        footer?.social?.behance,
+        footer?.social?.youtube,
+    ].filter(Boolean)
+    const categoryDescription = category.seoDesc || stripHtml(category.description, 160)
+    const categoryImage = category.imageUrl ? getSeoImageUrl(category.imageUrl) : undefined
+    const breadcrumbId = `${SITE_URL}/${slug}#breadcrumb`
+    const webPageId = `${SITE_URL}/${slug}#webpage`
 
     // SEPARATE FAQs and CTAs from other dynamic sections if they are in the layout order
     const faqSections = dynamicSections.filter((s: any) => s.type === 'faq')
@@ -344,6 +403,87 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
 
     return (
         <main className="min-h-screen">
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "Organization",
+                    "@id": `${SITE_URL}/#organization`,
+                    "name": siteName,
+                    "url": SITE_URL,
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": logoUrl,
+                    },
+                    "description": categoryDescription,
+                    "email": email,
+                    "contactPoint": {
+                        "@type": "ContactPoint",
+                        "telephone": phone,
+                        "contactType": "customer service",
+                        "areaServed": "US",
+                        "availableLanguage": "en"
+                    },
+                    ...(socialLinks.length > 0 ? { "sameAs": socialLinks } : {})
+                }}
+            />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "LocalBusiness",
+                    "@id": `${SITE_URL}/#localbusiness`,
+                    "name": siteName,
+                    "url": SITE_URL,
+                    "logo": logoUrl,
+                    ...(categoryImage ? { "image": [categoryImage] } : {}),
+                    "description": categoryDescription,
+                    "telephone": phone,
+                    "email": email,
+                    "address": {
+                        "@type": "PostalAddress",
+                        "streetAddress": general.address || "123 Packaging Street, Industrial District, NY 10001",
+                        "addressCountry": "US"
+                    },
+                    "parentOrganization": { "@id": `${SITE_URL}/#organization` },
+                    ...(socialLinks.length > 0 ? { "sameAs": socialLinks } : {})
+                }}
+            />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "@id": `${SITE_URL}/#website`,
+                    "url": SITE_URL,
+                    "name": siteName,
+                    "description": categoryDescription,
+                    "publisher": { "@id": `${SITE_URL}/#organization` },
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": `${SITE_URL}/products?search={search_term_string}`,
+                        "query-input": "required name=search_term_string"
+                    }
+                }}
+            />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "@id": webPageId,
+                    "url": `${SITE_URL}/${slug}`,
+                    "name": category.name,
+                    "description": categoryDescription,
+                    "isPartOf": { "@id": `${SITE_URL}/#website` },
+                    "about": { "@id": `${SITE_URL}/#organization` },
+                    "breadcrumb": { "@id": breadcrumbId },
+                    ...(categoryImage
+                        ? {
+                            "primaryImageOfPage": {
+                                "@type": "ImageObject",
+                                "url": categoryImage
+                            }
+                        }
+                        : {})
+                }}
+            />
             {/* 1. Collection Page Schema */}
             <JsonLd
                 data={{
@@ -352,27 +492,57 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     "@id": `${SITE_URL}/${slug}#collection`,
                     "name": category.name,
                     "url": `${SITE_URL}/${slug}`,
-                    "description": category.seoDesc || stripHtml(category.description, 160),
+                    "description": categoryDescription,
                     "isPartOf": { "@id": `${SITE_URL}/#website` },
                     "aggregateRating": categoryAggregateRating
                 }}
             />
-            {/* 2. ItemList (Category Products) */}
-            {category.products && category.products.length > 0 && (
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "ProductGroup",
+                    "@id": `${SITE_URL}/${slug}#product-group`,
+                    "name": category.name,
+                    "url": `${SITE_URL}/${slug}`,
+                    "description": categoryDescription,
+                    ...(categoryImage ? { "image": [categoryImage] } : {}),
+                    "brand": {
+                        "@type": "Brand",
+                        "name": "Packaging Hippo",
+                        "@id": `${SITE_URL}/#organization`
+                    },
+                    "aggregateRating": categoryAggregateRating,
+                    ...(categorySchemaPrice
+                        ? {
+                            "offers": {
+                                "@type": "Offer",
+                                "priceCurrency": "USD",
+                                "price": categorySchemaPrice.toFixed(2),
+                                "availability": "https://schema.org/InStock",
+                                "url": `${SITE_URL}/${slug}`,
+                                "seller": {
+                                    "@type": "Organization",
+                                    "name": "Packaging Hippo",
+                                    "@id": `${SITE_URL}/#organization`
+                                }
+                            }
+                        }
+                        : {})
+                }}
+            />
+            {/* 2. ItemList (Displayed Category Products) */}
+            {categorySchemaProducts.length > 0 && (
                 <JsonLd
                     data={{
                         "@context": "https://schema.org",
                         "@type": "ItemList",
                         "@id": `${SITE_URL}/${slug}#itemlist`,
                         "name": category.name,
-                        "itemListElement": category.products.map((product: any, index: number) => ({
+                        "itemListElement": categorySchemaProducts.map((product: any, index: number) => ({
                             "@type": "ListItem",
                             "position": index + 1,
-                            "item": {
-                                "@type": "Product",
-                                "name": product.name,
-                                "url": `${SITE_URL}/${product.slug}`
-                            }
+                            "name": product.name,
+                            "item": `${SITE_URL}/${product.slug}`
                         }))
                     }}
                 />
@@ -403,6 +573,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                 data={{
                     "@context": "https://schema.org",
                     "@type": "BreadcrumbList",
+                    "@id": breadcrumbId,
                     "itemListElement": breadcrumbItems.map((item, index) => ({
                         "@type": "ListItem",
                         "position": index + 1,
@@ -439,6 +610,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
         getLayoutSettings(),
         getQuoteFormImage(),
     ])
+    const { general, footer } = await getStructuredDataSettings()
     const layoutOrder = product.layout && Array.isArray(product.layout) && product.layout.length > 0
         ? product.layout
         : layoutSettings.product
@@ -579,13 +751,27 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
         }
     }
 
-    const offerPrice =
-        typeof product.ecommercePrice === "number" && product.ecommercePrice > 0
-            ? product.ecommercePrice
-            : typeof product.price === "number" && product.price > 0
-                ? product.price
-                : null
+    const offerPrice = getSchemaPrice(product)
     const productAggregateRating = getAggregateRating(product)
+    const siteName = general.siteName || "Packaging Hippo"
+    const phone = general.phone || "+1 (510) 500-9533"
+    const email = general.email || "sales@packaginghippo.com"
+    const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
+        ? getSeoImageUrl(general.logoUrl)
+        : `${SITE_URL}/logo-horizontal.svg`
+    const socialLinks = [
+        footer?.social?.facebook,
+        footer?.social?.instagram,
+        footer?.social?.linkedin,
+        footer?.social?.twitter,
+        footer?.social?.behance,
+        footer?.social?.youtube,
+    ].filter(Boolean)
+    const productDescription = product.shortDesc || product.seoDesc || stripHtml(product.description, 160)
+    const productImages = product.images ? product.images.map((img: string) => getSeoImageUrl(img)) : []
+    const productImage = productImages[0]
+    const breadcrumbId = `${SITE_URL}/${slug}#breadcrumb`
+    const webPageId = `${SITE_URL}/${slug}#webpage`
 
     const availabilityMap: Record<string, string> = {
         IN_STOCK: "https://schema.org/InStock",
@@ -595,11 +781,93 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
 
     return (
         <main className="min-h-screen bg-white">
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "Organization",
+                    "@id": `${SITE_URL}/#organization`,
+                    "name": siteName,
+                    "url": SITE_URL,
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": logoUrl,
+                    },
+                    "description": productDescription,
+                    "email": email,
+                    "contactPoint": {
+                        "@type": "ContactPoint",
+                        "telephone": phone,
+                        "contactType": "customer service",
+                        "areaServed": "US",
+                        "availableLanguage": "en"
+                    },
+                    ...(socialLinks.length > 0 ? { "sameAs": socialLinks } : {})
+                }}
+            />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "LocalBusiness",
+                    "@id": `${SITE_URL}/#localbusiness`,
+                    "name": siteName,
+                    "url": SITE_URL,
+                    "logo": logoUrl,
+                    ...(productImage ? { "image": [productImage] } : {}),
+                    "description": productDescription,
+                    "telephone": phone,
+                    "email": email,
+                    "address": {
+                        "@type": "PostalAddress",
+                        "streetAddress": general.address || "123 Packaging Street, Industrial District, NY 10001",
+                        "addressCountry": "US"
+                    },
+                    "parentOrganization": { "@id": `${SITE_URL}/#organization` },
+                    ...(socialLinks.length > 0 ? { "sameAs": socialLinks } : {})
+                }}
+            />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "@id": `${SITE_URL}/#website`,
+                    "url": SITE_URL,
+                    "name": siteName,
+                    "description": productDescription,
+                    "publisher": { "@id": `${SITE_URL}/#organization` },
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": `${SITE_URL}/products?search={search_term_string}`,
+                        "query-input": "required name=search_term_string"
+                    }
+                }}
+            />
+            <JsonLd
+                data={{
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "@id": webPageId,
+                    "url": `${SITE_URL}/${slug}`,
+                    "name": product.name,
+                    "description": productDescription,
+                    "isPartOf": { "@id": `${SITE_URL}/#website` },
+                    "about": { "@id": `${SITE_URL}/#organization` },
+                    "breadcrumb": { "@id": breadcrumbId },
+                    ...(productImage
+                        ? {
+                            "primaryImageOfPage": {
+                                "@type": "ImageObject",
+                                "url": productImage
+                            }
+                        }
+                        : {})
+                }}
+            />
             {/* 1. Breadcrumb Schema */}
             <JsonLd
                 data={{
                     "@context": "https://schema.org",
                     "@type": "BreadcrumbList",
+                    "@id": breadcrumbId,
                     "itemListElement": breadcrumbItems.map((item, index) => ({
                         "@type": "ListItem",
                         "position": index + 1,
@@ -615,8 +883,8 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     "@type": "Product",
                     "@id": `${SITE_URL}/${product.slug}`,
                     "name": product.name,
-                    "image": product.images ? product.images.map((img: string) => getSeoImageUrl(img)) : [],
-                    "description": product.shortDesc || product.seoDesc || stripHtml(product.description, 160),
+                    "image": productImages,
+                    "description": productDescription,
                     "sku": product.id.substring(0, 8).toUpperCase(),
                     "mpn": product.id.substring(0, 8).toUpperCase(),
                     "url": `${SITE_URL}/${product.slug}`,
@@ -633,11 +901,39 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                 "priceCurrency": "USD",
                                 "price": offerPrice.toFixed(2),
                                 "availability": availabilityMap[product.stockStatus] || availabilityMap.IN_STOCK,
+                                "itemCondition": "https://schema.org/NewCondition",
                                 "url": `${SITE_URL}/${product.slug}`,
                                 "seller": {
                                     "@type": "Organization",
                                     "name": "Packaging Hippo",
                                     "@id": `${SITE_URL}/#organization`
+                                },
+                                "shippingDetails": {
+                                    "@type": "OfferShippingDetails",
+                                    "shippingRate": {
+                                        "@type": "MonetaryAmount",
+                                        "value": "0",
+                                        "currency": "USD"
+                                    },
+                                    "shippingDestination": {
+                                        "@type": "DefinedRegion",
+                                        "addressCountry": "US"
+                                    },
+                                    "deliveryTime": {
+                                        "@type": "ShippingDeliveryTime",
+                                        "handlingTime": {
+                                            "@type": "QuantitativeValue",
+                                            "minValue": 8,
+                                            "maxValue": 12,
+                                            "unitCode": "DAY"
+                                        },
+                                        "transitTime": {
+                                            "@type": "QuantitativeValue",
+                                            "minValue": 8,
+                                            "maxValue": 12,
+                                            "unitCode": "DAY"
+                                        }
+                                    }
                                 }
                             }
                         }

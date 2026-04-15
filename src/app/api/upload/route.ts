@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
         // 2. Slugify the filename for SEO-friendly URLs
         // e.g. "What Are Bagged Packaged Goods" -> "what-are-bagged-packaged-goods"
-        // The final URL will be: packaginghippo.com/images/products/what-are-bagged-packaged-goods.jpg
+        // The final public-facing URL will be: packaginghippo.com/assets/products/what-are-bagged-packaged-goods.jpg
         const finalPublicId = slugifyFilename(rawName)
 
         // Convert file to buffer

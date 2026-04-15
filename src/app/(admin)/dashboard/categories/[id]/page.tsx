@@ -31,6 +31,7 @@ type Category = {
     ratingValue: number | null
     bestRating: number | null
     ratingCount: number | null
+    schemaPrice: number | null
     descriptionCollapsedHeight: number
     isActive: boolean
     sections: any
@@ -515,6 +516,19 @@ export default function CategoryEditor({ params }: { params: Promise<{ id: strin
                                     </div>
                                 </div>
                                 <p className="text-xs text-muted-foreground">Blank chhoro to default 4.9 / 5 / 101 use hoga.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="schema_price">Schema Price (USD)</Label>
+                                <Input
+                                    id="schema_price"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={category.schemaPrice ?? ""}
+                                    onChange={(e) => setCategory({ ...category, schemaPrice: e.target.value === "" ? null : parseFloat(e.target.value) })}
+                                    placeholder="29.99"
+                                />
+                                <p className="text-xs text-muted-foreground">Ye sirf schema me use hoga, category page UI par show nahi hoga.</p>
                             </div>
                         </div>
                     </div>

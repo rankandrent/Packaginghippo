@@ -210,7 +210,7 @@ export default function MediaLibraryPage() {
     // Build the SEO-friendly URL for display
     const getSeoUrl = (image: CloudinaryResource) => {
         const slug = getSlugFromPublicId(image.public_id)
-        return `/images/products/${slug}.${image.format}`
+        return `/assets/products/${slug}.${image.format}`
     }
 
     return (
@@ -380,7 +380,7 @@ export default function MediaLibraryPage() {
                                 <p className="text-[11px] text-muted-foreground">
                                     This changes the actual image URL. Use lowercase, hyphens, no spaces.
                                     <br />
-                                    <span className="text-blue-600 font-medium">URL: packaginghippo.com/images/products/{editSlug || 'slug'}.{editingImage.format}</span>
+                                    <span className="text-blue-600 font-medium">URL: packaginghippo.com/assets/products/{editSlug || 'slug'}.{editingImage.format}</span>
                                 </p>
                             </div>
 

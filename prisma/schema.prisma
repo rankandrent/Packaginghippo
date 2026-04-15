@@ -91,6 +91,7 @@ model ProductCategory {
   ratingValue Float?
   bestRating  Float?
   ratingCount Int?
+  schemaPrice Float?
   descriptionCollapsedHeight Int @default(300)
   sections    Json?    // List of dynamic sections
   layout      Json?    // Custom order: ['content', 'related_categories', 'quote_form', 'testimonials']
@@ -132,6 +133,7 @@ model Product {
   ratingValue Float?
   bestRating  Float?
   ratingCount Int?
+  schemaPrice Float?
   descriptionCollapsedHeight Int @default(300)
   tabs        Json?    // Tabbed content: specification, box_features, materials, printing_methods, inks, finishing, addons
 

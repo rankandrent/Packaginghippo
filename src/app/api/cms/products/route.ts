@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, categoryId, templateId, cloneFromId, ratingValue, bestRating, ratingCount } = body
+        const { name, slug, categoryId, templateId, cloneFromId, ratingValue, bestRating, ratingCount, schemaPrice } = body
 
         if (cloneFromId) {
             const source = await prisma.product.findUnique({
@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
                     ratingValue: source.ratingValue,
                     bestRating: source.bestRating,
                     ratingCount: source.ratingCount,
+                    schemaPrice: source.schemaPrice,
                     tabs: source.tabs,
                     isEcommerce: source.isEcommerce,
                     ecommercePrice: source.ecommercePrice,
@@ -107,6 +108,7 @@ export async function POST(request: NextRequest) {
                 ratingValue: parseOptionalFloat(ratingValue),
                 bestRating: parseOptionalFloat(bestRating),
                 ratingCount: parseOptionalInt(ratingCount),
+                schemaPrice: parseOptionalFloat(schemaPrice),
                 sections: initialSections,
                 isActive: false,
             },
@@ -131,6 +133,7 @@ export async function PUT(request: NextRequest) {
             ratingValue,
             bestRating,
             ratingCount,
+            schemaPrice,
             ...data
         } = body
 
@@ -141,6 +144,7 @@ export async function PUT(request: NextRequest) {
                 ratingValue: parseOptionalFloat(ratingValue),
                 bestRating: parseOptionalFloat(bestRating),
                 ratingCount: parseOptionalInt(ratingCount),
+                schemaPrice: parseOptionalFloat(schemaPrice),
                 updatedAt: new Date(),
             },
         })

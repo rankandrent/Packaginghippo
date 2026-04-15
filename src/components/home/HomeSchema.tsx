@@ -2,31 +2,190 @@ import prisma from "@/lib/db"
 import { getSeoImageUrl } from "@/lib/image-seo"
 import { getSiteUrl } from "@/lib/utils"
 
-async function getSettings() {
+function toAbsoluteUrl(url: string | null | undefined, siteUrl: string) {
+    if (!url) return null
+
+    const normalized = getSeoImageUrl(url)
+    if (!normalized) return null
+
+    if (normalized.startsWith("http://") || normalized.startsWith("https://")) {
+        return normalized
+    }
+
+    return `${siteUrl}${normalized.startsWith("/") ? normalized : `/${normalized}`}`
+}
+
+function parsePostalAddress(rawAddress: string) {
+    const normalized = rawAddress.replace(/\s+/g, " ").trim()
+    const commaParts = normalized.split(",").map(part => part.trim()).filter(Boolean)
+
+    const fullAddress = {
+        "@type": "PostalAddress",
+        "streetAddress": normalized,
+        "addressCountry": "US"
+    } as Record<string, string>
+
+    if (commaParts.length >= 3) {
+        const streetAddress = commaParts.slice(0, -2).join(", ")
+        const city = commaParts[commaParts.length - 2]
+        const regionPart = commaParts[commaParts.length - 1]
+        const regionMatch = regionPart.match(/^([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/i)
+
+        return {
+            "@type": "PostalAddress",
+            "streetAddress": streetAddress || normalized,
+            ...(city ? { "addressLocality": city } : {}),
+            ...(regionMatch ? { "addressRegion": regionMatch[1].toUpperCase() } : {}),
+            ...(regionMatch ? { "postalCode": regionMatch[2] } : {}),
+            "addressCountry": "US"
+        }
+    }
+
+    const compactMatch = normalized.match(/^(.*?)(?:,\s*|\s+)([A-Za-z .'-]+)\s+([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/)
+    if (compactMatch) {
+        return {
+            "@type": "PostalAddress",
+            "streetAddress": compactMatch[1].trim(),
+            "addressLocality": compactMatch[2].trim(),
+            "addressRegion": compactMatch[3].toUpperCase(),
+            "postalCode": compactMatch[4],
+            "addressCountry": "US"
+        }
+    }
+
+    return fullAddress
+}
+
+function normalizeOpeningHours(openingHours: unknown) {
+    if (!openingHours) return undefined
+
+    if (typeof openingHours === "string" && openingHours.trim()) {
+        return openingHours.trim()
+    }
+
+    if (Array.isArray(openingHours)) {
+        const values = openingHours
+            .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+            .map(value => value.trim())
+
+        if (values.length > 0) {
+            return values
+        }
+    }
+
+    return undefined
+}
+
+function getGeoCoordinates(general: Record<string, any>) {
+    const latitude = general.latitude ?? general.lat
+    const longitude = general.longitude ?? general.lng ?? general.long
+
+    if (latitude === undefined || longitude === undefined) {
+        return undefined
+    }
+
+    return {
+        "@type": "GeoCoordinates",
+        "latitude": String(latitude),
+        "longitude": String(longitude)
+    }
+}
+
+async function getHomeSchemaData() {
     try {
-        const settings = await prisma.siteSettings.findMany({
-            where: {
-                key: { in: ['general', 'footer'] }
-            }
-        })
-        const general = settings.find(s => s.key === 'general')?.value as any || {}
-        return general
+        const [settings, categories, heroSection] = await Promise.all([
+            prisma.siteSettings.findMany({
+                where: {
+                    key: { in: ["general", "footer", "seo"] }
+                }
+            }),
+            prisma.productCategory.findMany({
+                where: {
+                    isActive: true,
+                    imageUrl: { not: null }
+                },
+                orderBy: [
+                    { order: "asc" },
+                    { updatedAt: "desc" }
+                ],
+                take: 12,
+                select: {
+                    imageUrl: true
+                }
+            }),
+            prisma.homepageSection.findFirst({
+                where: {
+                    sectionKey: "hero",
+                    isActive: true
+                },
+                select: {
+                    content: true
+                }
+            })
+        ])
+
+        const general = settings.find(s => s.key === "general")?.value as any || {}
+        const footer = settings.find(s => s.key === "footer")?.value as any || {}
+        const seo = settings.find(s => s.key === "seo")?.value as any || {}
+
+        return {
+            general,
+            footer,
+            seo,
+            categoryImages: categories.map(category => category.imageUrl).filter(Boolean),
+            heroImage: (heroSection?.content as any)?.hero_image || null
+        }
     } catch (e) {
-        return {}
+        return {
+            general: {},
+            footer: {},
+            seo: {},
+            categoryImages: [],
+            heroImage: null
+        }
     }
 }
 
 export async function HomeSchema() {
-    const general = await getSettings()
-
+    const { general, footer, seo, categoryImages, heroImage } = await getHomeSchemaData()
     const siteUrl = getSiteUrl()
     const siteName = general.siteName || "Packaging Hippo"
     const phone = general.phone || "+1 (510) 500-9533"
     const email = general.email || "sales@packaginghippo.com"
+    const description = seo.defaultDescription || general.tagline || "Premium custom packaging boxes with logo at wholesale prices across the USA."
     const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
-        ? getSeoImageUrl(general.logoUrl)
+        ? toAbsoluteUrl(general.logoUrl, siteUrl)
         : `${siteUrl}/logo-horizontal.svg`
     const rawAddress = general.address || "123 Packaging Street, Industrial District, NY 10001"
+    const address = parsePostalAddress(rawAddress)
+    const socialLinks = [
+        footer?.social?.facebook,
+        footer?.social?.instagram,
+        footer?.social?.linkedin,
+        footer?.social?.twitter,
+        footer?.social?.behance,
+        footer?.social?.youtube,
+    ].filter(Boolean)
+    const defaultSocialLinks = [
+        "https://www.facebook.com/packaginghippo",
+        "https://twitter.com/packaginghippo",
+        "https://www.instagram.com/packaginghippo",
+        "https://www.linkedin.com/company/packaginghippo"
+    ]
+    const sameAs = socialLinks.length > 0 ? socialLinks : defaultSocialLinks
+    const mapUrl = general.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rawAddress)}`
+    const openingHours = normalizeOpeningHours(general.openingHours)
+    const geo = getGeoCoordinates(general)
+    const imageUrls = Array.from(
+        new Set(
+            [
+                logoUrl,
+                toAbsoluteUrl(seo.ogImage, siteUrl),
+                toAbsoluteUrl(heroImage, siteUrl),
+                ...categoryImages.map((imageUrl: string | null) => toAbsoluteUrl(imageUrl, siteUrl))
+            ].filter(Boolean)
+        )
+    ).slice(0, 20)
 
     const organizationSchema = {
         "@context": "https://schema.org",
@@ -34,6 +193,7 @@ export async function HomeSchema() {
         "@id": `${siteUrl}/#organization`,
         "name": siteName,
         "url": siteUrl,
+        "description": description,
         "logo": {
             "@type": "ImageObject",
             "url": logoUrl,
@@ -48,12 +208,7 @@ export async function HomeSchema() {
             "availableLanguage": "en"
         },
         "email": email,
-        "sameAs": [
-            "https://www.facebook.com/packaginghippo",
-            "https://twitter.com/packaginghippo",
-            "https://www.instagram.com/packaginghippo",
-            "https://www.linkedin.com/company/packaginghippo"
-        ]
+        "sameAs": sameAs
     }
 
     const localBusinessSchema = {
@@ -61,22 +216,19 @@ export async function HomeSchema() {
         "@type": "LocalBusiness",
         "@id": `${siteUrl}/#localbusiness`,
         "name": siteName,
-        "image": [
-            `${siteUrl}/images/packaging-hero.webp`,
-            `${siteUrl}/images/custom-boxes-wholesale.webp`
-        ],
+        ...(imageUrls.length > 0 ? { "image": imageUrls } : {}),
         "logo": logoUrl,
         "url": siteUrl,
         "telephone": phone,
         "email": email,
-        "priceRange": "$$",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": rawAddress,
-            "addressCountry": "US"
-        },
-        "description": "Premium custom packaging boxes with logo at wholesale prices. Packaging Hippo offers high-quality custom made boxes with fast turnaround across the USA.",
-        "parentOrganization": { "@id": `${siteUrl}/#organization` }
+        "priceRange": general.priceRange || "$1 - $50",
+        "address": address,
+        "description": description,
+        "parentOrganization": { "@id": `${siteUrl}/#organization` },
+        "hasMap": mapUrl,
+        "sameAs": sameAs,
+        ...(openingHours ? { "openingHours": openingHours } : {}),
+        ...(geo ? { "geo": geo } : {})
     }
 
     const websiteSchema = {
@@ -85,6 +237,7 @@ export async function HomeSchema() {
         "@id": `${siteUrl}/#website`,
         "url": siteUrl,
         "name": siteName,
+        "description": description,
         "publisher": { "@id": `${siteUrl}/#organization` },
         "potentialAction": {
             "@type": "SearchAction",
@@ -99,7 +252,7 @@ export async function HomeSchema() {
         "@id": `${siteUrl}/#webpage`,
         "url": siteUrl,
         "name": siteName,
-        "description": "Premium custom packaging boxes with logo.",
+        "description": description,
         "isPartOf": {
             "@id": `${siteUrl}/#website`
         },
@@ -108,7 +261,13 @@ export async function HomeSchema() {
         },
         "breadcrumb": {
             "@id": `${siteUrl}/#breadcrumb`
-        }
+        },
+        ...(imageUrls[0] ? {
+            "primaryImageOfPage": {
+                "@type": "ImageObject",
+                "url": imageUrls[0]
+            }
+        } : {})
     }
 
     const faqSchema = {

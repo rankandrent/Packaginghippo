@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, slug, description, templateId, layout, cloneFromId, ratingValue, bestRating, ratingCount } = body
+        const { name, slug, description, templateId, layout, cloneFromId, ratingValue, bestRating, ratingCount, schemaPrice } = body
 
         if (cloneFromId) {
             const sourceCat = await prisma.productCategory.findUnique({
@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
                     ratingValue: sourceCat.ratingValue,
                     bestRating: sourceCat.bestRating,
                     ratingCount: sourceCat.ratingCount,
+                    schemaPrice: sourceCat.schemaPrice,
                     descriptionCollapsedHeight: sourceCat.descriptionCollapsedHeight,
                     isActive: false, // Default to draft
                     sections: sourceCat.sections ?? [],
@@ -104,6 +105,7 @@ export async function POST(request: NextRequest) {
                 ratingValue: parseOptionalFloat(ratingValue),
                 bestRating: parseOptionalFloat(bestRating),
                 ratingCount: parseOptionalInt(ratingCount),
+                schemaPrice: parseOptionalFloat(schemaPrice),
                 isActive: false,
                 sections: initialSections,
                 layout: layout || null,
@@ -133,6 +135,7 @@ export async function PUT(request: NextRequest) {
             ratingValue,
             bestRating,
             ratingCount,
+            schemaPrice,
             descriptionCollapsedHeight,
             order,
             isActive,
@@ -154,6 +157,7 @@ export async function PUT(request: NextRequest) {
                 ratingValue: parseOptionalFloat(ratingValue),
                 bestRating: parseOptionalFloat(bestRating),
                 ratingCount: parseOptionalInt(ratingCount),
+                schemaPrice: parseOptionalFloat(schemaPrice),
                 descriptionCollapsedHeight,
                 order,
                 isActive,

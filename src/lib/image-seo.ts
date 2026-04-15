@@ -1,20 +1,67 @@
 
 export const CLOUDINARY_CLOUD_NAME = 'da9culaxt'
 
+function normalizeCloudinaryPath(pathname: string) {
+    const uploadMarker = "/image/upload/"
+    const uploadIndex = pathname.indexOf(uploadMarker)
+
+    if (uploadIndex === -1) return null
+
+    const remainder = pathname.slice(uploadIndex + uploadMarker.length)
+    const parts = remainder.split("/").filter(Boolean)
+
+    if (parts[0] && /^v\d+$/.test(parts[0])) {
+        parts.shift()
+    }
+
+    return parts.join("/")
+}
+
 /**
  * Transforms a raw Cloudinary URL into a local SEO-friendly URL
- * e.g. https://res.cloudinary.com/da9culaxt/image/upload/v123/products/my-image.jpg 
- *   -> /images/v123/products/my-image.jpg
+ * e.g. https://res.cloudinary.com/da9culaxt/image/upload/v123/products/my-image.jpg
+ *   -> /assets/products/my-image.jpg
  * 
  * This makes the image appear to be served from:
- *   packaginghippo.com/images/v123/products/my-image.jpg
+ *   packaginghippo.com/assets/products/my-image.jpg
  */
 export function getSeoImageUrl(url: string | null | undefined): string {
     if (!url) return ''
 
-    // Only rewrite specific Cloudinary URLs
+    if (url.startsWith("/images/")) {
+        const parts = url.replace(/^\/images\//, "").split("/").filter(Boolean)
+        if (parts[0] && /^v\d+$/.test(parts[0])) {
+            parts.shift()
+        }
+        return `/assets/${parts.join("/")}`
+    }
+
+    if (url.startsWith("/assets/")) {
+        return url
+    }
+
     if (url.includes(`res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload`)) {
-        return url.replace(`https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload`, '/images')
+        try {
+            const parsed = new URL(url)
+            const normalizedPath = normalizeCloudinaryPath(parsed.pathname)
+            if (normalizedPath) {
+                return `/assets/${normalizedPath}`
+            }
+        } catch {
+            return url
+        }
+    }
+
+    if (url.includes("/image/upload/")) {
+        try {
+            const parsed = new URL(url)
+            const normalizedPath = normalizeCloudinaryPath(parsed.pathname)
+            if (normalizedPath) {
+                return `/assets/${normalizedPath}`
+            }
+        } catch {
+            return url
+        }
     }
 
     return url

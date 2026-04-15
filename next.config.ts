@@ -43,6 +43,10 @@ const nextConfig: NextConfig = {
         source: '/images/:path*',
         destination: 'https://res.cloudinary.com/da9culaxt/image/upload/:path*',
       },
+      {
+        source: '/assets/:path*',
+        destination: 'https://res.cloudinary.com/da9culaxt/image/upload/:path*',
+      },
     ]
   },
 };

@@ -163,11 +163,14 @@ export default function SettingsPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Email</Label>
+                            <Label>Business / Notification Email</Label>
                             <Input
                                 value={general.email}
                                 onChange={(e) => setGeneral({ ...general, email: e.target.value })}
                             />
+                            <p className="text-xs text-muted-foreground">
+                                Website form notifications will be sent to this email when SMTP is configured.
+                            </p>
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <Label>Address</Label>

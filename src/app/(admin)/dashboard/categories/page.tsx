@@ -38,6 +38,7 @@ export default function CategoriesPage() {
     const [newRatingValue, setNewRatingValue] = useState("")
     const [newBestRating, setNewBestRating] = useState("")
     const [newRatingCount, setNewRatingCount] = useState("")
+    const [newSchemaPrice, setNewSchemaPrice] = useState("")
     const [searchQuery, setSearchQuery] = useState("")
     const router = useRouter()
 
@@ -92,6 +93,7 @@ export default function CategoriesPage() {
                     ratingValue: newRatingValue,
                     bestRating: newBestRating,
                     ratingCount: newRatingCount,
+                    schemaPrice: newSchemaPrice,
                 }),
             })
 
@@ -234,6 +236,18 @@ export default function CategoriesPage() {
                                     />
                                 </div>
                                 <p className="text-xs text-muted-foreground">Blank chhoro to default 4.9 / 5 / 101 use hoga.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Schema Price (USD, Optional)</Label>
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    placeholder="29.99"
+                                    value={newSchemaPrice}
+                                    onChange={(e) => setNewSchemaPrice(e.target.value)}
+                                />
+                                <p className="text-xs text-muted-foreground">Ye sirf schema me use hoga, front-end par visible nahi hoga.</p>
                             </div>
                             <DialogFooter>
                                 <Button type="submit" className="w-full sm:w-auto">Create & Edit</Button>
