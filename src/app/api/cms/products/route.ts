@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
+import { revalidatePath } from 'next/cache'
 
 function parseOptionalFloat(value: unknown) {
     if (value === "" || value === null || value === undefined) return null
@@ -114,6 +115,10 @@ export async function POST(request: NextRequest) {
             },
         })
 
+        revalidatePath(`/${slug}`)
+        revalidatePath('/products')
+        revalidatePath('/services')
+
         return NextResponse.json({ product })
     } catch (error: any) {
         console.error('Error creating product:', error)
@@ -148,6 +153,20 @@ export async function PUT(request: NextRequest) {
                 updatedAt: new Date(),
             },
         })
+
+        revalidatePath(`/${updated.slug}`)
+        revalidatePath('/products')
+        revalidatePath('/services')
+        if (updated.categoryId) {
+            const category = await prisma.productCategory.findUnique({
+                where: { id: updated.categoryId },
+                select: { slug: true }
+            })
+
+            if (category?.slug) {
+                revalidatePath(`/${category.slug}`)
+            }
+        }
 
         return NextResponse.json({ product: updated })
     } catch (error) {

@@ -35,6 +35,21 @@ async function getCategories() {
     }
 }
 
+async function getAllProducts() {
+    try {
+        return await prisma.product.findMany({
+            where: { isActive: true },
+            include: { category: true },
+            orderBy: [
+                { updatedAt: "desc" },
+                { createdAt: "desc" }
+            ]
+        })
+    } catch (e) {
+        return []
+    }
+}
+
 
 interface ProductsPageProps {
     searchParams: { [key: string]: string | undefined }
@@ -74,6 +89,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
     } else {
         categories = await getCategories()
+        products = await getAllProducts()
     }
 
     const benefits = [
@@ -103,7 +119,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     "mainEntity": {
                         "@type": "ItemList",
                         "@id": `${siteUrl}/products#itemlist`,
-                        "numberOfItems": isSearching ? products.length + categories.length : categories.length,
+                        "numberOfItems": isSearching ? products.length + categories.length : products.length,
                         "itemListElement": isSearching
                             ? [
                                 ...products.map((product, index) => ({
@@ -119,12 +135,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                                     "name": category.name
                                 }))
                             ]
-                            : categories.map((category, index) => ({
+                            : products.map((product, index) => ({
                                 "@type": "ListItem",
                                 "position": index + 1,
-                                "url": `${siteUrl}/${category.slug}`,
-                                "name": category.name,
-                                ...(stripHtml(category.description, 160) ? { description: stripHtml(category.description, 160) } : {})
+                                "url": `${siteUrl}/${product.slug}`,
+                                "name": product.name,
+                                ...(stripHtml(product.shortDesc || product.description, 160) ? { description: stripHtml(product.shortDesc || product.description, 160) } : {})
                             }))
                     }
                 }}
@@ -137,12 +153,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <div className="bg-black text-white pt-32 pb-20">
                 <div className="container mx-auto px-4 text-center">
                     <h1 className="text-5xl font-black mb-4 text-yellow-500">
-                        {isSearching ? `Search Results for "${query}"` : "Our Products"}
+                        {isSearching ? `Search Results for "${query}"` : "All Products"}
                     </h1>
                     <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                         {isSearching
                             ? `Found ${products.length} products and ${categories.length} categories.`
-                            : "Discover premium custom packaging solutions designed to elevate your brand and protect your products."}
+                            : `Browse all ${products.length} active packaging products in one place.`}
                     </p>
                 </div>
             </div>
@@ -166,10 +182,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     <div className="container mx-auto px-4 text-center mb-12">
                         <h2 className="text-3xl font-bold text-gray-900 mb-4">Custom Packaging Solutions for Every Business</h2>
                         <p className="text-gray-600 leading-relaxed">
-                            At Packaging Hippo, we offer a comprehensive range of custom packaging products tailored to your specific needs.
-                            Whether you're a small business looking for professional mailer boxes, a luxury brand seeking premium rigid boxes,
-                            or an eco-conscious company requiring sustainable packaging options, we have you covered.
-                            Our expert team works with you to create packaging that not only protects your products but also enhances your brand identity.
+                            At Packaging Hippo, this page automatically pulls every active product from the dashboard, so your newest packaging products
+                            show up here without any manual page update. Browse by product, then jump straight into the matching product page for details and quotes.
                         </p>
                     </div>
                 </div>
@@ -207,10 +221,47 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     </div>
                 )}
 
-                {/* Categories Grid */}
-                {(categories.length > 0) && (
+                {/* All Products Grid */}
+                {!isSearching && products.length > 0 && (
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">{isSearching ? "Matching Categories" : "Browse Categories"}</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Browse All Products</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                            {products.map((product) => (
+                                <Link href={`/${product.slug}`} key={product.id} className="group">
+                                    <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
+                                        <div className="aspect-square bg-gray-100 relative flex items-center justify-center overflow-hidden">
+                                            {product.images && product.images[0] ? (
+                                                <img
+                                                    src={product.images[0]}
+                                                    alt=""
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                />
+                                            ) : (
+                                                <Package className="w-20 h-20 text-gray-200" />
+                                            )}
+                                        </div>
+                                        <CardContent className="p-6 bg-white border-t">
+                                            <div className="text-xs text-yellow-600 font-bold uppercase mb-2">
+                                                {product.category?.name || "Packaging Product"}
+                                            </div>
+                                            <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">
+                                                {product.name}
+                                            </h3>
+                                            <p className="text-sm opacity-60 flex items-center gap-2">
+                                                View Product <ArrowRight className="w-3 h-3" />
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Matching Categories */}
+                {isSearching && categories.length > 0 && (
+                    <div className={products.length > 0 ? "mt-16" : ""}>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Matching Categories</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {categories.map((cat) => (
                                 <Link href={`/${cat.slug}`} key={cat.id} className="group">
@@ -225,7 +276,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                                         <CardContent className="p-6 bg-white border-t group-hover:bg-gray-900 group-hover:text-white transition-colors">
                                             <h3 className="font-bold text-lg mb-2">{cat.name}</h3>
                                             <p className="text-sm opacity-60 flex items-center gap-2">
-                                                View Details <ArrowRight className="w-3 h-3" />
+                                                View Category <ArrowRight className="w-3 h-3" />
                                             </p>
                                         </CardContent>
                                     </Card>
@@ -246,7 +297,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     </div>
                 )}
 
-                {!isSearching && categories.length === 0 && (
+                {!isSearching && products.length === 0 && (
                     <div className="col-span-full text-center py-20 text-gray-500">
                         No products found. Please add products from the dashboard.
                     </div>

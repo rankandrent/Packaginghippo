@@ -311,7 +311,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
     }
 
     const breadcrumbItems = [
-        { label: "Services", href: "/services" },
+        { label: "Categories", href: "/services" },
         { label: category.name }
     ]
     const categoryAggregateRating = getAggregateRating(category)

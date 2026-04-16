@@ -309,7 +309,7 @@ export default function CategoriesPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    onClick={() => window.open(`/services/${cat.slug}`, '_blank')}
+                                                    onClick={() => window.open(`/${cat.slug}`, '_blank')}
                                                     title="View Category"
                                                 >
                                                     <Eye className="h-4 w-4 text-blue-500" />

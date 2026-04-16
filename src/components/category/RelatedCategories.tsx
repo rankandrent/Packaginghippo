@@ -25,7 +25,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-10">
                     <h2 className="text-3xl font-black text-blue-900">
-                        Related Categories
+                        Browse All Categories
                     </h2>
                     <Link
                         href="/services"

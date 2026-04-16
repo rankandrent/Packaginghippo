@@ -112,6 +112,10 @@ export async function POST(request: NextRequest) {
             },
         })
 
+        revalidatePath(`/${slug}`)
+        revalidatePath('/products')
+        revalidatePath('/services')
+
         return NextResponse.json({ category })
     } catch (error) {
         console.error('Error creating category:', error)
@@ -168,9 +172,9 @@ export async function PUT(request: NextRequest) {
             },
         })
 
-        revalidatePath(`/services/${slug}`)
+        revalidatePath(`/${slug}`)
         revalidatePath('/products') // Categories list
-        revalidatePath('/services') // Services list
+        revalidatePath('/services') // Categories list
 
         return NextResponse.json({ category: updated })
     } catch (error) {

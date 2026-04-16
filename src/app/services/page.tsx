@@ -17,9 +17,12 @@ async function getServicesPage() {
 
 export async function generateMetadata(): Promise<Metadata> {
     const page = await getServicesPage()
+    const pageTitle = page?.title && page.title.trim().toLowerCase() !== "services"
+        ? page.title
+        : "Categories"
 
     return {
-        title: constructMetadataTitle(page?.seoTitle || "All Packaging Categories | Packaging Hippo"),
+        title: constructMetadataTitle(page?.seoTitle || `${pageTitle} | Packaging Hippo`),
         description: page?.seoDesc || "Browse our complete range of custom packaging categories. From corrugated boxes to luxury rigid packaging.",
         keywords: page?.seoKeywords || undefined,
         alternates: {
@@ -50,15 +53,23 @@ function ArrowRight({ className }: { className?: string }) {
 export default async function ServicesPage() {
     const page = await getServicesPage()
     const siteUrl = getSiteUrl()
-    const categories = await prisma.productCategory.findMany({
-        where: { isActive: true },
-        orderBy: { order: 'asc' },
-        include: {
-            _count: {
-                select: { products: true }
+    const pageTitle = page?.title && page.title.trim().toLowerCase() !== "services"
+        ? page.title
+        : "Categories"
+    const [categories, activeProductCount] = await Promise.all([
+        prisma.productCategory.findMany({
+            where: { isActive: true },
+            orderBy: { order: 'asc' },
+            include: {
+                _count: {
+                    select: { products: true }
+                }
             }
-        }
-    })
+        }),
+        prisma.product.count({
+            where: { isActive: true }
+        })
+    ])
 
     const htmlContent = page?.content ? (typeof page.content === 'string' ? page.content : (page.content as any).html || '') : null
 
@@ -69,7 +80,7 @@ export default async function ServicesPage() {
                     "@context": "https://schema.org",
                     "@type": "CollectionPage",
                     "@id": `${siteUrl}/services#collection`,
-                    "name": page?.title || "All Packaging Categories",
+                    "name": pageTitle,
                     "description": page?.seoDesc || "Browse our complete range of custom packaging categories. From corrugated boxes to luxury rigid packaging.",
                     "url": `${siteUrl}/services`,
                     "isPartOf": { "@id": `${siteUrl}/#website` },
@@ -92,7 +103,7 @@ export default async function ServicesPage() {
                     "@type": "BreadcrumbList",
                     "itemListElement": [
                         { "@type": "ListItem", "position": 1, "name": "Home", "item": siteUrl },
-                        { "@type": "ListItem", "position": 2, "name": "Services", "item": `${siteUrl}/services` }
+                        { "@type": "ListItem", "position": 2, "name": "Categories", "item": `${siteUrl}/services` }
                     ]
                 }}
             />
@@ -101,13 +112,57 @@ export default async function ServicesPage() {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/10 via-zinc-950 to-zinc-950"></div>
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <h1 className="text-4xl md:text-6xl font-black text-white mb-6">
-                        {page?.title || "Explore All Categories"}
+                        {pageTitle}
                     </h1>
                     <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                         {page?.seoDesc || "Discover our comprehensive range of custom packaging solutions designed for every industry and need."}
                     </p>
                 </div>
             </div>
+
+            <section className="py-16 md:py-20 bg-white border-b border-gray-100">
+                <div className="container mx-auto px-4">
+                    <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+                        <div className="max-w-4xl">
+                            <p className="text-sm font-bold uppercase tracking-[0.18em] text-yellow-700 mb-4">
+                                Find The Right Packaging Faster
+                            </p>
+                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight mb-5">
+                                Browse every active packaging category in one place.
+                            </h2>
+                            <div className="space-y-4 text-base md:text-lg text-gray-600 leading-relaxed">
+                                <p>
+                                    This page brings together our full range of packaging categories so you can move from broad product research to the right box style without guessing. From retail-ready presentation packaging to shipping-safe corrugated solutions, each category is organized to help you compare options quickly.
+                                </p>
+                                <p>
+                                    Whether you need rigid boxes, mailer boxes, kraft packaging, food packaging, cosmetic packaging, or fully custom printed solutions, you can use these category pages to explore matching products, request quotes, and narrow down the packaging direction that fits your product line.
+                                </p>
+                                <p>
+                                    New active products and categories added from the dashboard are reflected here automatically, so this section stays current as your catalog grows.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+                            <div className="rounded-xl border border-gray-200 bg-gray-50 px-5 py-5">
+                                <div className="text-3xl font-black text-gray-900 mb-1">{categories.length}+</div>
+                                <p className="text-sm font-semibold text-gray-900 mb-1">Active Categories</p>
+                                <p className="text-sm text-gray-600">Packaging types organized for quick browsing.</p>
+                            </div>
+                            <div className="rounded-xl border border-gray-200 bg-gray-50 px-5 py-5">
+                                <div className="text-3xl font-black text-gray-900 mb-1">{activeProductCount}+</div>
+                                <p className="text-sm font-semibold text-gray-900 mb-1">Live Products</p>
+                                <p className="text-sm text-gray-600">Product pages connected to these categories.</p>
+                            </div>
+                            <div className="rounded-xl border border-gray-200 bg-gray-50 px-5 py-5">
+                                <div className="text-3xl font-black text-gray-900 mb-1">100+</div>
+                                <p className="text-sm font-semibold text-gray-900 mb-1">MOQ Friendly</p>
+                                <p className="text-sm text-gray-600">Flexible ordering for growing and established brands.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {/* Managed Content Area */}
             {htmlContent && (
@@ -160,7 +215,7 @@ export default async function ServicesPage() {
                         theme="dark"
                         title="Can't find what you're looking for?"
                         subtitle="Request a custom quote and our packaging experts will get back to you within 24 hours."
-                        pageSource="All Categories Page"
+                        pageSource="Categories Page"
                     />
                 </div>
             </section>
