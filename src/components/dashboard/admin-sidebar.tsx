@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { LayoutDashboard, FileText, Package, ShoppingCart, MessageSquare, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { BrandLogo } from "@/components/brand/BrandLogo"
+import { BRAND_LOGO_MENU } from "@/lib/brand"
 
 const sidebarItems = [
     { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
@@ -21,7 +22,7 @@ export function AdminSidebar() {
     return (
         <div className="w-64 h-screen bg-gray-900 text-white flex flex-col fixed left-0 top-0">
             <div className="p-6">
-                <BrandLogo theme="light" size="sm" />
+                <BrandLogo theme="light" size="sm" fallbackLogoUrl={BRAND_LOGO_MENU} />
                 <p className="text-xs text-gray-400">Admin Panel</p>
             </div>
             <nav className="flex-1 px-4 space-y-2">

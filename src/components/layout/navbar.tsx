@@ -11,6 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useCart } from "@/context/CartContext"
 import dynamic from "next/dynamic"
 import { BrandLogo } from "@/components/brand/BrandLogo"
+import { BRAND_LOGO_MENU } from "@/lib/brand"
 
 const CartDrawer = dynamic(
     () => import("@/components/cart/CartDrawer").then((mod) => mod.CartDrawer),
@@ -50,7 +51,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
     const { totalItems } = useCart()
     const siteName = settings?.siteName || "PackagingHippo"
     const phone = settings?.phone || "+1 845 379 9277"
-    const logoUrl = settings?.logoUrl || null
+    const logoUrl = BRAND_LOGO_MENU
 
     const navItems = menuData || DEFAULT_MENU;
 
@@ -147,7 +148,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                 <div className="container mx-auto px-4 h-24 flex items-center justify-between gap-8">
                     {/* Logo */}
                     <Link href="/" className="flex-shrink-0">
-                        <BrandLogo siteName={siteName} logoUrl={logoUrl} size="md" />
+                        <BrandLogo siteName={siteName} logoUrl={logoUrl} fallbackLogoUrl={BRAND_LOGO_MENU} size="md" />
                     </Link>
 
                     {/* Search Bar */}

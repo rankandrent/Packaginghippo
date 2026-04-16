@@ -3,6 +3,7 @@ import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } 
 import prisma from "@/lib/db"
 import { getSeoImageUrl } from "@/lib/image-seo"
 import { BrandLogo } from "@/components/brand/BrandLogo"
+import { BRAND_LOGO_FOOTER } from "@/lib/brand"
 
 async function getSettings() {
     try {
@@ -48,7 +49,13 @@ export async function Footer({
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     {/* Brand */}
                     <div className="space-y-4">
-                        <BrandLogo siteName={siteName} logoUrl={footer.footerLogoUrl || general.logoUrl || null} theme="light" size="md" />
+                        <BrandLogo
+                            siteName={siteName}
+                            logoUrl={footer.footerLogoUrl || null}
+                            fallbackLogoUrl={BRAND_LOGO_FOOTER}
+                            theme="light"
+                            size="md"
+                        />
                         <p className="text-white/75 text-sm leading-relaxed">
                             {tagline}
                         </p>

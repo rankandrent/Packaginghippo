@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { headers } from "next/headers";
+import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
 import { Navbar } from "@/components/layout/navbar";
@@ -9,6 +10,7 @@ import prisma from "@/lib/db";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { TawkChatLoader } from "@/components/layout/TawkChatLoader";
 import { CartProvider } from "@/context/CartContext";
+import { BRAND_FAVICON } from "@/lib/brand";
 
 // export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Revalidate layout-level data every hour
@@ -60,6 +62,15 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       images: seo.ogImage ? [seo.ogImage] : [],
     },
+    icons: {
+      icon: [
+        { url: BRAND_FAVICON, type: 'image/png' },
+      ],
+      shortcut: [BRAND_FAVICON],
+      apple: [
+        { url: BRAND_FAVICON },
+      ],
+    },
     robots: {
       index: true,
       follow: true,
@@ -92,6 +103,15 @@ export default async function RootLayout({
         </CartProvider>
         <WhatsAppButton whatsappNumber={generalSettings.whatsapp || null} />
         <TawkChatLoader />
+        <Script id="microsoft-clarity" strategy="afterInteractive">
+          {`
+            (function(c,l,a,r,i,t,y){
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "wcssypnaig");
+          `}
+        </Script>
       </body>
     </html>
   );

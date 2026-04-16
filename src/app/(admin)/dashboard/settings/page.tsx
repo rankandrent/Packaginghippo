@@ -185,6 +185,9 @@ export default function SettingsPage() {
                                 value={general.logoUrl}
                                 onChange={(e) => setGeneral({ ...general, logoUrl: e.target.value })}
                             />
+                            <p className="text-xs text-muted-foreground">
+                                Navbar main logo ab default `/brand/Logo-menu.png` se aata hai.
+                            </p>
                         </div>
                     </div>
                     <Button
@@ -263,14 +266,17 @@ export default function SettingsPage() {
 
                     <div className="space-y-2">
                         <Label>Footer Logo URL</Label>
-                        <Input
-                            value={footer.footerLogoUrl ?? ''}
-                            onChange={(e) => setFooter({ ...footer, footerLogoUrl: e.target.value })}
-                            placeholder="https://example.com/footer-logo.png or /logo-horizontal.svg"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Agar blank chhoro to footer header wala main logo use karega.
-                        </p>
+                            <Input
+                                value={footer.footerLogoUrl ?? ''}
+                                onChange={(e) => setFooter({ ...footer, footerLogoUrl: e.target.value })}
+                                placeholder="https://example.com/footer-logo.png or /brand/Logo-Footer.png"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                Leave blank to use `/brand/Logo-Footer.png`.
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                                Agar blank chhoro to footer apna default `/brand/Logo-Footer.png` use karega.
+                            </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">

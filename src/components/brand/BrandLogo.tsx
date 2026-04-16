@@ -1,5 +1,6 @@
 import { getSeoImageUrl } from "@/lib/image-seo"
 import { cn } from "@/lib/utils"
+import { BRAND_LOGO_MENU } from "@/lib/brand"
 
 type BrandLogoProps = {
     siteName?: string
@@ -8,6 +9,7 @@ type BrandLogoProps = {
     theme?: "default" | "light"
     size?: "sm" | "md" | "lg"
     className?: string
+    fallbackLogoUrl?: string
 }
 
 function BrandMark({ color = "#123B9F", className }: { color?: string, className?: string }) {
@@ -30,9 +32,9 @@ function BrandMark({ color = "#123B9F", className }: { color?: string, className
     )
 }
 
-function resolveLogoUrl(logoUrl?: string | null) {
+function resolveLogoUrl(logoUrl?: string | null, fallbackLogoUrl?: string) {
     if (!logoUrl || logoUrl === "/logo.png") {
-        return "/logo-horizontal.svg"
+        return fallbackLogoUrl || BRAND_LOGO_MENU
     }
 
     return getSeoImageUrl(logoUrl)
@@ -45,6 +47,7 @@ export function BrandLogo({
     theme = "default",
     size = "md",
     className,
+    fallbackLogoUrl = BRAND_LOGO_MENU,
 }: BrandLogoProps) {
     const primaryText = theme === "light" ? "text-white" : "text-[#123B9F]"
     const accentText = "text-[#E7B11E]"
@@ -55,7 +58,7 @@ export function BrandLogo({
     const words = siteName.trim().split(/\s+/)
     const firstLine = words[0] || "Packaging"
     const secondLine = words.slice(1).join(" ") || "Hippo"
-    const resolvedLogoUrl = resolveLogoUrl(logoUrl)
+    const resolvedLogoUrl = resolveLogoUrl(logoUrl, fallbackLogoUrl)
 
     if (resolvedLogoUrl) {
         return (
