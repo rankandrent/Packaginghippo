@@ -19,6 +19,7 @@ import { ProductTabs } from "@/components/product/ProductTabs"
 import { ProductImageGallery } from "@/components/product/ProductImageGallery"
 import { AddToCartButton } from "@/components/cart/AddToCartButton"
 import { Button } from "@/components/ui/button"
+import { BRAND_LOGO_MENU } from "@/lib/brand"
 import { cn, constructMetadataTitle, getSiteUrl, stripHtml } from "@/lib/utils"
 import { getSeoImageUrl } from "@/lib/image-seo"
 import { getPublicContactEmail } from "@/lib/contact"
@@ -324,9 +325,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
     const siteName = general.siteName || "Packaging Hippo"
     const phone = general.phone || "+1 (510) 500-9533"
     const email = getPublicContactEmail(general.email)
-    const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
-        ? getSeoImageUrl(general.logoUrl)
-        : `${SITE_URL}/brand/Logo-menu.png`
+    const logoUrl = `${SITE_URL}${BRAND_LOGO_MENU}`
     const socialLinks = [
         footer?.social?.facebook,
         footer?.social?.instagram,
@@ -415,7 +414,6 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                         "@type": "ImageObject",
                         "url": logoUrl,
                     },
-                    "description": categoryDescription,
                     "email": email,
                     "contactPoint": {
                         "@type": "ContactPoint",
@@ -433,19 +431,13 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     "@type": "LocalBusiness",
                     "@id": `${SITE_URL}/#localbusiness`,
                     "name": siteName,
-                    "url": SITE_URL,
-                    "logo": logoUrl,
                     ...(categoryImage ? { "image": [categoryImage] } : {}),
-                    "description": categoryDescription,
-                    "telephone": phone,
-                    "email": email,
                     "address": {
                         "@type": "PostalAddress",
                         "streetAddress": general.address || "123 Packaging Street, Industrial District, NY 10001",
                         "addressCountry": "US"
                     },
-                    "parentOrganization": { "@id": `${SITE_URL}/#organization` },
-                    ...(socialLinks.length > 0 ? { "sameAs": socialLinks } : {})
+                    "parentOrganization": { "@id": `${SITE_URL}/#organization` }
                 }}
             />
             <JsonLd
@@ -455,7 +447,6 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     "@id": `${SITE_URL}/#website`,
                     "url": SITE_URL,
                     "name": siteName,
-                    "description": categoryDescription,
                     "publisher": { "@id": `${SITE_URL}/#organization` },
                     "potentialAction": {
                         "@type": "SearchAction",
@@ -471,7 +462,6 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     "@id": webPageId,
                     "url": `${SITE_URL}/${slug}`,
                     "name": category.name,
-                    "description": categoryDescription,
                     "isPartOf": { "@id": `${SITE_URL}/#website` },
                     "about": { "@id": `${SITE_URL}/#organization` },
                     "breadcrumb": { "@id": breadcrumbId },
@@ -493,7 +483,6 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                     "@id": `${SITE_URL}/${slug}#collection`,
                     "name": category.name,
                     "url": `${SITE_URL}/${slug}`,
-                    "description": categoryDescription,
                     "isPartOf": { "@id": `${SITE_URL}/#website` },
                     "aggregateRating": categoryAggregateRating
                 }}
@@ -757,9 +746,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
     const siteName = general.siteName || "Packaging Hippo"
     const phone = general.phone || "+1 (510) 500-9533"
     const email = getPublicContactEmail(general.email)
-    const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
-        ? getSeoImageUrl(general.logoUrl)
-        : `${SITE_URL}/brand/Logo-menu.png`
+    const logoUrl = `${SITE_URL}${BRAND_LOGO_MENU}`
     const socialLinks = [
         footer?.social?.facebook,
         footer?.social?.instagram,
@@ -793,7 +780,6 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                         "@type": "ImageObject",
                         "url": logoUrl,
                     },
-                    "description": productDescription,
                     "email": email,
                     "contactPoint": {
                         "@type": "ContactPoint",
@@ -811,19 +797,13 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     "@type": "LocalBusiness",
                     "@id": `${SITE_URL}/#localbusiness`,
                     "name": siteName,
-                    "url": SITE_URL,
-                    "logo": logoUrl,
                     ...(productImage ? { "image": [productImage] } : {}),
-                    "description": productDescription,
-                    "telephone": phone,
-                    "email": email,
                     "address": {
                         "@type": "PostalAddress",
                         "streetAddress": general.address || "123 Packaging Street, Industrial District, NY 10001",
                         "addressCountry": "US"
                     },
-                    "parentOrganization": { "@id": `${SITE_URL}/#organization` },
-                    ...(socialLinks.length > 0 ? { "sameAs": socialLinks } : {})
+                    "parentOrganization": { "@id": `${SITE_URL}/#organization` }
                 }}
             />
             <JsonLd
@@ -833,7 +813,6 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     "@id": `${SITE_URL}/#website`,
                     "url": SITE_URL,
                     "name": siteName,
-                    "description": productDescription,
                     "publisher": { "@id": `${SITE_URL}/#organization` },
                     "potentialAction": {
                         "@type": "SearchAction",
@@ -849,7 +828,6 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                     "@id": webPageId,
                     "url": `${SITE_URL}/${slug}`,
                     "name": product.name,
-                    "description": productDescription,
                     "isPartOf": { "@id": `${SITE_URL}/#website` },
                     "about": { "@id": `${SITE_URL}/#organization` },
                     "breadcrumb": { "@id": breadcrumbId },

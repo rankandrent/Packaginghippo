@@ -1,4 +1,5 @@
 import prisma from "@/lib/db"
+import { BRAND_LOGO_MENU } from "@/lib/brand"
 import { getSeoImageUrl } from "@/lib/image-seo"
 import { getPublicContactEmail } from "@/lib/contact"
 import { getSiteUrl } from "@/lib/utils"
@@ -14,6 +15,15 @@ function toAbsoluteUrl(url: string | null | undefined, siteUrl: string) {
     }
 
     return `${siteUrl}${normalized.startsWith("/") ? normalized : `/${normalized}`}`
+}
+
+function isLogoAssetUrl(url: string | null | undefined, logoUrl: string) {
+    if (!url) return false
+
+    return url === logoUrl ||
+        url.includes("/brand/Logo-") ||
+        url.includes("/brand/favicon") ||
+        url.includes("packaginghippo-logo")
 }
 
 function parsePostalAddress(rawAddress: string) {
@@ -154,9 +164,7 @@ export async function HomeSchema() {
     const phone = general.phone || "+1 (510) 500-9533"
     const email = getPublicContactEmail(general.email)
     const description = seo.defaultDescription || general.tagline || "Premium custom packaging boxes with logo at wholesale prices across the USA."
-    const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
-        ? toAbsoluteUrl(general.logoUrl, siteUrl)
-        : `${siteUrl}/brand/Logo-menu.png`
+    const logoUrl = `${siteUrl}${BRAND_LOGO_MENU}`
     const rawAddress = general.address || "123 Packaging Street, Industrial District, NY 10001"
     const address = parsePostalAddress(rawAddress)
     const socialLinks = [
@@ -180,11 +188,12 @@ export async function HomeSchema() {
     const imageUrls = Array.from(
         new Set(
             [
-                logoUrl,
                 toAbsoluteUrl(seo.ogImage, siteUrl),
                 toAbsoluteUrl(heroImage, siteUrl),
                 ...categoryImages.map((imageUrl: string | null) => toAbsoluteUrl(imageUrl, siteUrl))
-            ].filter(Boolean)
+            ]
+                .filter(Boolean)
+                .filter((imageUrl) => !isLogoAssetUrl(imageUrl, logoUrl))
         )
     ).slice(0, 20)
 
@@ -218,16 +227,10 @@ export async function HomeSchema() {
         "@id": `${siteUrl}/#localbusiness`,
         "name": siteName,
         ...(imageUrls.length > 0 ? { "image": imageUrls } : {}),
-        "logo": logoUrl,
-        "url": siteUrl,
-        "telephone": phone,
-        "email": email,
         "priceRange": general.priceRange || "$1 - $50",
         "address": address,
-        "description": description,
         "parentOrganization": { "@id": `${siteUrl}/#organization` },
         "hasMap": mapUrl,
-        "sameAs": sameAs,
         ...(openingHours ? { "openingHours": openingHours } : {}),
         ...(geo ? { "geo": geo } : {})
     }
@@ -238,7 +241,6 @@ export async function HomeSchema() {
         "@id": `${siteUrl}/#website`,
         "url": siteUrl,
         "name": siteName,
-        "description": description,
         "publisher": { "@id": `${siteUrl}/#organization` },
         "potentialAction": {
             "@type": "SearchAction",
@@ -253,7 +255,6 @@ export async function HomeSchema() {
         "@id": `${siteUrl}/#webpage`,
         "url": siteUrl,
         "name": siteName,
-        "description": description,
         "isPartOf": {
             "@id": `${siteUrl}/#website`
         },
