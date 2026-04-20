@@ -1,5 +1,6 @@
 import prisma from "@/lib/db"
 import { getSeoImageUrl } from "@/lib/image-seo"
+import { getPublicContactEmail } from "@/lib/contact"
 import { getSiteUrl } from "@/lib/utils"
 
 function toAbsoluteUrl(url: string | null | undefined, siteUrl: string) {
@@ -151,11 +152,11 @@ export async function HomeSchema() {
     const siteUrl = getSiteUrl()
     const siteName = general.siteName || "Packaging Hippo"
     const phone = general.phone || "+1 (510) 500-9533"
-    const email = general.email || "sales@packaginghippo.com"
+    const email = getPublicContactEmail(general.email)
     const description = seo.defaultDescription || general.tagline || "Premium custom packaging boxes with logo at wholesale prices across the USA."
     const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
         ? toAbsoluteUrl(general.logoUrl, siteUrl)
-        : `${siteUrl}/logo-horizontal.svg`
+        : `${siteUrl}/brand/Logo-menu.png`
     const rawAddress = general.address || "123 Packaging Street, Industrial District, NY 10001"
     const address = parsePostalAddress(rawAddress)
     const socialLinks = [

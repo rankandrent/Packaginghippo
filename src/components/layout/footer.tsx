@@ -4,6 +4,7 @@ import prisma from "@/lib/db"
 import { getSeoImageUrl } from "@/lib/image-seo"
 import { BrandLogo } from "@/components/brand/BrandLogo"
 import { BRAND_LOGO_FOOTER } from "@/lib/brand"
+import { getPublicContactEmail } from "@/lib/contact"
 
 async function getSettings() {
     try {
@@ -34,7 +35,7 @@ export async function Footer({
 
     const siteName = general.siteName || "PackagingHippo"
     const phone = general.phone || "(510) 500-9533"
-    const email = general.email || "sales@packaginghippo.com"
+    const email = getPublicContactEmail(general.email)
     const address = general.address || "123 Packaging Street, Industrial District, NY 10001"
     const tagline = footer.description || general.tagline || "Your trusted partner for premium custom packaging solutions."
 

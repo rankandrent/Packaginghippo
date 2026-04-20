@@ -21,6 +21,7 @@ import { AddToCartButton } from "@/components/cart/AddToCartButton"
 import { Button } from "@/components/ui/button"
 import { cn, constructMetadataTitle, getSiteUrl, stripHtml } from "@/lib/utils"
 import { getSeoImageUrl } from "@/lib/image-seo"
+import { getPublicContactEmail } from "@/lib/contact"
 import prisma from "@/lib/db"
 
 import {
@@ -322,10 +323,10 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
             : category.products || []
     const siteName = general.siteName || "Packaging Hippo"
     const phone = general.phone || "+1 (510) 500-9533"
-    const email = general.email || "sales@packaginghippo.com"
+    const email = getPublicContactEmail(general.email)
     const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
         ? getSeoImageUrl(general.logoUrl)
-        : `${SITE_URL}/logo-horizontal.svg`
+        : `${SITE_URL}/brand/Logo-menu.png`
     const socialLinks = [
         footer?.social?.facebook,
         footer?.social?.instagram,
@@ -500,8 +501,8 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
             <JsonLd
                 data={{
                     "@context": "https://schema.org",
-                    "@type": "ProductGroup",
-                    "@id": `${SITE_URL}/${slug}#product-group`,
+                    "@type": "Product",
+                    "@id": `${SITE_URL}/${slug}#product`,
                     "name": category.name,
                     "url": `${SITE_URL}/${slug}`,
                     "description": categoryDescription,
@@ -755,10 +756,10 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
     const productAggregateRating = getAggregateRating(product)
     const siteName = general.siteName || "Packaging Hippo"
     const phone = general.phone || "+1 (510) 500-9533"
-    const email = general.email || "sales@packaginghippo.com"
+    const email = getPublicContactEmail(general.email)
     const logoUrl = general.logoUrl && general.logoUrl !== "/logo.png"
         ? getSeoImageUrl(general.logoUrl)
-        : `${SITE_URL}/logo-horizontal.svg`
+        : `${SITE_URL}/brand/Logo-menu.png`
     const socialLinks = [
         footer?.social?.facebook,
         footer?.social?.instagram,
