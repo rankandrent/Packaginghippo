@@ -313,7 +313,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
     }
 
     const breadcrumbItems = [
-        { label: "Categories", href: "/services" },
+        { label: "Home", href: "/" },
         { label: category.name }
     ]
     const categoryAggregateRating = getAggregateRating(category)
@@ -473,18 +473,6 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
                             }
                         }
                         : {})
-                }}
-            />
-            {/* 1. Collection Page Schema */}
-            <JsonLd
-                data={{
-                    "@context": "https://schema.org",
-                    "@type": "CollectionPage",
-                    "@id": `${SITE_URL}/${slug}#collection`,
-                    "name": category.name,
-                    "url": `${SITE_URL}/${slug}`,
-                    "isPartOf": { "@id": `${SITE_URL}/#website` },
-                    "aggregateRating": categoryAggregateRating
                 }}
             />
             <JsonLd
@@ -679,8 +667,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
     )
 
     const breadcrumbItems = [
-        { label: "Products", href: "/products" },
-        ...(product.category ? [{ label: product.category.name, href: `/${product.category.slug}` }] : []),
+        { label: "Home", href: "/" },
         { label: product.name }
     ]
 
@@ -887,6 +874,17 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                     "name": "Packaging Hippo",
                                     "@id": `${SITE_URL}/#organization`
                                 },
+                                "hasMerchantReturnPolicy": {
+                                    "@type": "MerchantReturnPolicy",
+                                    "applicableCountry": {
+                                        "@type": "Country",
+                                        "name": "US"
+                                    },
+                                    "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+                                    "merchantReturnDays": 0,
+                                    "returnMethod": "https://schema.org/ReturnByMail",
+                                    "returnFees": "https://schema.org/FreeReturn"
+                                },
                                 "shippingDetails": {
                                     "@type": "OfferShippingDetails",
                                     "shippingRate": {
@@ -896,7 +894,10 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                     },
                                     "shippingDestination": {
                                         "@type": "DefinedRegion",
-                                        "addressCountry": "US"
+                                        "addressCountry": {
+                                            "@type": "Country",
+                                            "name": "US"
+                                        }
                                     },
                                     "deliveryTime": {
                                         "@type": "ShippingDeliveryTime",
