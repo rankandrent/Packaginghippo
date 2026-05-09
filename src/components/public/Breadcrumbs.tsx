@@ -13,6 +13,10 @@ interface BreadcrumbsProps {
 
 export function Breadcrumbs({ items, theme = 'dark' }: BreadcrumbsProps) {
     const isDark = theme === 'dark'
+    const normalizedItems =
+        items[0]?.label.toLowerCase() === "home" && items[0]?.href === "/"
+            ? items.slice(1)
+            : items
 
     // Styles for inactive links
     const linkColor = isDark
@@ -44,7 +48,7 @@ export function Breadcrumbs({ items, theme = 'dark' }: BreadcrumbsProps) {
                         Home
                     </Link>
                 </li>
-                {items.map((item, index) => (
+                {normalizedItems.map((item, index) => (
                     <li key={index}>
                         <div className="flex items-center">
                             <ChevronRight className={`w-4 h-4 mx-1 ${separatorColor}`} />
