@@ -37,6 +37,17 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  async redirects() {
+    return [
+      // www → non-www (301 permanent) — handles both http and https
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.packaginghippo.com' }],
+        destination: 'https://packaginghippo.com/:path*',
+        permanent: true,
+      },
+    ]
+  },
   async rewrites() {
     return [
       {
