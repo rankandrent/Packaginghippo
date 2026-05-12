@@ -22,7 +22,7 @@ export function ProductImageGallery({ images, name }: { images: string[], name: 
             <div className="relative aspect-[6/5] rounded-2xl overflow-hidden bg-white border shadow-sm group">
                 <Image
                     src={images[selected]}
-                    alt={name || getAltFromUrl(images[selected])}
+                    alt={getAltFromUrl(images[selected]) || name}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1210px) 50vw, 600px"
                     className="object-contain transition-opacity duration-300"
@@ -44,7 +44,7 @@ export function ProductImageGallery({ images, name }: { images: string[], name: 
                                     : "border-gray-100 hover:border-blue-200 grayscale-[0.5] hover:grayscale-0"
                             )}
                         >
-                            <Image src={img} alt={name || getAltFromUrl(img)} fill sizes="120px" className="object-cover" />
+                            <Image src={img} alt={getAltFromUrl(img) || name} fill sizes="120px" className="object-cover" />
                         </div>
                     ))}
                 </div>
