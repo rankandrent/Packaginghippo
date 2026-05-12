@@ -322,7 +322,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
 
     const breadcrumbItems = [
         { label: "Home", href: "/" },
-        { label: category.name }
+        { label: category.name, href: `/${slug}` }
     ]
     const categoryAggregateRating = getAggregateRating(category)
     const categorySchemaPrice = getSchemaPrice(category)
@@ -676,7 +676,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
 
     const breadcrumbItems = [
         { label: "Home", href: "/" },
-        { label: product.name }
+        { label: product.name, href: `/${slug}` }
     ]
 
     const renderSection = (id: string) => {
