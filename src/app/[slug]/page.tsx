@@ -38,6 +38,14 @@ import {
 } from "@/lib/cms"
 
 const SITE_URL = getSiteUrl()
+
+// Returns absolute URL for use in JSON-LD schema (Google requires full URLs)
+function toAbsoluteUrl(path: string): string {
+    if (!path) return ''
+    if (path.startsWith('http')) return path
+    return `${SITE_URL}${path.startsWith('/') ? '' : '/'}${path}`
+}
+
 const DEFAULT_SCHEMA_RATING = {
     ratingValue: 4.9,
     bestRating: 5,
@@ -335,7 +343,7 @@ async function CategoryView({ category, slug }: { category: any, slug: string })
         footer?.social?.youtube,
     ].filter(Boolean)
     const categoryDescription = category.seoDesc || stripHtml(category.description, 160)
-    const categoryImage = category.imageUrl ? getSeoImageUrl(category.imageUrl) : undefined
+    const categoryImage = category.imageUrl ? toAbsoluteUrl(getSeoImageUrl(category.imageUrl)) : undefined
     const breadcrumbId = `${SITE_URL}/${slug}#breadcrumb`
     const webPageId = `${SITE_URL}/${slug}#webpage`
 
@@ -743,7 +751,7 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
         footer?.social?.youtube,
     ].filter(Boolean)
     const productDescription = product.shortDesc || product.seoDesc || stripHtml(product.description, 160)
-    const productImages = product.images ? product.images.map((img: string) => getSeoImageUrl(img)) : []
+    const productImages = product.images ? product.images.map((img: string) => toAbsoluteUrl(getSeoImageUrl(img))) : []
     const productImage = productImages[0]
     const breadcrumbId = `${SITE_URL}/${slug}#breadcrumb`
     const webPageId = `${SITE_URL}/${slug}#webpage`
