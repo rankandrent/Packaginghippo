@@ -357,61 +357,20 @@ function ProductGridSection({ content }: { content: any }) {
 // ... existing sub components ...
 
 function TextSection({ content }: { content: any }) {
-    const [isExpanded, setIsExpanded] = useState(false)
-    const contentRef = React.useRef<HTMLDivElement>(null)
-    const [needsReadMore, setNeedsReadMore] = useState(false)
-
-    // ~480px is roughly 200 words in prose-lg
-    const COLLAPSED_HEIGHT = 480
-
-    useEffect(() => {
-        if (contentRef.current) {
-            // Check if actual content height exceeds our collapsed height
-            if (contentRef.current.scrollHeight > COLLAPSED_HEIGHT) {
-                setNeedsReadMore(true)
-            }
-        }
-    }, [content])
-
     if (!content.html) return null
 
     return (
         <section className="py-16 bg-white">
             <div className="container mx-auto px-4">
                 {content.heading && <h2 className="text-3xl font-bold text-gray-900 mb-6">{content.heading}</h2>}
-
-                <div className="relative">
+                <div
+                    className="overflow-y-auto pr-3 custom-scrollbar"
+                    style={{ maxHeight: '480px' }}
+                >
                     <div
-                        className={`overflow-hidden transition-all duration-700 ease-in-out ${isExpanded ? '' : 'relative'}`}
-                        style={{ maxHeight: !needsReadMore || isExpanded ? 'none' : `${COLLAPSED_HEIGHT}px` }}
-                    >
-                        <div
-                            ref={contentRef}
-                            className="prose prose-lg max-w-none text-gray-700 leading-relaxed rich-text"
-                            dangerouslySetInnerHTML={{ __html: content.html }}
-                        />
-
-                        {/* Gradient Fade Overlay when collapsed */}
-                        {needsReadMore && !isExpanded && (
-                            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
-                        )}
-                    </div>
-
-                    {needsReadMore && (
-                        <div className="mt-8 text-center relative z-10">
-                            <Button
-                                variant="outline"
-                                onClick={() => setIsExpanded(!isExpanded)}
-                                className="bg-white hover:bg-gray-50 text-gray-900 border-gray-200 shadow-sm transition-all px-8 rounded-full"
-                            >
-                                {isExpanded ? (
-                                    <>Read Less <ChevronDown className="ml-2 w-4 h-4 rotate-180" /></>
-                                ) : (
-                                    <>Read More <ChevronDown className="ml-2 w-4 h-4" /></>
-                                )}
-                            </Button>
-                        </div>
-                    )}
+                        className="prose prose-lg max-w-none text-gray-700 leading-relaxed rich-text"
+                        dangerouslySetInnerHTML={{ __html: content.html }}
+                    />
                 </div>
             </div>
         </section>
@@ -419,7 +378,6 @@ function TextSection({ content }: { content: any }) {
 }
 
 function SeoContentSection({ content }: { content: any }) {
-    const [isExpanded, setIsExpanded] = useState(false)
     const collapsedHeight = content.collapsedHeight || 300
 
     return (
@@ -428,37 +386,15 @@ function SeoContentSection({ content }: { content: any }) {
                 {content.heading && (
                     <h2 className="text-3xl font-bold mb-8 text-gray-900">{content.heading}</h2>
                 )}
-
-                <div className="relative">
+                <div
+                    className="overflow-y-auto pr-3 custom-scrollbar"
+                    style={{ maxHeight: `${collapsedHeight}px` }}
+                >
                     <div
-                        className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? '' : 'relative'}`}
-                        style={{ maxHeight: isExpanded ? 'none' : `${collapsedHeight}px` }}
-                    >
-                        <div
-                            className="prose prose-lg max-w-none text-gray-600 leading-relaxed rich-text"
-                            dangerouslySetInnerHTML={{ __html: content.content }}
-                            suppressHydrationWarning
-                        />
-
-                        {/* Gradient Fade Overlay when collapsed */}
-                        {!isExpanded && (
-                            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                        )}
-                    </div>
-
-                    <div className="mt-6 text-center">
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className="bg-white hover:bg-gray-50 text-gray-900 border-gray-200 shadow-sm transition-all"
-                        >
-                            {isExpanded ? (
-                                <>Read Less <ChevronDown className="ml-2 w-4 h-4 rotate-180" /></>
-                            ) : (
-                                <>Read More <ChevronDown className="ml-2 w-4 h-4" /></>
-                            )}
-                        </Button>
-                    </div>
+                        className="prose prose-lg max-w-none text-gray-600 leading-relaxed rich-text"
+                        dangerouslySetInnerHTML={{ __html: content.content }}
+                        suppressHydrationWarning
+                    />
                 </div>
             </div>
         </section>

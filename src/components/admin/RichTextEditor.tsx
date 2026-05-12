@@ -110,6 +110,11 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
             Image,
             Link.configure({
                 openOnClick: false,
+                HTMLAttributes: {
+                    rel: 'noopener noreferrer',
+                    target: '_blank',
+                    class: null,
+                },
             }),
             TextStyle,
             Color,
