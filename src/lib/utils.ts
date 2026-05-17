@@ -54,13 +54,8 @@ export function sanitizeInternalLinkRel(html?: string | null) {
     const href = tag.match(/href\s*=\s*(["'])([^"']*)\1/i)?.[2] || ""
     if (!isInternalHref(href)) return tag
 
-    return tag.replace(/\srel\s*=\s*(["'])([^"']*)\1/i, (_match, quote, value) => {
-      const relValues = value
-        .split(/\s+/)
-        .filter(Boolean)
-        .filter((item: string) => item.toLowerCase() !== "nofollow")
-
-      return relValues.length ? ` rel=${quote}${relValues.join(" ")}${quote}` : ""
-    })
+    return tag
+      .replace(/\starget\s*=\s*(["'])[^"']*\1/gi, "")
+      .replace(/\srel\s*=\s*(["'])[^"']*\1/gi, "")
   })
 }
