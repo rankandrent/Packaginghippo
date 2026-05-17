@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { cn } from "@/lib/utils"
+import { cn, sanitizeInternalLinkRel } from "@/lib/utils"
 import { getSeoImageUrl } from "@/lib/image-seo"
 
 interface TabItem {
@@ -147,7 +147,7 @@ export default function TabsSection({ data }: TabsSectionProps) {
                                     {activeTab.content && (
                                         <div
                                             className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed"
-                                            dangerouslySetInnerHTML={{ __html: activeTab.content }}
+                                            dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(activeTab.content) }}
                                         />
                                     )}
                                 </div>

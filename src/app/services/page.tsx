@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import prisma from "@/lib/db"
-import { constructMetadataTitle, getSiteUrl } from "@/lib/utils"
+import { constructMetadataTitle, getSiteUrl, sanitizeInternalLinkRel } from "@/lib/utils"
 import { QuoteForm } from "@/components/forms/QuoteForm"
 import { JsonLd } from "@/components/seo/JsonLd"
 import { getSeoImageUrl } from "@/lib/image-seo"
@@ -168,7 +168,7 @@ export default async function ServicesPage() {
             {htmlContent && (
                 <section className="py-16 bg-white border-b border-gray-100">
                     <div className="container mx-auto px-4 prose prose-lg max-w-none text-gray-700 leading-relaxed rich-text">
-                        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                        <div dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(htmlContent) }} />
                     </div>
                 </section>
             )}

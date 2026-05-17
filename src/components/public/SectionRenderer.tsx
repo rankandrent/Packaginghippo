@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ArrowRight, CheckCircle, ChevronDown, Package, Star, Leaf, Box, Quote, Clock, DollarSign, Truck, Palette, Pen, Sparkles, Shield, Zap, Check } from "lucide-react"
 import { PopularProducts } from "@/components/category/PopularProducts"
 import { getSeoImageUrl, getAltFromUrl } from "@/lib/image-seo"
+import { sanitizeInternalLinkRel } from "@/lib/utils"
 
 // Types matching SectionBuilder
 export type Section = {
@@ -369,7 +370,7 @@ function TextSection({ content }: { content: any }) {
                 >
                     <div
                         className="prose prose-lg max-w-none text-gray-700 leading-relaxed rich-text"
-                        dangerouslySetInnerHTML={{ __html: content.html }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(content.html) }}
                     />
                 </div>
             </div>
@@ -392,7 +393,7 @@ function SeoContentSection({ content }: { content: any }) {
                 >
                     <div
                         className="prose prose-lg max-w-none text-gray-600 leading-relaxed rich-text"
-                        dangerouslySetInnerHTML={{ __html: content.content }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(content.content) }}
                         suppressHydrationWarning
                     />
                 </div>

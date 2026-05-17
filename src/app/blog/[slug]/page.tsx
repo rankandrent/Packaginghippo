@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Calendar, User, ChevronRight, Clock } from "lucide-react"
 import { notFound } from "next/navigation"
 import prisma from "@/lib/db"
-import { constructMetadataTitle, getSiteUrl } from "@/lib/utils"
+import { constructMetadataTitle, getSiteUrl, sanitizeInternalLinkRel } from "@/lib/utils"
 import { DynamicTOC } from "@/components/blog/DynamicTOC"
 import { ShareButtons } from "@/components/blog/ShareButtons"
 import { QuoteForm } from "@/components/forms/QuoteForm"
@@ -184,7 +184,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
 
                         <div
                             className="rich-text max-w-none"
-                            dangerouslySetInnerHTML={{ __html: post.content }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(post.content) }}
                         />
 
 

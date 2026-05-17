@@ -18,13 +18,29 @@ async function verifyTokenEdge(token: string) {
 // Normalize source URL for consistent matching
 function normalizeSourceUrl(url: string): string {
     // Remove trailing slash (except for root "/")
-    let normalized = url.length > 1 && url.endsWith('/') ? url.slice(0, -1) : url;
+    const normalized = url.length > 1 && url.endsWith('/') ? url.slice(0, -1) : url;
     // Lowercase for case-insensitive matching
     return normalized.toLowerCase();
 }
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
+    const host = request.headers.get('host')?.toLowerCase() || '';
+    const hostname = host.split(':')[0];
+    const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
+    const protocol = forwardedProto || request.nextUrl.protocol.replace(':', '');
+
+    if (
+        (hostname === 'packaginghippo.com' || hostname === 'www.packaginghippo.com') &&
+        (hostname !== 'packaginghippo.com' || protocol !== 'https')
+    ) {
+        const canonicalUrl = request.nextUrl.clone();
+        canonicalUrl.protocol = 'https:';
+        canonicalUrl.hostname = 'packaginghippo.com';
+        canonicalUrl.port = '';
+
+        return NextResponse.redirect(canonicalUrl, 301);
+    }
 
     // Public auth pages - redirect to dashboard if already logged in
     const authPages = ['/dashboard/login', '/dashboard/signup', '/dashboard/forgot-password'];

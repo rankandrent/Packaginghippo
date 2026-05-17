@@ -20,7 +20,7 @@ import { ProductImageGallery } from "@/components/product/ProductImageGallery"
 import { AddToCartButton } from "@/components/cart/AddToCartButton"
 import { Button } from "@/components/ui/button"
 import { BRAND_LOGO_MENU } from "@/lib/brand"
-import { cn, constructMetadataTitle, getSiteUrl, stripHtml } from "@/lib/utils"
+import { cn, constructMetadataTitle, getSiteUrl, sanitizeInternalLinkRel, stripHtml } from "@/lib/utils"
 import { getSeoImageUrl } from "@/lib/image-seo"
 import { getPublicContactEmail } from "@/lib/contact"
 import prisma from "@/lib/db"
@@ -1111,7 +1111,7 @@ async function PageView({ page, slug }: { page: any, slug: string }) {
                 <div className="bg-white py-16 border-t border-gray-100">
                     <div className="container mx-auto px-4">
                         <div className="max-w-4xl mx-auto prose prose-lg prose-blue max-w-none text-gray-700 leading-relaxed rich-text">
-                            <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                            <div dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(htmlContent) }} />
                         </div>
                     </div>
                 </div>

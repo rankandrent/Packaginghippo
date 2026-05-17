@@ -1,3 +1,5 @@
+import { sanitizeInternalLinkRel } from "@/lib/utils"
+
 interface CollapsibleTextProps {
     content: string
     collapsedHeight?: number
@@ -15,7 +17,7 @@ export function CollapsibleText({ content, collapsedHeight = 300, className }: C
             >
                 <div
                     className="prose max-w-none text-gray-600 leading-relaxed rich-text text-justify"
-                    dangerouslySetInnerHTML={{ __html: content }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(content) }}
                     suppressHydrationWarning
                 />
             </div>

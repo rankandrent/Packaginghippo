@@ -1,3 +1,5 @@
+import { sanitizeInternalLinkRel } from "@/lib/utils"
+
 export function SeoContent({ data }: { data: any }) {
     const collapsedHeight = data.collapsedHeight || 300
 
@@ -23,7 +25,7 @@ export function SeoContent({ data }: { data: any }) {
                         prose-ul:list-disc prose-ul:pl-5 prose-ul:mb-4
                         prose-ol:list-decimal prose-ol:pl-5 prose-ol:mb-4
                         prose-li:mb-2"
-                        dangerouslySetInnerHTML={{ __html: data.content }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(data.content) }}
                         suppressHydrationWarning
                     />
                 </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { cn } from "@/lib/utils"
+import { cn, sanitizeInternalLinkRel } from "@/lib/utils"
 import { getSeoImageUrl } from "@/lib/image-seo"
 
 interface TabContent {
@@ -119,7 +119,7 @@ export function ProductTabs({ tabs }: ProductTabsProps) {
                                 {activeContent.content && (
                                     <div
                                         className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed"
-                                        dangerouslySetInnerHTML={{ __html: activeContent.content }}
+                                        dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(activeContent.content) }}
                                     />
                                 )}
                             </div>
