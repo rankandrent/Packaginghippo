@@ -20,6 +20,8 @@ async function getBlogs(category?: string, author?: string) {
 
     const posts = await prisma.blogPost.findMany({
         where,
+        // Listing only needs excerpt/title/image/meta — skip the full HTML body and schema JSON
+        omit: { content: true, schema_json: true },
         include: { author: true, category: true },
         orderBy: { createdAt: 'desc' }
     })

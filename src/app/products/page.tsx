@@ -27,6 +27,8 @@ async function getCategories() {
     try {
         const categories = await prisma.productCategory.findMany({
             where: { isActive: true },
+            // Heavy page-builder JSON not used in listing — skip to lighten the query
+            omit: { sections: true, layout: true },
             orderBy: { order: 'asc' }
         })
         return categories
@@ -39,7 +41,9 @@ async function getAllProducts() {
     try {
         return await prisma.product.findMany({
             where: { isActive: true },
-            include: { category: true },
+            // Drop heavy page-builder JSON fields that the grid/schema never read
+            omit: { sections: true, tabs: true, content: true, layout: true },
+            include: { category: { select: { name: true } } },
             orderBy: [
                 { updatedAt: "desc" },
                 { createdAt: "desc" }
@@ -73,7 +77,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 ],
                 isActive: true
             },
-            include: { category: true } // Include category for linking
+            omit: { sections: true, tabs: true, content: true, layout: true },
+            include: { category: { select: { name: true } } } // Include category for linking
         })
 
         // Also find categories matching execution (optional, but good for UX)
@@ -84,7 +89,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     { description: { contains: query, mode: 'insensitive' } },
                 ],
                 isActive: true
-            }
+            },
+            omit: { sections: true, layout: true }
         })
 
     } else {
