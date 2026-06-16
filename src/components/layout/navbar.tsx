@@ -48,6 +48,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
 
     const [isOpen, setIsOpen] = useState(false)
     const [isCartOpen, setIsCartOpen] = useState(false)
+    const [hideTopBar, setHideTopBar] = useState(false)
     const { totalItems } = useCart()
     const siteName = settings?.siteName || "PackagingHippo"
     const phone = settings?.phone || "+1 845 379 9277"
@@ -100,6 +101,34 @@ export function Navbar({ settings, menuData }: NavbarProps) {
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
+    // Hide the logo/top bar when scrolling down, reveal it immediately on scroll up.
+    // The bottom nav bar stays pinned at the top of the (sticky) header.
+    // Throttled with rAF + an 8px dead-zone so trackpad/momentum jitter can't flicker the bar.
+    useEffect(() => {
+        let lastY = window.scrollY
+        let ticking = false
+        const update = () => {
+            const y = window.scrollY
+            if (y < 120) {
+                setHideTopBar(false)        // near the top → always show
+            } else if (y > lastY + 8) {
+                setHideTopBar(true)         // scrolling down → hide logo bar
+            } else if (y < lastY - 8) {
+                setHideTopBar(false)        // scrolling up → show immediately
+            }
+            lastY = y
+            ticking = false
+        }
+        const onScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(update)
+                ticking = true
+            }
+        }
+        window.addEventListener('scroll', onScroll, { passive: true })
+        return () => window.removeEventListener('scroll', onScroll)
+    }, [])
+
     // Helper for Recursive Menu Rendering
     const renderMenuItem = (item: any) => {
         const hasChildren = item.children && item.children.length > 0;
@@ -108,7 +137,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
             const itemHref = item.href?.startsWith('/') || item.href?.startsWith('http') ? item.href : `/${item.href}`;
             return (
                 <div key={item.id} className="group relative h-full flex items-center">
-                    <Link href={itemHref || "#"} className="text-sm font-bold text-gray-700 group-hover:text-primary uppercase tracking-wide flex items-center gap-1">
+                    <Link href={itemHref || "#"} className="text-sm font-bold text-gray-700 group-hover:text-primary flex items-center gap-1">
                         {item.label} <ChevronDown className="w-3 h-3" />
                     </Link>
                     <div className="absolute top-full left-0 min-w-[250px] bg-white shadow-xl border-t-2 border-accent opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-2 rounded-b-lg">
@@ -131,7 +160,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
 
         const itemHref = item.href?.startsWith('/') || item.href?.startsWith('http') ? item.href : `/${item.href}`;
         return (
-            <Link key={item.id} href={itemHref || "#"} className="text-sm font-bold text-gray-700 hover:text-primary uppercase tracking-wide h-full flex items-center">
+            <Link key={item.id} href={itemHref || "#"} className="text-sm font-bold text-gray-700 hover:text-primary h-full flex items-center">
                 {item.label}
             </Link>
         )
@@ -143,8 +172,8 @@ export function Navbar({ settings, menuData }: NavbarProps) {
     ];
 
     return (
-        <header className="site-navbar w-full z-50 bg-white">
-            <div className="border-b">
+        <header className="site-navbar w-full z-50 bg-white sticky top-0">
+            <div className={`border-b transition-all duration-300 ease-in-out ${hideTopBar ? 'max-h-0 opacity-0 overflow-hidden border-transparent' : 'max-h-28 opacity-100 overflow-visible'}`}>
                 <div className="container mx-auto px-4 h-24 flex items-center justify-between gap-8">
                     {/* Logo */}
                     <Link href="/" className="flex-shrink-0">
@@ -152,24 +181,24 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                     </Link>
 
                     {/* Search Bar */}
-                    <div className="hidden lg:flex flex-1 max-w-2xl mx-auto relative search-container">
-                        <form onSubmit={handleSearch} className="relative w-full flex">
+                    <div className="hidden lg:flex flex-1 max-w-md mx-auto relative search-container">
+                        <form onSubmit={handleSearch} className="relative w-full">
                             <Input
                                 type="text"
                                 name="search"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onFocus={() => searchQuery.trim().length >= 2 && setShowSuggestions(true)}
-                                placeholder="Search products, categories or blogs..."
-                                className="w-full bg-gray-50 border-gray-200 rounded-l-md rounded-r-none h-11 focus-visible:ring-0 focus-visible:ring-offset-0"
+                                placeholder="Search..."
+                                className="w-full bg-white border border-gray-200 rounded-full h-10 pl-5 pr-11 text-sm shadow-sm focus-visible:ring-1 focus-visible:ring-primary/30 focus-visible:ring-offset-0"
                             />
-                            <Button
+                            <button
                                 type="submit"
                                 aria-label="Search products, categories, or blogs"
-                                className="h-11 rounded-l-none rounded-r-md bg-primary hover:bg-primary/90 px-6"
+                                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center text-primary hover:text-primary/70 transition-colors"
                             >
-                                {isSearching ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> : <Search className="w-5 h-5" />}
-                            </Button>
+                                {isSearching ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" /> : <Search className="w-5 h-5" />}
+                            </button>
                         </form>
 
                         {/* Suggestions Dropdown */}
@@ -255,7 +284,10 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                     </div>
 
                     {/* Right Actions */}
-                    <div className="hidden lg:flex items-center gap-8">
+                    <div className="hidden lg:flex items-center gap-6">
+                        <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold rounded-md h-10 px-6 whitespace-nowrap">
+                            <Link href="/quote">Request a Quote</Link>
+                        </Button>
                         <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
                             <Phone className="w-8 h-8 text-primary fill-primary/10" />
                             <div className="flex flex-col">
@@ -292,14 +324,10 @@ export function Navbar({ settings, menuData }: NavbarProps) {
 
             {/* BOTTOM NAV BAR */}
             <div className="bg-white border-b hidden lg:block shadow-sm">
-                <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+                <div className="container mx-auto px-4 h-14 flex items-center">
                     <nav className="flex items-center gap-8 h-full">
                         {displayItems.map((item) => renderMenuItem(item))}
                     </nav>
-
-                    <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-wider rounded-md h-10 px-6">
-                        <Link href="/quote">Request A Quote</Link>
-                    </Button>
                 </div>
             </div>
 
@@ -320,7 +348,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                         {navItems.map((item, idx) => {
                             const itemHref = item.href?.startsWith('/') || item.href?.startsWith('http') ? item.href : `/${item.href}`;
                             return (
-                                <Link key={idx} href={itemHref || "#"} className="text-sm font-bold text-gray-900 uppercase border-b pb-2" onClick={() => setIsOpen(false)}>
+                                <Link key={idx} href={itemHref || "#"} className="text-sm font-bold text-gray-900 border-b pb-2" onClick={() => setIsOpen(false)}>
                                     {item.label}
                                 </Link>
                             )
@@ -333,7 +361,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                             <span className="text-sm font-bold">{phone}</span>
                         </a>
                         <Button asChild className="w-full bg-primary hover:bg-primary/90">
-                            <Link href="/quote" onClick={() => setIsOpen(false)}>Request A Quote</Link>
+                            <Link href="/quote" onClick={() => setIsOpen(false)}>Request a Quote</Link>
                         </Button>
                     </div>
                 </div>
