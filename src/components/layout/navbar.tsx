@@ -223,7 +223,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                 <div className="container mx-auto px-4 h-24 flex items-center justify-between gap-8">
                     {/* Logo */}
                     <Link href="/" className="flex-shrink-0">
-                        <BrandLogo siteName={siteName} logoUrl={logoUrl} fallbackLogoUrl={BRAND_LOGO_MENU} size="md" />
+                        <BrandLogo siteName={siteName} logoUrl={logoUrl} fallbackLogoUrl={BRAND_LOGO_MENU} size="lg" />
                     </Link>
 
                     {/* Search Bar */}

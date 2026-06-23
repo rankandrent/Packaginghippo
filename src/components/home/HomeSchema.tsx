@@ -21,7 +21,7 @@ function isLogoAssetUrl(url: string | null | undefined, logoUrl: string) {
     if (!url) return false
 
     return url === logoUrl ||
-        url.includes("/brand/Logo-") ||
+        url.includes("/brand/Logo") ||
         url.includes("/brand/favicon") ||
         url.includes("packaginghippo-logo")
 }
