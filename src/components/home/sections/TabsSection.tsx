@@ -38,7 +38,7 @@ export default function TabsSection({ data }: TabsSectionProps) {
                 {/* Section Heading */}
                 {(data.heading || data.subheading) && (
                     <div className="text-center mb-10 max-w-3xl mx-auto">
-                        {data.heading && <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4 tracking-tight">{data.heading}</h2>}
+                        {data.heading && <h2 className="text-3xl md:text-4xl font-black text-[#011f7b] mb-4 tracking-tight">{data.heading}</h2>}
                         {data.subheading && <p className="text-lg text-gray-600 leading-relaxed">{data.subheading}</p>}
                     </div>
                 )}
@@ -52,7 +52,7 @@ export default function TabsSection({ data }: TabsSectionProps) {
                             className={cn(
                                 "px-6 py-4 text-sm font-black uppercase transition-all border-t-2 border-x-2 rounded-t-xl -mb-[2px]",
                                 activeTabId === tab.id
-                                    ? "bg-[#8bc34a] text-white border-[#8bc34a] shadow-[0_-4px_10px_rgba(139,195,74,0.2)] z-10"
+                                    ? "bg-[#011f7b] text-white border-[#011f7b] shadow-[0_-4px_10px_rgba(1,31,123,0.2)] z-10"
                                     : "bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100 hover:text-gray-600"
                             )}
                         >
@@ -71,11 +71,11 @@ export default function TabsSection({ data }: TabsSectionProps) {
                                     <table className="w-full border-collapse">
                                         {(activeTab.specsLabelHeader || activeTab.specsValueHeader) && (
                                             <thead>
-                                                <tr className="bg-gray-100 border-b border-gray-200">
-                                                    <th className="py-3 px-8 text-left text-sm font-black text-gray-900 w-1/3 border-r border-gray-200 uppercase tracking-tight">
+                                                <tr className="bg-[#011f7b]/[0.06] border-b border-gray-200">
+                                                    <th className="py-3 px-8 text-left text-sm font-black text-[#011f7b] w-1/3 border-r border-gray-200 uppercase tracking-tight">
                                                         {activeTab.specsLabelHeader || 'Label'}
                                                     </th>
-                                                    <th className="py-3 px-8 text-left text-sm font-black text-gray-900 uppercase tracking-tight">
+                                                    <th className="py-3 px-8 text-left text-sm font-black text-[#011f7b] uppercase tracking-tight">
                                                         {activeTab.specsValueHeader || 'Value'}
                                                     </th>
                                                 </tr>
@@ -87,13 +87,13 @@ export default function TabsSection({ data }: TabsSectionProps) {
                                                     key={i}
                                                     className={cn(
                                                         "border-b border-gray-100 last:border-0",
-                                                        i % 2 === 0 ? "bg-white" : "bg-[#f9fbf2]"
+                                                        i % 2 === 0 ? "bg-white" : "bg-[#F8F9FA]"
                                                     )}
                                                 >
-                                                    <td className="py-4 px-8 text-sm font-black text-gray-900 w-1/3 border-r border-gray-100 uppercase tracking-tight">
+                                                    <td className="py-4 px-8 text-sm font-black text-[#011f7b] w-1/3 border-r border-gray-100 uppercase tracking-tight">
                                                         {spec.label}
                                                     </td>
-                                                    <td className="py-4 px-8 text-sm text-gray-700 font-medium">
+                                                    <td className="py-4 px-8 text-sm text-[#212529] font-medium">
                                                         {spec.value}
                                                     </td>
                                                 </tr>
@@ -119,7 +119,7 @@ export default function TabsSection({ data }: TabsSectionProps) {
                                                         </div>
                                                     )}
                                                     <div className="p-5 flex-grow">
-                                                        {card.title && <h4 className="font-bold text-gray-900 mb-2">{card.title}</h4>}
+                                                        {card.title && <h4 className="font-bold text-[#011f7b] mb-2">{card.title}</h4>}
                                                         <p className="text-sm text-gray-600 leading-relaxed">{card.description}</p>
                                                     </div>
                                                 </div>
@@ -146,7 +146,7 @@ export default function TabsSection({ data }: TabsSectionProps) {
                                     {/* Rich Text Content */}
                                     {activeTab.content && (
                                         <div
-                                            className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed"
+                                            className="prose prose-lg max-w-none rich-text prose-headings:font-black prose-headings:text-[#011f7b] prose-p:text-[#212529] prose-p:leading-relaxed"
                                             dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(activeTab.content) }}
                                         />
                                     )}

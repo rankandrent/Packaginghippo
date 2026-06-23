@@ -27,7 +27,7 @@ export function MaterialFinishing({ data }: { data: MaterialFinishingData }) {
 
                 {data.heading && (
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight relative inline-block">
+                        <h2 className="text-3xl md:text-5xl font-black text-[#011f7b] tracking-tight relative inline-block">
                             {data.heading}
                             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-primary rounded-full"></div>
                         </h2>
@@ -38,7 +38,7 @@ export function MaterialFinishing({ data }: { data: MaterialFinishingData }) {
                 {stockTypes.length > 0 && (
                     <div className="mb-20">
                         {data.stockHeading && (
-                            <h3 className="text-2xl font-bold text-gray-900 mb-8 border-b-2 border-gray-100 pb-2 inline-block">
+                            <h3 className="text-2xl font-bold text-[#011f7b] mb-8 border-b-2 border-gray-100 pb-2 inline-block">
                                 {data.stockHeading}
                             </h3>
                         )}
@@ -59,7 +59,7 @@ export function MaterialFinishing({ data }: { data: MaterialFinishingData }) {
                                             </div>
                                         )}
                                     </div>
-                                    <h4 className="text-lg font-bold text-gray-900 mb-2 truncate group-hover:text-primary transition-colors">{item.title}</h4>
+                                    <h4 className="text-lg font-bold text-[#011f7b] mb-2 truncate group-hover:text-primary transition-colors">{item.title}</h4>
                                     <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">{item.desc}</p>
                                 </div>
                             ))}
@@ -71,7 +71,7 @@ export function MaterialFinishing({ data }: { data: MaterialFinishingData }) {
                 {finishing.length > 0 && (
                     <div>
                         {data.finishingHeading && (
-                            <h3 className="text-2xl font-bold text-gray-900 mb-8 border-b-2 border-gray-100 pb-2 inline-block">
+                            <h3 className="text-2xl font-bold text-[#011f7b] mb-8 border-b-2 border-gray-100 pb-2 inline-block">
                                 {data.finishingHeading}
                             </h3>
                         )}
@@ -92,7 +92,7 @@ export function MaterialFinishing({ data }: { data: MaterialFinishingData }) {
                                             </div>
                                         )}
                                     </div>
-                                    <h4 className="text-lg font-bold text-gray-900 mb-2 truncate group-hover:text-primary transition-colors">{item.title}</h4>
+                                    <h4 className="text-lg font-bold text-[#011f7b] mb-2 truncate group-hover:text-primary transition-colors">{item.title}</h4>
                                     <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">{item.desc}</p>
                                 </div>
                             ))}

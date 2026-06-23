@@ -50,10 +50,10 @@ export function FeaturesBar({ data }: { data: any }) {
     ]
 
     return (
-        <section className="py-12 bg-[#F0FDF4] border-y border-emerald-100">
+        <section className="py-12 bg-[#F8F9FA] border-y border-gray-100">
             <div className="container mx-auto px-4">
                 {heading && (
-                    <h3 className="text-center text-lg md:text-xl font-semibold text-gray-800 mb-8">
+                    <h3 className="text-center text-lg md:text-xl font-semibold text-[#011f7b] mb-8">
                         {heading}
                     </h3>
                 )}
@@ -66,14 +66,14 @@ export function FeaturesBar({ data }: { data: any }) {
                                 key={idx}
                                 className="flex flex-col items-center text-center group"
                             >
-                                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-emerald-200 bg-white flex items-center justify-center mb-4 group-hover:border-emerald-500 group-hover:shadow-lg transition-all duration-300">
-                                    <IconComponent className="w-10 h-10 md:w-12 md:h-12 text-emerald-600 group-hover:text-emerald-700 transition-colors" />
+                                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-[#011f7b]/15 bg-white flex items-center justify-center mb-4 group-hover:border-[#DAA520] group-hover:shadow-lg transition-all duration-300">
+                                    <IconComponent className="w-10 h-10 md:w-12 md:h-12 text-[#011f7b] group-hover:text-[#DAA520] transition-colors" />
                                 </div>
-                                <p className="text-xs md:text-sm font-bold text-gray-800 uppercase tracking-wide">
+                                <p className="text-xs md:text-sm font-bold text-[#011f7b] uppercase tracking-wide">
                                     {feature.title}
                                 </p>
                                 {feature.subtitle && (
-                                    <p className="text-xs md:text-sm font-bold text-gray-800 uppercase tracking-wide">
+                                    <p className="text-xs md:text-sm font-bold text-[#011f7b] uppercase tracking-wide">
                                         {feature.subtitle}
                                     </p>
                                 )}

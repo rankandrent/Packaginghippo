@@ -14,7 +14,7 @@ export function LogoLoop({ data }: { data: any }) {
         <section className="py-6 bg-white border-y border-gray-100 overflow-hidden">
             <div className="container mx-auto px-4 mb-2 text-center">
                 {data.heading && (
-                    <h3 className="text-xs font-black text-blue-900/40 tracking-[0.2em] mb-2">
+                    <h3 className="text-xs font-black text-[#011f7b]/40 tracking-[0.2em] mb-2">
                         {data.heading}
                     </h3>
                 )}
@@ -39,7 +39,7 @@ export function LogoLoop({ data }: { data: any }) {
                                     />
                                 </div>
                             ) : (
-                                <span className="text-xl md:text-2xl font-black text-blue-900 transition-colors duration-300 tracking-tighter italic">
+                                <span className="text-xl md:text-2xl font-black text-[#011f7b] transition-colors duration-300 tracking-tighter italic">
                                     {typeof logo === 'string' ? logo : logo.name}
                                 </span>
                             )}

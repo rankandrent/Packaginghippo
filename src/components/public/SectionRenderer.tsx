@@ -196,8 +196,8 @@ function RenderSection({
 
 export function HeroSection({ content, breadcrumbs }: { content: any, breadcrumbs?: React.ReactNode }) {
     return (
-        <section className="relative bg-zinc-950 pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/20 via-zinc-950 to-zinc-950"></div>
+        <section className="relative bg-[#011f7b] pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-[#DAA520]/25 via-[#011f7b] to-[#01154f]"></div>
             {content.bgImage && (
                 <div className="absolute inset-0 opacity-20">
                     <Image src={getSeoImageUrl(content.bgImage)} alt={getAltFromUrl(content.bgImage, 'Background')} fill sizes="100vw" className="object-cover" />
@@ -214,12 +214,12 @@ export function HeroSection({ content, breadcrumbs }: { content: any, breadcrumb
                         <h1 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
                             {content.heading}
                         </h1>
-                        <p className="text-xl text-gray-400 max-w-lg leading-relaxed">
+                        <p className="text-xl text-white/85 max-w-lg leading-relaxed">
                             {content.subheading}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 pt-4">
                             {content.ctaText && (
-                                <Button variant="default" size="lg" className="text-lg px-8 py-6 rounded-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold" asChild>
+                                <Button variant="default" size="lg" className="btn-gold text-lg px-8 py-6 rounded-full" asChild>
                                     <Link href={content.ctaLink || "/quote"}>{content.ctaText} <ArrowRight className="ml-2 w-5 h-5" /></Link>
                                 </Button>
                             )}
@@ -303,7 +303,7 @@ function ProductGridSection({ content }: { content: any }) {
 
     if (products.length === 0) return (
         <section className="py-24 bg-gray-50 text-center text-muted-foreground">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">{content.heading || "Our Products"}</h2>
+            <h2 className="text-3xl font-bold text-[#011f7b] mb-6">{content.heading || "Our Products"}</h2>
             <p>No products found in this category.</p>
         </section>
     )
@@ -312,7 +312,7 @@ function ProductGridSection({ content }: { content: any }) {
         <section className="py-24 bg-gray-50">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-2">{content.heading || "Our Products"}</h2>
+                    <h2 className="text-4xl font-bold text-[#011f7b] mb-2">{content.heading || "Our Products"}</h2>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {products.map((item: any, i: number) => (
@@ -332,10 +332,10 @@ function ProductGridSection({ content }: { content: any }) {
                                     )}
                                 </div>
                                 <CardContent className="p-5 bg-white">
-                                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-yellow-600 transition-colors line-clamp-2">{item.name}</h3>
+                                    <h3 className="font-bold text-lg text-[#011f7b] group-hover:text-[#c4901a] transition-colors line-clamp-2">{item.name}</h3>
                                     <div className="mt-4 flex items-center justify-between text-sm">
                                         <div className="mt-4 flex items-center justify-between text-sm">
-                                            <div className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full">
+                                            <div className="bg-[#DAA520]/15 text-[#a87c16] text-xs font-bold px-2 py-1 rounded-full">
                                                 {item.isCustomizable !== false ? 'Customizable' : 'Standard'}
                                             </div>
                                         </div>
@@ -363,7 +363,7 @@ function TextSection({ content }: { content: any }) {
     return (
         <section className="py-16 bg-white">
             <div className="container mx-auto px-4">
-                {content.heading && <h2 className="text-3xl font-bold text-gray-900 mb-6">{content.heading}</h2>}
+                {content.heading && <h2 className="text-3xl font-bold text-[#011f7b] mb-6">{content.heading}</h2>}
                 <div
                     className="overflow-y-auto pr-3 custom-scrollbar"
                     style={{ maxHeight: '480px' }}
@@ -385,7 +385,7 @@ function SeoContentSection({ content }: { content: any }) {
         <section className="py-16 bg-white border-t border-gray-100">
             <div className="container mx-auto px-4">
                 {content.heading && (
-                    <h2 className="text-3xl font-bold mb-8 text-gray-900">{content.heading}</h2>
+                    <h2 className="text-3xl font-bold mb-8 text-[#011f7b]">{content.heading}</h2>
                 )}
                 <div
                     className="overflow-y-auto pr-3 custom-scrollbar"
@@ -415,8 +415,8 @@ function BenefitsSection({ content }: { content: any }) {
                     {content.items?.map((item: any, i: number) => (
                         <Card key={i} className="border-none shadow-sm hover:shadow-md transition-shadow">
                             <CardContent className="p-6">
-                                <div className="mb-4 bg-yellow-100 w-12 h-12 rounded-full flex items-center justify-center">
-                                    <CheckCircle className="w-6 h-6 text-yellow-600" />
+                                <div className="mb-4 bg-[#DAA520]/15 w-12 h-12 rounded-full flex items-center justify-center">
+                                    <CheckCircle className="w-6 h-6 text-[#c4901a]" />
                                 </div>
                                 <h3 className="font-bold text-lg mb-2">{item.title}</h3>
                                 <p className="text-sm text-gray-500">{item.desc}</p>
@@ -434,7 +434,7 @@ function FaqSection({ content }: { content: any }) {
     return (
         <section className="py-24 bg-white">
             <div className="container mx-auto px-4 max-w-6xl">
-                <h2 className="text-4xl font-black text-center mb-16">{content.heading || "Frequently Asked Questions"}</h2>
+                <h2 className="text-4xl font-black text-center mb-16 text-[#011f7b]">{content.heading || "Frequently Asked Questions"}</h2>
                 <div className="grid md:grid-cols-2 gap-4">
                     {items.map((item: any, i: number) => (
                         <FaqItem key={i} question={item.q} answer={item.a} />
@@ -448,13 +448,13 @@ function FaqSection({ content }: { content: any }) {
 function FaqItem({ question, answer }: { question: string, answer: string }) {
     const [isOpen, setIsOpen] = useState(false)
     return (
-        <div className="border border-gray-200 rounded-xl overflow-hidden bg-gray-50/50 hover:bg-white transition-colors duration-300">
+        <div className={`border rounded-xl overflow-hidden transition-colors duration-300 ${isOpen ? 'border-[#DAA520]/40 bg-white' : 'border-gray-200 bg-[#F8F9FA] hover:bg-white'}`}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center justify-between w-full p-6 text-left"
             >
-                <span className="font-bold text-lg text-gray-900">{question}</span>
-                <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                <span className="font-bold text-lg text-[#011f7b]">{question}</span>
+                <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180 text-[#DAA520]' : 'text-gray-500'}`} />
             </button>
             <AnimatePresence>
                 {isOpen && (
@@ -465,7 +465,7 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
                         transition={{ duration: 0.3 }}
                         className="overflow-hidden"
                     >
-                        <div className="p-6 pt-0 text-gray-600 leading-relaxed">
+                        <div className="p-6 pt-0 text-[#212529]/70 leading-relaxed">
                             {answer}
                         </div>
                     </motion.div>
@@ -477,12 +477,13 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
 
 function CtaSection({ content }: { content: any }) {
     return (
-        <section className="py-24 bg-yellow-500 text-black text-center">
-            <div className="container mx-auto px-4 max-w-3xl space-y-8">
-                <h2 className="text-5xl font-black tracking-tight">{content.heading}</h2>
-                <p className="text-xl font-medium opacity-80">{content.subheading}</p>
+        <section className="section-py bg-[#011f7b] text-white text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#DAA520]/15 via-transparent to-transparent"></div>
+            <div className="container mx-auto px-4 max-w-3xl space-y-8 relative">
+                <h2 className="text-5xl font-black tracking-tight text-white">{content.heading}</h2>
+                <p className="text-xl font-medium text-white/80">{content.subheading}</p>
                 <div className="flex justify-center gap-4">
-                    <Button size="lg" className="bg-black text-white hover:bg-gray-800 text-lg px-10 h-14 rounded-full" asChild>
+                    <Button size="lg" className="btn-gold text-lg px-10 h-14 rounded-full" asChild>
                         <Link href={content.link || "/quote"}>{content.buttonText || "Get Started"}</Link>
                     </Button>
                 </div>
@@ -522,7 +523,7 @@ function CustomerReviewsSection({ content }: { content: any }) {
         <section className="py-24 bg-white overflow-hidden">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">{content.heading || "What Our Customers Say"}</h2>
+                    <h2 className="text-4xl md:text-5xl font-black text-[#011f7b] mb-4 tracking-tight">{content.heading || "What Our Customers Say"}</h2>
                     <p className="text-xl text-gray-500 max-w-2xl mx-auto">{content.subheading || "Trusted by businesses worldwide for premium packaging solutions."}</p>
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
@@ -540,24 +541,24 @@ function CustomerReviewsSection({ content }: { content: any }) {
                                         {[...Array(5)].map((_, starIdx) => (
                                             <Star
                                                 key={starIdx}
-                                                className={`w-4 h-4 ${starIdx < (review.rating || 5) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`}
+                                                className={`w-4 h-4 ${starIdx < (review.rating || 5) ? 'text-[#DAA520] fill-[#DAA520]' : 'text-gray-200 fill-gray-200'}`}
                                             />
                                         ))}
                                     </div>
-                                    <Quote className="w-8 h-8 text-yellow-500/20 mb-4 group-hover:text-yellow-500/40 transition-colors" />
+                                    <Quote className="w-8 h-8 text-[#DAA520]/20 mb-4 group-hover:text-[#DAA520]/40 transition-colors" />
                                     <p className="text-gray-600 italic leading-relaxed mb-8 flex-grow">"{review.text}"</p>
                                     <div className="flex items-center gap-4 pt-6 border-t border-gray-50">
                                         {review.image ? (
-                                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-yellow-500/20">
+                                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#DAA520]/20">
                                                 <Image src={getSeoImageUrl(review.image)} alt={review.name} width={48} height={48} className="object-cover" />
                                             </div>
                                         ) : (
-                                            <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-600 font-bold">
+                                            <div className="w-12 h-12 rounded-full bg-[#DAA520]/10 flex items-center justify-center text-[#c4901a] font-bold">
                                                 {review.name?.charAt(0) || 'U'}
                                             </div>
                                         )}
                                         <div>
-                                            <h4 className="font-bold text-gray-900">{review.name}</h4>
+                                            <h4 className="font-bold text-[#011f7b]">{review.name}</h4>
                                             <p className="text-xs text-gray-400 font-medium tracking-wider">{review.role}</p>
                                         </div>
                                     </div>
@@ -587,7 +588,7 @@ function FeaturesBarSection({ content }: { content: any }) {
     }
 
     return (
-        <section className="py-12 bg-zinc-950 border-y border-white/5">
+        <section className="py-12 bg-[#011f7b] border-y border-white/10">
             <div className="container mx-auto px-4">
                 {content.heading && (
                     <div className="text-center mb-10">
@@ -599,8 +600,8 @@ function FeaturesBarSection({ content }: { content: any }) {
                         const Icon = iconMap[feature.icon] || Check
                         return (
                             <div key={i} className="flex flex-col items-center text-center group">
-                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-yellow-500 transition-all duration-300 group-hover:rotate-12">
-                                    <Icon className="w-6 h-6 text-yellow-500 group-hover:text-black transition-colors" />
+                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-[#DAA520] transition-all duration-300 group-hover:rotate-12">
+                                    <Icon className="w-6 h-6 text-[#DAA520] group-hover:text-[#011f7b] transition-colors" />
                                 </div>
                                 <h3 className="text-white font-black text-sm tracking-tight">{feature.title}</h3>
                                 <p className="text-gray-500 text-[10px] font-bold tracking-widest mt-1">{feature.subtitle}</p>

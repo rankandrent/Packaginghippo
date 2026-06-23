@@ -20,21 +20,21 @@ export function Breadcrumbs({ items, theme = 'dark' }: BreadcrumbsProps) {
 
     // Styles for inactive links
     const linkColor = isDark
-        ? "text-gray-200 hover:text-yellow-400 drop-shadow-sm"
-        : "text-gray-600 hover:text-yellow-600 font-medium"
+        ? "text-gray-200 hover:text-[#DAA520] drop-shadow-sm"
+        : "text-gray-600 hover:text-[#c4901a] font-medium"
 
     // Styles for active item
     const activeColor = isDark
         ? "text-white font-bold drop-shadow-md"
-        : "text-black font-bold"
+        : "text-[#011f7b] font-bold"
 
     // Styles for separator
     const separatorColor = isDark ? "text-gray-400" : "text-gray-400"
 
     // Home icon color
     const homeIconColor = isDark
-        ? "text-gray-300 group-hover:text-yellow-400"
-        : "text-gray-500 group-hover:text-yellow-600"
+        ? "text-gray-300 group-hover:text-[#DAA520]"
+        : "text-gray-500 group-hover:text-[#c4901a]"
 
     return (
         <nav className="flex overflow-x-auto whitespace-nowrap pb-1" aria-label="Breadcrumb">

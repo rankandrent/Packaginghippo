@@ -22,7 +22,7 @@ export function CustomerReviews({ data }: { data: any }) {
         <section className="py-16 bg-gray-50">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-3xl md:text-4xl font-bold text-[#011f7b] mb-4">
                         {heading}
                     </h2>
                     {subheading && (
@@ -44,7 +44,7 @@ export function CustomerReviews({ data }: { data: any }) {
                                     <Star
                                         key={i}
                                         className={`w-5 h-5 ${i < (review.rating || 5)
-                                            ? "fill-yellow-400 text-yellow-400"
+                                            ? "fill-[#DAA520] text-[#DAA520]"
                                             : "fill-gray-200 text-gray-200"
                                             }`}
                                     />
@@ -72,7 +72,7 @@ export function CustomerReviews({ data }: { data: any }) {
                                     </div>
                                 )}
                                 <div>
-                                    <p className="font-semibold text-gray-900">{review.name}</p>
+                                    <p className="font-semibold text-[#212529]">{review.name}</p>
                                     {review.role && (
                                         <p className="text-sm text-gray-500">{review.role}</p>
                                     )}

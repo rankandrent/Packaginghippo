@@ -23,14 +23,15 @@ export function VideoSection({ data }: { data: any }) {
     )
 
     return (
-        <section className="py-16 bg-zinc-50">
+        <section className="section-py bg-[#F8F9FA]">
             <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-10">
-                        <h2 className="text-3xl md:text-4xl font-black text-zinc-900 mb-4">
+                        <span className="brand-eyebrow mb-3">Watch</span>
+                        <h2 className="text-3xl md:text-4xl font-black text-[#011f7b] mb-4 mt-3">
                             {data.heading || "See How We Work"}
                         </h2>
-                        <p className="text-lg text-zinc-600">
+                        <p className="text-lg text-[#212529]/70">
                             {data.subheading || "Watch our process and see the quality we deliver."}
                         </p>
                     </div>
@@ -67,7 +68,7 @@ export function VideoSection({ data }: { data: any }) {
                                     ) : null}
                                     <div className="absolute inset-0 bg-black/35" />
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-white/95 text-zinc-900 shadow-xl transition-transform hover:scale-105">
+                                        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-[#DAA520] text-[#011f7b] shadow-xl transition-transform hover:scale-105">
                                             <Play className="ml-1 h-8 w-8 fill-current" />
                                         </span>
                                     </div>

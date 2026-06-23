@@ -26,7 +26,7 @@ export function WhatsAppButton({ whatsappNumber }: { whatsappNumber?: string | n
             <span className="sr-only">Chat on WhatsApp</span>
 
             {/* Tooltip */}
-            <div className="absolute left-16 bg-white px-3 py-1.5 rounded-lg shadow-md text-sm font-medium text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            <div className="absolute left-16 bg-white px-3 py-1.5 rounded-lg shadow-md text-sm font-medium text-[#212529] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                 Chat with us
             </div>
         </a>

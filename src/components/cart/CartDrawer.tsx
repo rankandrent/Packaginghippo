@@ -28,11 +28,11 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       <SheetContent className="w-full sm:max-w-md flex flex-col p-0 bg-white/95 backdrop-blur-md">
         <SheetHeader className="p-6 border-b">
           <div className="flex items-center justify-between">
-            <SheetTitle className="text-2xl font-black text-gray-900 flex items-center gap-2">
-              <ShoppingBag className="w-6 h-6 text-blue-600" />
+            <SheetTitle className="text-2xl font-black text-[#212529] flex items-center gap-2">
+              <ShoppingBag className="w-6 h-6 text-[#011f7b]" />
               Your Cart
               {totalItems > 0 && (
-                <span className="text-sm font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                <span className="text-sm font-medium bg-blue-100 text-[#01154f] px-2 py-0.5 rounded-full">
                   {totalItems}
                 </span>
               )}
@@ -52,7 +52,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <ShoppingBag className="w-10 h-10 text-gray-300" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">Your cart is empty</h3>
+                  <h3 className="text-xl font-bold text-[#011f7b]">Your cart is empty</h3>
                   <p className="text-gray-500 mt-1">Looks like you haven't added anything yet.</p>
                 </div>
                 <Button onClick={onClose} variant="outline" className="mt-4">
@@ -81,7 +81,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <div className="flex-1 flex flex-col justify-between py-1">
                       <div>
                         <div className="flex justify-between items-start">
-                          <h4 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                          <h4 className="font-bold text-[#011f7b] group-hover:text-[#011f7b] transition-colors line-clamp-1">
                             {item.name}
                           </h4>
                           <button 
@@ -91,7 +91,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                        <p className="text-blue-600 font-bold mt-1 text-sm">${item.price.toFixed(2)}</p>
+                        <p className="text-[#011f7b] font-bold mt-1 text-sm">${item.price.toFixed(2)}</p>
                       </div>
                       
                       <div className="flex items-center justify-between mt-2">
@@ -102,7 +102,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           >
                             <Minus className="w-3 h-3 text-gray-600" />
                           </button>
-                          <span className="px-3 text-xs font-bold text-gray-900 min-w-[32px] text-center">
+                          <span className="px-3 text-xs font-bold text-[#212529] min-w-[32px] text-center">
                             {item.quantity}
                           </span>
                           <button 
@@ -112,7 +112,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                             <Plus className="w-3 h-3 text-gray-600" />
                           </button>
                         </div>
-                        <p className="font-black text-gray-900 text-sm">
+                        <p className="font-black text-[#212529] text-sm">
                           ${(item.price * item.quantity).toFixed(2)}
                         </p>
                       </div>
@@ -131,9 +131,9 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <span>Subtotal</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-xl font-black text-gray-900">
+              <div className="flex justify-between text-xl font-black text-[#212529]">
                 <span>Total</span>
-                <span className="text-blue-600">${subtotal.toFixed(2)}</span>
+                <span className="text-[#011f7b]">${subtotal.toFixed(2)}</span>
               </div>
               <p className="text-[10px] text-gray-400 text-center uppercase tracking-widest pt-2">
                 Shipping and taxes calculated at checkout
@@ -147,7 +147,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </Button>
-              <Button variant="ghost" onClick={onClose} className="font-bold text-gray-500 hover:text-gray-900">
+              <Button variant="ghost" onClick={onClose} className="font-bold text-gray-500 hover:text-[#212529]">
                 Continue Shopping
               </Button>
             </div>

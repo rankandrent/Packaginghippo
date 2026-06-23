@@ -21,14 +21,15 @@ export function FeaturedBlogs({ posts }: { posts: BlogPost[] }) {
     if (!posts || posts.length === 0) return null
 
     return (
-        <section className="py-16 bg-muted/30">
+        <section className="section-py bg-[#F8F9FA]">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
                     <div className="space-y-2 text-center md:text-left">
-                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                        <span className="brand-eyebrow mb-2">From The Blog</span>
+                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-[#011f7b]">
                             Latest Insights
                         </h2>
-                        <p className="text-muted-foreground md:text-xl/relaxed max-w-[600px]">
+                        <p className="text-[#212529]/70 md:text-xl/relaxed max-w-[600px]">
                             Expert tips, packaging trends, and business guides.
                         </p>
                     </div>
@@ -41,7 +42,7 @@ export function FeaturedBlogs({ posts }: { posts: BlogPost[] }) {
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {posts.map((post) => (
-                        <Card key={post.id} className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <Card key={post.id} className="brand-card flex flex-col h-full overflow-hidden border border-gray-100">
                             <div className="relative h-48 w-full overflow-hidden">
                                 {post.mainImage ? (
                                     <Image
@@ -78,7 +79,7 @@ export function FeaturedBlogs({ posts }: { posts: BlogPost[] }) {
                                     )}
                                 </div>
                                 <Link href={`/blog/${post.slug}`} className="hover:underline">
-                                    <h3 className="font-bold text-xl leading-tight line-clamp-2">
+                                    <h3 className="font-bold text-xl leading-tight line-clamp-2 text-[#011f7b]">
                                         {post.title}
                                     </h3>
                                 </Link>

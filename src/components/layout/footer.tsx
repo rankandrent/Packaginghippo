@@ -45,7 +45,7 @@ export async function Footer({
     const contactTitle = footer.columns?.contactTitle || "Get in Touch"
 
     return (
-        <footer className="site-footer bg-neutral-900 border-t border-neutral-800 text-white pt-16 pb-8">
+        <footer className="site-footer bg-[#011f7b] border-t border-white/10 text-white pt-16 pb-8">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     {/* Brand */}
@@ -62,33 +62,33 @@ export async function Footer({
                         </p>
                         <div className="flex gap-4">
                             {footer.social?.facebook && (
-                                <Link href={footer.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on Facebook" className="p-2 bg-gray-800 text-white rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                <Link href={footer.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on Facebook" className="p-2 bg-white/10 text-white rounded-full hover:bg-[#DAA520] hover:text-[#011f7b] transition">
                                     <Facebook className="w-4 h-4" />
                                 </Link>
                             )}
                             {footer.social?.instagram && (
-                                <Link href={footer.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on Instagram" className="p-2 bg-gray-800 text-white rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                <Link href={footer.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on Instagram" className="p-2 bg-white/10 text-white rounded-full hover:bg-[#DAA520] hover:text-[#011f7b] transition">
                                     <Instagram className="w-4 h-4" />
                                 </Link>
                             )}
                             {footer.social?.linkedin && (
-                                <Link href={footer.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on LinkedIn" className="p-2 bg-gray-800 text-white rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                <Link href={footer.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on LinkedIn" className="p-2 bg-white/10 text-white rounded-full hover:bg-[#DAA520] hover:text-[#011f7b] transition">
                                     <Linkedin className="w-4 h-4" />
                                 </Link>
                             )}
                             {footer.social?.twitter && (
-                                <Link href={footer.social.twitter} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on X" className="p-2 bg-gray-800 text-white rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                <Link href={footer.social.twitter} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on X" className="p-2 bg-white/10 text-white rounded-full hover:bg-[#DAA520] hover:text-[#011f7b] transition">
                                     <Twitter className="w-4 h-4" />
                                 </Link>
                             )}
                             {footer.social?.behance && (
-                                <Link href={footer.social.behance} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on Behance" className="p-2 bg-gray-800 text-white rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                <Link href={footer.social.behance} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on Behance" className="p-2 bg-white/10 text-white rounded-full hover:bg-[#DAA520] hover:text-[#011f7b] transition">
                                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 7h-7v-2h7v2zm1.726 10c-.002 1.296-.566 1.834-1.296 2.059l-9.338.002c-.736-.213-1.074-.755-1.092-2.061h11.726zm-10.613-2h4.561c.071-1.376-.803-1.896-1.503-1.996-1.554.01-1.467.434-3.058 1.996zm6.332-6.319c-1.42 0-2.31 1.051-2.31 2.379 0 1.259.982 2.193 2.33 2.193 1.348 0 2.308-.87 2.308-2.193 0-1.218-.888-2.379-2.328-2.379zm-7.904 4.319h11v2h-11v-2zm0-4h11v2h-11v-2zm-2.459 2.193c0-1.564 1.229-2.736 2.87-2.736 1.549 0 2.768 1.139 2.768 2.736 0 1.553-1.129 2.736-2.678 2.736-1.631 0-2.96-1.183-2.96-2.736zm4.195 0c-.004-.848-.601-1.487-1.325-1.487-.768 0-1.375.647-1.375 1.487 0 .848.6 1.487 1.375 1.487.732 0 1.329-.648 1.325-1.487z" /></svg>
                                     <span className="sr-only">Behance</span>
                                 </Link>
                             )}
                             {footer.social?.youtube && (
-                                <Link href={footer.social.youtube} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on YouTube" className="p-2 bg-gray-800 text-white rounded-full hover:bg-yellow-500 hover:text-black transition">
+                                <Link href={footer.social.youtube} target="_blank" rel="noopener noreferrer" aria-label="Packaging Hippo on YouTube" className="p-2 bg-white/10 text-white rounded-full hover:bg-[#DAA520] hover:text-[#011f7b] transition">
                                     <Youtube className="w-4 h-4" />
                                 </Link>
                             )}
@@ -97,7 +97,7 @@ export async function Footer({
 
                     {/* Products */}
                     <div>
-                        <h4 className="font-bold text-lg mb-6 text-yellow-500">{productsTitle}</h4>
+                        <h4 className="font-bold text-lg mb-6 text-[#DAA520]">{productsTitle}</h4>
                         <ul className="space-y-3 text-sm">
                             <li><Link href="/display-packaging" className="text-white/80 hover:text-white transition-colors">Display Packaging</Link></li>
                             <li><Link href="/cosmetic-packaging" className="text-white/80 hover:text-white transition-colors">Cosmetic Packaging</Link></li>
@@ -110,7 +110,7 @@ export async function Footer({
 
                     {/* Company */}
                     <div>
-                        <h4 className="font-bold text-lg mb-6 text-yellow-500">{companyTitle}</h4>
+                        <h4 className="font-bold text-lg mb-6 text-[#DAA520]">{companyTitle}</h4>
                         <ul className="space-y-3 text-sm">
                             <li><Link href="/about-us" className="text-white/80 hover:text-white transition-colors">About Us</Link></li>
                             <li><Link href="/contact-us" className="text-white/80 hover:text-white transition-colors">Contact Us</Link></li>
@@ -121,25 +121,25 @@ export async function Footer({
 
                     {/* Contact */}
                     <div>
-                        <h4 className="font-bold text-lg mb-6 text-yellow-500">{contactTitle}</h4>
+                        <h4 className="font-bold text-lg mb-6 text-[#DAA520]">{contactTitle}</h4>
                         <ul className="space-y-4 text-sm text-white/80">
                             <li className="flex items-start gap-3">
-                                <MapPin className="w-5 h-5 text-yellow-500 shrink-0" />
+                                <MapPin className="w-5 h-5 text-[#DAA520] shrink-0" />
                                 <span>{address}</span>
                             </li>
                             <li className="flex items-center gap-3">
-                                <Phone className="w-5 h-5 text-yellow-500 shrink-0" />
+                                <Phone className="w-5 h-5 text-[#DAA520] shrink-0" />
                                 <a href={`tel:${phone}`} className="text-white/80 hover:text-white transition-colors">{phone}</a>
                             </li>
                             <li className="flex items-center gap-3">
-                                <Mail className="w-5 h-5 text-yellow-500 shrink-0" />
+                                <Mail className="w-5 h-5 text-[#DAA520] shrink-0" />
                                 <a href={`mailto:${email}`} className="text-white/80 hover:text-white transition-colors">{email}</a>
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="border-t border-neutral-800 pt-8 mt-12">
+                <div className="border-t border-white/10 pt-8 mt-12">
                     <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-6">
                         {/* Copyright */}
                         <p className="text-sm text-white/75 text-center md:text-left">

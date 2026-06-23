@@ -19,7 +19,7 @@ export function CategoriesSection({ categories = [] }: { categories: Category[] 
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4 text-left border-b pb-4">
                     <div className="flex flex-col md:flex-row md:items-baseline gap-2">
-                        <h2 className="text-3xl font-bold text-gray-900">Browse by Category</h2>
+                        <h2 className="text-3xl font-bold text-[#011f7b]">Browse by Category</h2>
                         <span className="hidden md:inline text-gray-400">|</span>
                         <p className="text-gray-600 text-sm md:text-base">Find the perfect packaging for your industry.</p>
                     </div>
@@ -32,7 +32,7 @@ export function CategoriesSection({ categories = [] }: { categories: Category[] 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                     {categories.map((category) => (
                         <Link href={`/${category.slug}`} key={category.id} className="group block text-center h-full">
-                            <div className="relative aspect-[4/3] mb-4 rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-xl group-hover:border-green-500/50 transition-all duration-300 transform group-hover:-translate-y-1">
+                            <div className="relative aspect-[4/3] mb-4 rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-xl group-hover:border-[#DAA520]/50 transition-all duration-300 transform group-hover:-translate-y-1">
                                 {category.imageUrl ? (
                                     <Image
                                         src={getSeoImageUrl(category.imageUrl)}
@@ -47,12 +47,12 @@ export function CategoriesSection({ categories = [] }: { categories: Category[] 
                                     </div>
                                 )}
                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-                                    <span className="bg-white/90 text-gray-900 text-xs font-bold px-4 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <span className="bg-white/90 text-[#212529] text-xs font-bold px-4 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                         View Products
                                     </span>
                                 </div>
                             </div>
-                            <h3 className="font-bold text-gray-900 group-hover:text-green-700 transition-colors text-sm md:text-base px-2">
+                            <h3 className="font-bold text-[#011f7b] group-hover:text-green-700 transition-colors text-sm md:text-base px-2">
                                 {category.name}
                             </h3>
                         </Link>

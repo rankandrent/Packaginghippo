@@ -48,7 +48,7 @@ export function DynamicTOC({ selector = ".prose" }: { selector?: string }) {
 
     return (
         <div className="sticky top-32 space-y-4">
-            <h3 className="font-bold text-blue-900 tracking-wider text-xs border-b pb-2">Table of Contents</h3>
+            <h3 className="font-bold text-[#011f7b] tracking-wider text-xs border-b pb-2">Table of Contents</h3>
             <nav className="max-h-[60vh] overflow-y-auto pr-4 scrollbar-hide">
                 <ul className="space-y-3">
                     {headings.map((item) => (
@@ -63,8 +63,8 @@ export function DynamicTOC({ selector = ".prose" }: { selector?: string }) {
                                     document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
                                 }}
                                 className={cn(
-                                    "block text-xs font-semibold transition-all hover:text-blue-900",
-                                    activeId === item.id ? "text-blue-900 translate-x-1" : "text-gray-400"
+                                    "block text-xs font-semibold transition-all hover:text-[#011f7b]",
+                                    activeId === item.id ? "text-[#011f7b] translate-x-1" : "text-gray-400"
                                 )}
                             >
                                 {item.text}

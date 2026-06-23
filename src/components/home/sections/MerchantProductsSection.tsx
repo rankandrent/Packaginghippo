@@ -40,7 +40,7 @@ function AddToCartButton({ product, index }: { product: MerchantProduct, index: 
             className={`flex items-center justify-center gap-1.5 w-full text-xs font-bold py-2 px-3 rounded-lg transition-all duration-200 ${
                 added
                     ? 'bg-green-600 text-white'
-                    : 'bg-blue-900 hover:bg-blue-800 text-white'
+                    : 'bg-[#011f7b] hover:bg-[#01154f] text-white'
             }`}
         >
             {added ? (
@@ -72,7 +72,7 @@ export function MerchantProductsSection({ data }: { data: any }) {
     // Show placeholder skeleton when no products added yet
     if (products.length === 0) {
         return (
-            <section className="py-16 bg-gray-50">
+            <section className="section-py bg-[#F8F9FA]">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
                         <div className="h-10 bg-gray-200 rounded-xl animate-pulse max-w-xs mx-auto mb-4" />
@@ -87,14 +87,14 @@ export function MerchantProductsSection({ data }: { data: any }) {
     }
 
     return (
-        <section className="py-16 bg-gray-50">
+        <section className="section-py bg-[#F8F9FA]">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-5xl font-black text-zinc-900 mb-4">
+                    <h2 className="text-3xl md:text-5xl font-black text-[#011f7b] mb-4">
                         {data.heading || "Featured Products"}
                     </h2>
                     {data.subheading && (
-                        <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
+                        <p className="text-lg text-[#212529]/70 max-w-2xl mx-auto">
                             {data.subheading}
                         </p>
                     )}
@@ -104,7 +104,7 @@ export function MerchantProductsSection({ data }: { data: any }) {
                     {products.slice(0, 7).map((product, index) => (
                         <div
                             key={index}
-                            className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group flex flex-col"
+                            className="brand-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group flex flex-col"
                         >
                             {/* Product Image */}
                             <div className="relative aspect-square bg-gray-50 overflow-hidden">
@@ -125,11 +125,11 @@ export function MerchantProductsSection({ data }: { data: any }) {
 
                             {/* Product Info */}
                             <div className="p-3 flex flex-col flex-1 gap-2">
-                                <h3 className="font-bold text-zinc-800 text-sm leading-tight line-clamp-2">
+                                <h3 className="font-bold text-[#011f7b] text-sm leading-tight line-clamp-2">
                                     {product.name || "Custom Packaging"}
                                 </h3>
                                 {product.price && (
-                                    <p className="text-blue-700 font-black text-sm">
+                                    <p className="text-[#DAA520] font-black text-sm">
                                         {product.price}
                                     </p>
                                 )}

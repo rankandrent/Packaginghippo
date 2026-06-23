@@ -74,7 +74,7 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                     <CheckCircle2 className="w-9 h-9 text-green-500" />
                 </div>
                 <div>
-                    <h3 className="text-xl font-black text-gray-900">Quote Request Sent!</h3>
+                    <h3 className="text-xl font-black text-[#011f7b]">Quote Request Sent!</h3>
                     <p className="text-gray-500 text-sm mt-1">We'll email your pricing within 2 hours.</p>
                 </div>
                 <Button onClick={() => setIsSuccess(false)} variant="outline" className="w-full rounded-xl py-5 font-bold text-gray-600">
@@ -86,26 +86,26 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
         )
     }
 
-    const inputClass = "w-full bg-white border border-gray-200 text-gray-900 placeholder:text-gray-400 text-sm py-3 px-3 pl-10 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all outline-none shadow-sm"
+    const inputClass = "w-full bg-white border border-gray-200 text-[#212529] placeholder:text-gray-400 text-sm py-3 px-3 pl-10 rounded-xl focus:ring-2 focus:ring-[#011f7b]/30 focus:border-[#011f7b] transition-all outline-none shadow-sm"
     const labelClass = "text-xs font-semibold text-gray-700 mb-1.5 block"
-    const iconClass = "absolute left-3 top-[34px] w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors pointer-events-none"
+    const iconClass = "absolute left-3 top-[34px] w-4 h-4 text-gray-400 group-focus-within:text-[#011f7b] transition-colors pointer-events-none"
 
     return (
         <div className="relative">
             {/* Animated glow behind form */}
-            <div className="absolute -inset-[3px] bg-gradient-to-br from-blue-500 via-indigo-500 to-blue-600 rounded-[1.4rem] blur-md opacity-60 animate-pulse" />
+            <div className="absolute -inset-[3px] bg-gradient-to-br from-[#011f7b] via-[#1e3fa8] to-[#011f7b] rounded-[1.4rem] blur-md opacity-60 animate-pulse" />
 
             {/* Gradient border ring */}
-            <div className="relative bg-gradient-to-br from-blue-500 via-indigo-500 to-blue-600 p-[2.5px] rounded-[1.3rem] shadow-[0_20px_60px_rgba(59,130,246,0.45)]">
+            <div className="relative bg-gradient-to-br from-[#011f7b] via-[#1e3fa8] to-[#011f7b] p-[2.5px] rounded-[1.3rem] shadow-[0_20px_60px_rgba(1,31,123,0.45)]">
 
             {/* Inner white card */}
             <div className="bg-white rounded-[1.1rem] overflow-hidden">
 
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-[#011f7b] to-[#01154f] px-6 py-4 flex items-center justify-between">
                 <div>
                     <h2 className="text-white font-black text-lg leading-tight">Get Your Free Quote</h2>
-                    <p className="text-blue-200 text-xs mt-0.5">No commitment · 100% free · Fast turnaround</p>
+                    <p className="text-white/75 text-xs mt-0.5">No commitment · 100% free · Fast turnaround</p>
                 </div>
                 <div className="flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1.5 shrink-0">
                     <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
@@ -159,7 +159,7 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                     <button
                         type="button"
                         onClick={() => setShowDetails(!showDetails)}
-                        className="w-full flex items-center justify-between text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors px-4 py-2.5 rounded-xl border border-blue-100"
+                        className="w-full flex items-center justify-between text-xs font-semibold text-[#011f7b] hover:text-[#01154f] bg-blue-50 hover:bg-blue-100 transition-colors px-4 py-2.5 rounded-xl border border-blue-100"
                     >
                         <span>
                             + Add Dimensions & Material
@@ -173,9 +173,9 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                             <div>
                                 <label className={labelClass}>Box Dimensions (W × L × D)</label>
                                 <div className="grid grid-cols-4 gap-2">
-                                    <input {...form.register("width")} placeholder="W" className="w-full bg-white border border-gray-200 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-gray-400" />
-                                    <input {...form.register("length")} placeholder="L" className="w-full bg-white border border-gray-200 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-gray-400" />
-                                    <input {...form.register("depth")} placeholder="D" className="w-full bg-white border border-gray-200 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none placeholder:text-gray-400" />
+                                    <input {...form.register("width")} placeholder="W" className="w-full bg-white border border-gray-200 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-[#011f7b]/20 focus:border-[#011f7b] outline-none placeholder:text-gray-400" />
+                                    <input {...form.register("length")} placeholder="L" className="w-full bg-white border border-gray-200 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-[#011f7b]/20 focus:border-[#011f7b] outline-none placeholder:text-gray-400" />
+                                    <input {...form.register("depth")} placeholder="D" className="w-full bg-white border border-gray-200 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-[#011f7b]/20 focus:border-[#011f7b] outline-none placeholder:text-gray-400" />
                                     <select {...form.register("unit")} className="w-full bg-white border border-gray-200 text-sm py-2.5 px-2 rounded-xl outline-none cursor-pointer text-gray-700">
                                         <option value="Inches">in</option>
                                         <option value="CM">cm</option>
@@ -184,7 +184,7 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                             </div>
                             <div>
                                 <label className={labelClass}>Material Stock</label>
-                                <select {...form.register("stock")} className="w-full bg-white border border-gray-200 text-gray-700 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer">
+                                <select {...form.register("stock")} className="w-full bg-white border border-gray-200 text-gray-700 text-sm py-2.5 px-3 rounded-xl focus:ring-2 focus:ring-[#011f7b]/20 focus:border-[#011f7b] outline-none cursor-pointer">
                                     <option value="12pt Cardboard">12pt Cardboard (Standard)</option>
                                     <option value="14pt Cardboard">14pt Cardboard (Premium)</option>
                                     <option value="Rigid">Luxury Rigid</option>
@@ -216,7 +216,7 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                             { icon: Clock, label: "10–12 Day Lead" },
                         ].map(({ icon: Icon, label }) => (
                             <div key={label} className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-2 justify-center border border-gray-100">
-                                <Icon className="w-3 h-3 text-blue-500 shrink-0" />
+                                <Icon className="w-3 h-3 text-[#011f7b] shrink-0" />
                                 <span className="text-[10px] font-semibold text-gray-600">{label}</span>
                             </div>
                         ))}
@@ -225,7 +225,7 @@ export function ProductHeroQuoteForm({ productSlug }: { productSlug: string }) {
                     <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-black py-7 rounded-xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-[0.99] transition-all text-base border-b-4 border-orange-700"
+                        className="w-full btn-gold py-7 rounded-xl font-black active:scale-[0.99] text-base border-b-4 border-[#a87c16]"
                     >
                         {isSubmitting ? (
                             <Loader2 className="animate-spin h-5 w-5" />

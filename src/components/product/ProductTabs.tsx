@@ -59,8 +59,8 @@ export function ProductTabs({ tabs }: ProductTabsProps) {
                                 className={cn(
                                     "px-6 py-4 text-sm font-black uppercase transition-all border-t-2 border-x-2 rounded-t-xl -mb-[2px]",
                                     activeTab === tab.key
-                                        ? "bg-[#8bc34a] text-white border-[#8bc34a] shadow-[0_-4px_10px_rgba(139,195,74,0.2)]"
-                                        : "bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100 hover:text-gray-600"
+                                        ? "bg-[#011f7b] text-white border-[#011f7b] shadow-[0_-4px_10px_rgba(1,31,123,0.2)]"
+                                        : "bg-[#F8F9FA] text-gray-400 border-transparent hover:bg-[#DAA520]/10 hover:text-[#011f7b]"
                                 )}
                             >
                                 {tab.label}
@@ -83,13 +83,13 @@ export function ProductTabs({ tabs }: ProductTabsProps) {
                                                 key={i}
                                                 className={cn(
                                                     "border-b border-gray-100 last:border-0",
-                                                    i % 2 === 0 ? "bg-white" : "bg-[#f9fbf2]"
+                                                    i % 2 === 0 ? "bg-white" : "bg-[#F8F9FA]"
                                                 )}
                                             >
-                                                <td className="py-4 px-8 text-sm font-black text-gray-900 w-1/3 border-r border-gray-100 uppercase tracking-tight">
+                                                <td className="py-4 px-8 text-sm font-black text-[#011f7b] w-1/3 border-r border-gray-100 uppercase tracking-tight">
                                                     {spec.label}
                                                 </td>
-                                                <td className="py-4 px-8 text-sm text-gray-700 font-medium">
+                                                <td className="py-4 px-8 text-sm text-[#212529]/80 font-medium">
                                                     {spec.value}
                                                 </td>
                                             </tr>
@@ -118,7 +118,7 @@ export function ProductTabs({ tabs }: ProductTabsProps) {
                                 {/* Rich Text Content */}
                                 {activeContent.content && (
                                     <div
-                                        className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed"
+                                        className="prose prose-lg max-w-none rich-text prose-headings:font-black prose-headings:text-[#011f7b] prose-p:text-[#212529] prose-p:leading-relaxed"
                                         dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(activeContent.content) }}
                                     />
                                 )}

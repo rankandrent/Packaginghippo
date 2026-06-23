@@ -12,7 +12,7 @@ export default async function NotFound() {
                 <div className="relative">
                     <h1 className="text-9xl font-black text-gray-100 italic">404</h1>
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <h2 className="text-3xl font-black text-blue-900 uppercase">Page Not Found</h2>
+                        <h2 className="text-3xl font-black text-[#011f7b] uppercase">Page Not Found</h2>
                     </div>
                 </div>
 
@@ -24,14 +24,14 @@ export default async function NotFound() {
                 <div className="flex flex-col sm:flex-row gap-4">
                     <Link
                         href="/"
-                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-900 text-white font-bold uppercase rounded-lg hover:bg-blue-800 transition-all"
+                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#011f7b] text-white font-bold uppercase rounded-lg hover:bg-[#01154f] transition-all"
                     >
                         <Home className="w-5 h-5" />
                         Home
                     </Link>
                     <Link
                         href="/products"
-                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border-2 border-blue-900 text-blue-900 font-bold uppercase rounded-lg hover:bg-blue-50 transition-all"
+                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border-2 border-[#011f7b] text-[#011f7b] font-bold uppercase rounded-lg hover:bg-blue-50 transition-all"
                     >
                         <Search className="w-5 h-5" />
                         Browse Products
@@ -41,9 +41,9 @@ export default async function NotFound() {
                 <div className="pt-8 border-t">
                     <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Popular Categories</p>
                     <div className="flex flex-wrap justify-center gap-3">
-                        <Link href="/services/custom-rigid-boxes" className="text-xs font-bold text-gray-600 hover:text-blue-900 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">Rigid Boxes</Link>
-                        <Link href="/services/gift-boxes" className="text-xs font-bold text-gray-600 hover:text-blue-900 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">Gift Boxes</Link>
-                        <Link href="/blog" className="text-xs font-bold text-gray-600 hover:text-blue-900 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">Packaging Guide</Link>
+                        <Link href="/services/custom-rigid-boxes" className="text-xs font-bold text-gray-600 hover:text-[#011f7b] bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">Rigid Boxes</Link>
+                        <Link href="/services/gift-boxes" className="text-xs font-bold text-gray-600 hover:text-[#011f7b] bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">Gift Boxes</Link>
+                        <Link href="/blog" className="text-xs font-bold text-gray-600 hover:text-[#011f7b] bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">Packaging Guide</Link>
                     </div>
                 </div>
             </div>

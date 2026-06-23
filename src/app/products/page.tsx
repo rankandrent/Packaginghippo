@@ -156,12 +156,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 { name: "Products", url: "/products" }
             ]} />
 
-            <div className="bg-black text-white pt-32 pb-20">
-                <div className="container mx-auto px-4 text-center">
-                    <h1 className="text-5xl font-black mb-4 text-yellow-500">
+            <div className="relative overflow-hidden bg-[#011f7b] text-white pt-32 pb-20">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-[#DAA520]/20 via-[#011f7b] to-[#01154f]"></div>
+                <div className="container mx-auto px-4 text-center relative z-10">
+                    <h1 className="text-5xl font-black mb-4 text-[#DAA520]">
                         {isSearching ? `Search Results for "${query}"` : "All Products"}
                     </h1>
-                    <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                    <p className="text-xl text-white/85 max-w-2xl mx-auto">
                         {isSearching
                             ? `Found ${products.length} products and ${categories.length} categories.`
                             : `Browse all ${products.length} active packaging products in one place.`}
@@ -175,10 +176,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
                         {benefits.map((benefit, idx) => (
                             <div key={idx} className="text-center p-4">
-                                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <benefit.icon className="w-6 h-6 text-yellow-600" />
+                                <div className="w-12 h-12 bg-[#DAA520]/15 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <benefit.icon className="w-6 h-6 text-[#c4901a]" />
                                 </div>
-                                <h3 className="font-bold text-gray-900 mb-1">{benefit.title}</h3>
+                                <h3 className="font-bold text-[#011f7b] mb-1">{benefit.title}</h3>
                                 <p className="text-sm text-gray-600">{benefit.desc}</p>
                             </div>
                         ))}
@@ -186,7 +187,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
                     {/* Intro Content */}
                     <div className="container mx-auto px-4 text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Custom Packaging Solutions for Every Business</h2>
+                        <h2 className="text-3xl font-bold text-[#011f7b] mb-4">Custom Packaging Solutions for Every Business</h2>
                         <p className="text-gray-600 leading-relaxed">
                             At Packaging Hippo, this page automatically pulls every active product from the dashboard, so your newest packaging products
                             show up here without any manual page update. Browse by product, then jump straight into the matching product page for details and quotes.
@@ -200,7 +201,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 {/* Search Results: Products */}
                 {isSearching && products.length > 0 && (
                     <div className="mb-16">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-8">Matching Products</h2>
+                        <h2 className="text-2xl font-bold text-[#011f7b] mb-8">Matching Products</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {products.map((product) => (
                                 <Link href={`/${product.slug}`} key={product.id} className="group">
@@ -217,7 +218,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                                             )}
                                         </div>
                                         <CardContent className="p-4 bg-white">
-                                            <div className="text-xs text-yellow-600 font-bold uppercase mb-1">{product.category.name}</div>
+                                            <div className="text-xs text-[#c4901a] font-bold uppercase mb-1">{product.category.name}</div>
                                             <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">{product.name}</h3>
                                         </CardContent>
                                     </Card>
@@ -230,7 +231,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 {/* All Products Grid */}
                 {!isSearching && products.length > 0 && (
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Browse All Products</h2>
+                        <h2 className="text-2xl font-bold text-[#011f7b] mb-8 text-center">Browse All Products</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {products.map((product) => (
                                 <Link href={`/${product.slug}`} key={product.id} className="group">
@@ -247,7 +248,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                                             )}
                                         </div>
                                         <CardContent className="p-6 bg-white border-t">
-                                            <div className="text-xs text-yellow-600 font-bold uppercase mb-2">
+                                            <div className="text-xs text-[#c4901a] font-bold uppercase mb-2">
                                                 {product.category?.name || "Packaging Product"}
                                             </div>
                                             <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">
@@ -267,19 +268,19 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 {/* Matching Categories */}
                 {isSearching && categories.length > 0 && (
                     <div className={products.length > 0 ? "mt-16" : ""}>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Matching Categories</h2>
+                        <h2 className="text-2xl font-bold text-[#011f7b] mb-8 text-center">Matching Categories</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {categories.map((cat) => (
                                 <Link href={`/${cat.slug}`} key={cat.id} className="group">
                                     <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
-                                        <div className="aspect-square bg-white relative flex items-center justify-center p-8 group-hover:bg-yellow-50 transition-colors">
+                                        <div className="aspect-square bg-white relative flex items-center justify-center p-8 group-hover:bg-[#DAA520]/10 transition-colors">
                                             {cat.imageUrl ? (
                                                 <img src={cat.imageUrl} alt="" className="w-full h-full object-contain" />
                                             ) : (
-                                                <Package className="w-20 h-20 text-gray-200 group-hover:text-yellow-500 transition-colors" />
+                                                <Package className="w-20 h-20 text-gray-200 group-hover:text-[#DAA520] transition-colors" />
                                             )}
                                         </div>
-                                        <CardContent className="p-6 bg-white border-t group-hover:bg-gray-900 group-hover:text-white transition-colors">
+                                        <CardContent className="p-6 bg-white border-t group-hover:bg-[#011f7b] group-hover:text-white transition-colors">
                                             <h3 className="font-bold text-lg mb-2">{cat.name}</h3>
                                             <p className="text-sm opacity-60 flex items-center gap-2">
                                                 View Category <ArrowRight className="w-3 h-3" />
@@ -295,7 +296,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 {isSearching && products.length === 0 && categories.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-20">
                         <Package className="w-24 h-24 text-gray-200 mb-4" />
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">No results found</h3>
+                        <h3 className="text-2xl font-bold text-[#011f7b] mb-2">No results found</h3>
                         <p className="text-gray-500">We couldn't find any products or categories matching "{query}"</p>
                         <Link href="/products" className="mt-6 text-primary font-bold hover:underline">
                             View all categories

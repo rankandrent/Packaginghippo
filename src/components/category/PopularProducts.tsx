@@ -23,20 +23,21 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
     if (!products || products.length === 0) return null
 
     return (
-        <section className="py-20 bg-gray-50">
+        <section className="section-py bg-[#F8F9FA]">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-black text-blue-900 mb-4">
+                    <span className="brand-eyebrow mb-3">Bestsellers</span>
+                    <h2 className="text-3xl md:text-4xl font-black text-[#011f7b] mb-4 mt-3">
                         Discover Our Popular {categoryName}
                     </h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-[#212529]/70 max-w-2xl mx-auto">
                         Explore our most requested solutions, trusted by businesses for their quality and impact.
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {products.map((product) => (
-                        <div key={product.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100">
+                        <div key={product.id} className="brand-card group bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col border border-gray-100">
                             <Link href={`/${product.slug}`} className="relative aspect-square overflow-hidden bg-gray-100">
                                 {product.images && product.images[0] ? (
                                     <Image
@@ -51,13 +52,13 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                                     </div>
                                 )}
 
-                                <div className="absolute top-3 right-3 bg-yellow-400 text-blue-900 text-xs font-bold px-2 py-1 rounded-full shadow-sm flex items-center gap-1">
+                                <div className="absolute top-3 right-3 bg-[#DAA520] text-[#011f7b] text-xs font-bold px-2 py-1 rounded-full shadow-sm flex items-center gap-1">
                                     <Star className="w-3 h-3 fill-current" /> Popular
                                 </div>
                             </Link>
 
                             <div className="p-6 flex flex-col flex-grow">
-                                <h3 className="text-lg font-black text-gray-900 group-hover:text-blue-600 transition-colors tracking-tight">
+                                <h3 className="text-lg font-black text-[#011f7b] group-hover:text-[#DAA520] transition-colors tracking-tight">
                                     <Link href={`/${product.slug}`}>
                                         {product.name}
                                     </Link>
@@ -67,7 +68,7 @@ export function PopularProducts({ categoryName, products }: PopularProductsProps
                                     <Link
                                         href={`/${product.slug}`}
                                         aria-label={`View ${product.name}`}
-                                        className="bg-blue-600 text-white p-2 rounded-full hover:bg-yellow-500 hover:text-blue-900 transition-colors shadow-md group-hover:scale-110 transform duration-300"
+                                        className="bg-[#011f7b] text-white p-2 rounded-full hover:bg-[#DAA520] hover:text-[#011f7b] transition-colors shadow-md group-hover:scale-110 transform duration-300"
                                     >
                                         <ArrowRight className="w-5 h-5" />
                                     </Link>

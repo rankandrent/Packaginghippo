@@ -108,13 +108,13 @@ export default async function ServicesPage() {
                 }}
             />
             {/* Header Section */}
-            <div className="bg-zinc-950 pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden relative">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/10 via-zinc-950 to-zinc-950"></div>
+            <div className="bg-[#011f7b] pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden relative">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-[#DAA520]/20 via-[#011f7b] to-[#01154f]"></div>
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <h1 className="text-4xl md:text-6xl font-black text-white mb-6">
                         {pageTitle}
                     </h1>
-                    <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                    <p className="text-xl text-white/85 max-w-2xl mx-auto">
                         {page?.seoDesc || "Discover our comprehensive range of custom packaging solutions designed for every industry and need."}
                     </p>
                 </div>
@@ -124,10 +124,10 @@ export default async function ServicesPage() {
                 <div className="container mx-auto px-4">
                     <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
                         <div className="max-w-4xl">
-                            <p className="text-sm font-bold uppercase tracking-[0.18em] text-yellow-700 mb-4">
+                            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#c4901a] mb-4">
                                 Find The Right Packaging Faster
                             </p>
-                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight mb-5">
+                            <h2 className="text-3xl md:text-4xl font-black text-[#011f7b] leading-tight mb-5">
                                 Browse every active packaging category in one place.
                             </h2>
                             <div className="space-y-4 text-base md:text-lg text-gray-600 leading-relaxed">
@@ -145,18 +145,18 @@ export default async function ServicesPage() {
 
                         <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
                             <div className="rounded-xl border border-gray-200 bg-gray-50 px-5 py-5">
-                                <div className="text-3xl font-black text-gray-900 mb-1">{categories.length}+</div>
-                                <p className="text-sm font-semibold text-gray-900 mb-1">Active Categories</p>
+                                <div className="text-3xl font-black text-[#212529] mb-1">{categories.length}+</div>
+                                <p className="text-sm font-semibold text-[#212529] mb-1">Active Categories</p>
                                 <p className="text-sm text-gray-600">Packaging types organized for quick browsing.</p>
                             </div>
                             <div className="rounded-xl border border-gray-200 bg-gray-50 px-5 py-5">
-                                <div className="text-3xl font-black text-gray-900 mb-1">{activeProductCount}+</div>
-                                <p className="text-sm font-semibold text-gray-900 mb-1">Live Products</p>
+                                <div className="text-3xl font-black text-[#212529] mb-1">{activeProductCount}+</div>
+                                <p className="text-sm font-semibold text-[#212529] mb-1">Live Products</p>
                                 <p className="text-sm text-gray-600">Product pages connected to these categories.</p>
                             </div>
                             <div className="rounded-xl border border-gray-200 bg-gray-50 px-5 py-5">
-                                <div className="text-3xl font-black text-gray-900 mb-1">100+</div>
-                                <p className="text-sm font-semibold text-gray-900 mb-1">MOQ Friendly</p>
+                                <div className="text-3xl font-black text-[#212529] mb-1">100+</div>
+                                <p className="text-sm font-semibold text-[#212529] mb-1">MOQ Friendly</p>
                                 <p className="text-sm text-gray-600">Flexible ordering for growing and established brands.</p>
                             </div>
                         </div>
@@ -188,18 +188,18 @@ export default async function ServicesPage() {
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             />
                                         ) : (
-                                            <div className="w-full h-full bg-yellow-50 flex items-center justify-center">
-                                                <PackageIcon className="w-12 h-12 text-yellow-500 opacity-50" />
+                                            <div className="w-full h-full bg-[#DAA520]/10 flex items-center justify-center">
+                                                <PackageIcon className="w-12 h-12 text-[#DAA520] opacity-50" />
                                             </div>
                                         )}
                                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-                                            <span className="bg-white/90 text-gray-900 text-xs font-bold px-4 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                            <span className="bg-white/90 text-[#212529] text-xs font-bold px-4 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                                 View Products
                                             </span>
                                         </div>
                                     </div>
                                     <CardContent className="p-6 text-center">
-                                        <h3 className="font-bold text-xl text-gray-900 group-hover:text-yellow-600 transition-colors uppercase tracking-tight">{item.name}</h3>
+                                        <h3 className="font-bold text-xl text-[#011f7b] group-hover:text-[#c4901a] transition-colors uppercase tracking-tight">{item.name}</h3>
                                     </CardContent>
                                 </Card>
                             </Link>

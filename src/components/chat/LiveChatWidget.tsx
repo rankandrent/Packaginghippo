@@ -253,7 +253,7 @@ export function LiveChatWidget() {
             {!isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-110 group"
+                    className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#011f7b] rounded-full shadow-lg hover:bg-[#01154f] transition-all hover:scale-110 group"
                     aria-label="Open live chat"
                 >
                     <MessageCircle className="w-7 h-7 text-white" />
@@ -262,7 +262,7 @@ export function LiveChatWidget() {
                             {unreadFromAgent}
                         </span>
                     )}
-                    <div className="absolute right-16 bg-white px-3 py-1.5 rounded-lg shadow-md text-sm font-medium text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    <div className="absolute right-16 bg-white px-3 py-1.5 rounded-lg shadow-md text-sm font-medium text-[#212529] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                         Chat with us
                     </div>
                 </button>
@@ -272,14 +272,14 @@ export function LiveChatWidget() {
             {isOpen && (
                 <div className="fixed bottom-4 right-4 z-50 w-[380px] h-[520px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 animate-in slide-in-from-bottom-4 fade-in duration-300">
                     {/* Header — shows assigned agent name */}
-                    <div className="bg-blue-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                    <div className="bg-[#011f7b] px-4 py-3 flex items-center justify-between flex-shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            <div className="w-10 h-10 bg-[#011f7b] rounded-full flex items-center justify-center text-white font-bold text-sm">
                                 {assignedAgentName.charAt(0)}
                             </div>
                             <div>
                                 <h3 className="text-white font-semibold text-sm">{assignedAgentName}</h3>
-                                <p className="text-blue-100 text-xs flex items-center gap-1">
+                                <p className="text-white/80 text-xs flex items-center gap-1">
                                     {isChatEnded ? (
                                         <><span className="w-2 h-2 bg-gray-400 rounded-full inline-block"></span> Chat ended</>
                                     ) : (
@@ -297,9 +297,9 @@ export function LiveChatWidget() {
                     {!hasStarted ? (
                         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
                             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-2">
-                                <User className="w-8 h-8 text-blue-600" />
+                                <User className="w-8 h-8 text-[#011f7b]" />
                             </div>
-                            <h4 className="font-bold text-gray-900 text-lg">Welcome! 👋</h4>
+                            <h4 className="font-bold text-[#011f7b] text-lg">Welcome! 👋</h4>
                             <p className="text-gray-500 text-sm text-center">Enter your name to start chatting with our support team.</p>
                             <input
                                 type="text"
@@ -307,7 +307,7 @@ export function LiveChatWidget() {
                                 value={visitorName}
                                 onChange={e => setVisitorName(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleStartChat()}
-                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#011f7b] focus:border-transparent"
                             />
                             <input
                                 type="email"
@@ -315,12 +315,12 @@ export function LiveChatWidget() {
                                 value={visitorEmail}
                                 onChange={e => setVisitorEmail(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleStartChat()}
-                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#011f7b] focus:border-transparent"
                             />
                             <button
                                 onClick={handleStartChat}
                                 disabled={!visitorName.trim()}
-                                className="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                className="w-full py-2.5 bg-[#011f7b] text-white font-semibold rounded-lg hover:bg-[#01154f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                             >
                                 Start Chat
                             </button>
@@ -337,15 +337,15 @@ export function LiveChatWidget() {
                                 {messages.map((msg) => (
                                     <div key={msg.id} className={`flex ${msg.sender === 'visitor' ? 'justify-end' : 'justify-start'}`}>
                                         <div className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${msg.sender === 'visitor'
-                                            ? 'bg-blue-600 text-white rounded-br-md'
-                                            : msg.sender === 'ai' ? 'bg-purple-50 text-gray-800 shadow-sm border border-purple-200 rounded-bl-md'
-                                                : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-md'
+                                            ? 'bg-[#011f7b] text-white rounded-br-md'
+                                            : msg.sender === 'ai' ? 'bg-purple-50 text-[#212529] shadow-sm border border-purple-200 rounded-bl-md'
+                                                : 'bg-white text-[#212529] shadow-sm border border-gray-100 rounded-bl-md'
                                             }`}>
                                             {(msg.sender === 'agent' || msg.sender === 'ai') && msg.agentName && (
-                                                <p className="text-[10px] font-semibold text-blue-600 mb-0.5">{msg.sender === 'ai' ? '🤖 ' : ''}{msg.agentName}</p>
+                                                <p className="text-[10px] font-semibold text-[#011f7b] mb-0.5">{msg.sender === 'ai' ? '🤖 ' : ''}{msg.agentName}</p>
                                             )}
                                             <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                                            <p className={`text-[10px] mt-1 ${msg.sender === 'visitor' ? 'text-blue-200' : 'text-gray-400'}`}>
+                                            <p className={`text-[10px] mt-1 ${msg.sender === 'visitor' ? 'text-white/75' : 'text-gray-400'}`}>
                                                 {formatTime(msg.createdAt)}
                                             </p>
                                         </div>
@@ -377,7 +377,7 @@ export function LiveChatWidget() {
                                 {/* 5-Star Rating UI — shown when chat is ended */}
                                 {isChatEnded && !ratingSubmitted && (showRating || true) && (
                                     <div className="bg-white border border-gray-200 rounded-2xl p-4 text-center space-y-3 shadow-sm">
-                                        <p className="text-sm font-semibold text-gray-800">How was your experience?</p>
+                                        <p className="text-sm font-semibold text-[#212529]">How was your experience?</p>
                                         <p className="text-xs text-gray-500">Rate your chat with {assignedAgentName}</p>
                                         <div className="flex justify-center gap-1">
                                             {[1, 2, 3, 4, 5].map(star => (
@@ -390,7 +390,7 @@ export function LiveChatWidget() {
                                                 >
                                                     <Star
                                                         className={`w-8 h-8 transition-colors ${(hoverRating || selectedRating) >= star
-                                                            ? 'text-yellow-400 fill-yellow-400'
+                                                            ? 'text-[#DAA520] fill-[#DAA520]'
                                                             : 'text-gray-300'
                                                             }`}
                                                     />
@@ -403,12 +403,12 @@ export function LiveChatWidget() {
                                                     placeholder="Tell us more (optional)..."
                                                     value={ratingFeedback}
                                                     onChange={e => setRatingFeedback(e.target.value)}
-                                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#011f7b] resize-none"
                                                     rows={2}
                                                 />
                                                 <button
                                                     onClick={handleSubmitRating}
-                                                    className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                                                    className="w-full py-2 bg-[#011f7b] text-white font-semibold rounded-lg hover:bg-[#01154f] transition-colors text-sm"
                                                 >
                                                     Submit Rating
                                                 </button>
@@ -425,7 +425,7 @@ export function LiveChatWidget() {
                                                 <Star
                                                     key={star}
                                                     className={`w-5 h-5 ${(existingRating || 0) >= star
-                                                        ? 'text-yellow-400 fill-yellow-400'
+                                                        ? 'text-[#DAA520] fill-[#DAA520]'
                                                         : 'text-gray-300'
                                                         }`}
                                                 />
@@ -443,7 +443,7 @@ export function LiveChatWidget() {
                                 {isChatEnded ? (
                                     <button
                                         onClick={handleNewChat}
-                                        className="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors text-sm flex items-center justify-center gap-2"
+                                        className="w-full py-2.5 bg-[#011f7b] text-white font-semibold rounded-full hover:bg-[#01154f] transition-colors text-sm flex items-center justify-center gap-2"
                                     >
                                         <RotateCcw className="w-4 h-4" />
                                         Start New Chat
@@ -456,13 +456,13 @@ export function LiveChatWidget() {
                                             value={inputValue}
                                             onChange={e => handleInputChange(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                                            className="flex-1 px-3 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+                                            className="flex-1 px-3 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#011f7b] focus:bg-white transition-colors"
                                             autoFocus
                                         />
                                         <button
                                             onClick={handleSend}
                                             disabled={!inputValue.trim() || sending}
-                                            className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                                            className="w-9 h-9 bg-[#011f7b] rounded-full flex items-center justify-center hover:bg-[#01154f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                                         >
                                             <Send className="w-4 h-4 text-white" />
                                         </button>

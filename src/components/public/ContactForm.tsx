@@ -54,9 +54,9 @@ export function ContactForm() {
                 <div className="flex justify-center">
                     <CheckCircle2 className="w-16 h-16 text-green-500" />
                 </div>
-                <h2 className="text-3xl font-black text-gray-900">Message Sent!</h2>
-                <p className="text-gray-500">Thank you for contacting us. Our team will get back to you shortly.</p>
-                <Button onClick={() => setIsSuccess(false)} className="w-full max-w-xs bg-blue-900 hover:bg-blue-800 mt-4 outline-none">
+                <h2 className="text-3xl font-black text-[#011f7b]">Message Sent!</h2>
+                <p className="text-[#212529]/70">Thank you for contacting us. Our team will get back to you shortly.</p>
+                <Button onClick={() => setIsSuccess(false)} className="w-full max-w-xs btn-gold mt-4 outline-none">
                     Send Another Message
                 </Button>
             </div>
@@ -71,7 +71,7 @@ export function ContactForm() {
                         <label className="text-sm font-bold text-gray-700">Full Name</label>
                         <input
                             {...form.register("name")}
-                            className="w-full p-3 rounded-lg border border-gray-200 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition"
+                            className="w-full p-3 rounded-lg border border-gray-200 focus:border-[#DAA520] focus:ring-1 focus:ring-[#DAA520] outline-none transition"
                             placeholder="Your name"
                         />
                         {form.formState.errors.name && <p className="text-red-500 text-xs">{form.formState.errors.name.message}</p>}
@@ -81,7 +81,7 @@ export function ContactForm() {
                         <label className="text-sm font-bold text-gray-700">Email Address</label>
                         <input
                             {...form.register("email")}
-                            className="w-full p-3 rounded-lg border border-gray-200 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition"
+                            className="w-full p-3 rounded-lg border border-gray-200 focus:border-[#DAA520] focus:ring-1 focus:ring-[#DAA520] outline-none transition"
                             placeholder="your@email.com"
                         />
                         {form.formState.errors.email && <p className="text-red-500 text-xs">{form.formState.errors.email.message}</p>}
@@ -91,7 +91,7 @@ export function ContactForm() {
                         <label className="text-sm font-bold text-gray-700">Phone (Optional)</label>
                         <input
                             {...form.register("phone")}
-                            className="w-full p-3 rounded-lg border border-gray-200 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition"
+                            className="w-full p-3 rounded-lg border border-gray-200 focus:border-[#DAA520] focus:ring-1 focus:ring-[#DAA520] outline-none transition"
                             placeholder="Your phone number"
                         />
                     </div>
@@ -100,7 +100,7 @@ export function ContactForm() {
                         <label className="text-sm font-bold text-gray-700">Message</label>
                         <textarea
                             {...form.register("message")}
-                            className="w-full p-3 rounded-lg border border-gray-200 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition flex-grow min-h-[120px] resize-none"
+                            className="w-full p-3 rounded-lg border border-gray-200 focus:border-[#DAA520] focus:ring-1 focus:ring-[#DAA520] outline-none transition flex-grow min-h-[120px] resize-none"
                             placeholder="How can we help you?"
                         />
                         {form.formState.errors.message && <p className="text-red-500 text-xs mt-1">{form.formState.errors.message.message}</p>}
@@ -110,7 +110,7 @@ export function ContactForm() {
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-6 mt-4 bg-blue-900 hover:bg-blue-800 text-white font-bold text-lg rounded-xl shadow-lg shadow-blue-900/10 outline-none"
+                    className="w-full py-6 mt-4 btn-gold text-lg rounded-xl outline-none"
                 >
                     {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : null}
                     Send Message

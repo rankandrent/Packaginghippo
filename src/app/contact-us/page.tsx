@@ -36,47 +36,48 @@ export default async function ContactPage() {
     const address = general.address || "1946 W 3rd Street, 1st Floor, Brooklyn, NY 11223"
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-24 pb-12 md:pt-32">
+        <div className="min-h-screen bg-[#F8F9FA] pt-24 pb-16 md:pt-32 md:pb-24">
             <div className="container mx-auto px-4">
                 <div className="max-w-6xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-12 items-stretch">
                         {/* Info Section */}
                         <div className="space-y-8 flex flex-col">
                             <div>
-                                <h1 className="text-4xl md:text-5xl font-black text-blue-900 mb-4 uppercase">Contact Us</h1>
-                                <p className="text-lg text-gray-600 leading-relaxed">
+                                <span className="brand-eyebrow mb-3">Get In Touch</span>
+                                <h1 className="text-4xl md:text-5xl font-black text-[#011f7b] mb-4 mt-3 uppercase">Contact Us</h1>
+                                <p className="text-lg text-[#212529]/70 leading-relaxed">
                                     Have questions about our custom packaging solutions? Reach out to our experts today.
                                 </p>
                             </div>
 
-                            <div className="space-y-6 flex-grow">
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                                        <Phone className="w-6 h-6 text-blue-900" />
+                            <div className="space-y-4 flex-grow">
+                                <a href={`tel:${phone}`} className="brand-card flex items-start gap-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                                    <div className="w-12 h-12 bg-[#DAA520]/15 rounded-xl flex items-center justify-center shrink-0">
+                                        <Phone className="w-6 h-6 text-[#011f7b]" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-gray-900">Phone</h3>
-                                        <a href={`tel:${phone}`} className="text-gray-600 hover:text-blue-900 transition-colors inline-block">{phone}</a>
+                                        <h3 className="font-bold text-[#011f7b]">Phone</h3>
+                                        <span className="text-[#212529]/70">{phone}</span>
                                     </div>
-                                </div>
+                                </a>
 
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                                        <Mail className="w-6 h-6 text-blue-900" />
+                                <a href={`mailto:${email}`} className="brand-card flex items-start gap-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                                    <div className="w-12 h-12 bg-[#DAA520]/15 rounded-xl flex items-center justify-center shrink-0">
+                                        <Mail className="w-6 h-6 text-[#011f7b]" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-gray-900">Email</h3>
-                                        <a href={`mailto:${email}`} className="text-gray-600 hover:text-blue-900 transition-colors inline-block">{email}</a>
+                                        <h3 className="font-bold text-[#011f7b]">Email</h3>
+                                        <span className="text-[#212529]/70 break-all">{email}</span>
                                     </div>
-                                </div>
+                                </a>
 
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                                        <MapPin className="w-6 h-6 text-blue-900" />
+                                <div className="flex items-start gap-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                                    <div className="w-12 h-12 bg-[#DAA520]/15 rounded-xl flex items-center justify-center shrink-0">
+                                        <MapPin className="w-6 h-6 text-[#011f7b]" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-gray-900">Address</h3>
-                                        <p className="text-gray-600 leading-snug">{address}</p>
+                                        <h3 className="font-bold text-[#011f7b]">Address</h3>
+                                        <p className="text-[#212529]/70 leading-snug">{address}</p>
                                     </div>
                                 </div>
                             </div>

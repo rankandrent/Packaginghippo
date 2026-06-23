@@ -24,12 +24,12 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
         <section className="py-16 bg-white border-t border-gray-100">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-10">
-                    <h2 className="text-3xl font-black text-blue-900">
+                    <h2 className="text-3xl font-black text-[#011f7b]">
                         Browse All Categories
                     </h2>
                     <Link
                         href="/services"
-                        className="hidden md:flex items-center gap-2 text-yellow-700 font-bold hover:text-yellow-800 transition-colors"
+                        className="hidden md:flex items-center gap-2 text-[#c4901a] font-bold hover:text-[#a87c16] transition-colors"
                     >
                         View All Categories <ArrowRight className="w-4 h-4" />
                     </Link>
@@ -40,7 +40,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                         <Link
                             key={category.id}
                             href={`/${category.slug}`}
-                            className="group bg-gray-50 rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                            className="brand-card group bg-white rounded-xl overflow-hidden border border-gray-100"
                         >
                             <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-200">
                                 {category.imageUrl ? (
@@ -64,7 +64,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                                 </div>
                             </div>
                             <div className="p-4 text-center">
-                                <span className="inline-flex items-center text-sm font-bold text-blue-700 group-hover:text-yellow-700 transition-colors">
+                                <span className="inline-flex items-center text-sm font-bold text-[#01154f] group-hover:text-[#c4901a] transition-colors">
                                     Explore <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                                 </span>
                             </div>
@@ -75,7 +75,7 @@ export function RelatedCategories({ categories }: RelatedCategoriesProps) {
                 <div className="mt-8 text-center md:hidden">
                     <Link
                         href="/services"
-                        className="inline-flex items-center gap-2 text-yellow-700 font-bold hover:text-yellow-800 transition-colors"
+                        className="inline-flex items-center gap-2 text-[#c4901a] font-bold hover:text-[#a87c16] transition-colors"
                     >
                         View All Categories <ArrowRight className="w-4 h-4" />
                     </Link>

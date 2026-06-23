@@ -101,24 +101,70 @@ export function Navbar({ settings, menuData }: NavbarProps) {
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
-    // Hide the logo/top bar when scrolling down, reveal it immediately on scroll up.
+    // Hide the logo/top bar when scrolling down, reveal it when scrolling up.
     // The bottom nav bar stays pinned at the top of the (sticky) header.
-    // Throttled with rAF + an 8px dead-zone so trackpad/momentum jitter can't flicker the bar.
+    //
+    // Two mechanisms keep this stable and stop the bar from flickering /
+    // "filling itself" on slow up-and-down scrolls:
+    //   1. Directional hysteresis — we only toggle after the user has moved a
+    //      sustained THRESHOLD distance in one direction (anchorY is reset on
+    //      every direction change, so jittery deltas never accumulate).
+    //   2. A cooldown lock — collapsing/expanding the bar animates for 300ms,
+    //      and that reflow generates its own scroll events that used to flip
+    //      the bar straight back. After every toggle we ignore further toggles
+    //      for COOLDOWN ms (just re-anchoring), breaking that feedback loop.
     useEffect(() => {
+        const TOP_ZONE = 140   // always show the bar this close to the top
+        const THRESHOLD = 50   // px of sustained scroll in one direction before toggling
+        const COOLDOWN = 450   // ms to ignore toggles after one (> CSS transition of 300ms)
+
         let lastY = window.scrollY
+        let anchorY = window.scrollY // reference for the current scroll direction
+        let dir: -1 | 0 | 1 = 0      // -1 = up, 1 = down
+        let hidden = false           // current logical state (mirrors hideTopBar)
+        let lockedUntil = 0          // timestamp until which toggles are ignored
         let ticking = false
+
         const update = () => {
-            const y = window.scrollY
-            if (y < 120) {
-                setHideTopBar(false)        // near the top → always show
-            } else if (y > lastY + 8) {
-                setHideTopBar(true)         // scrolling down → hide logo bar
-            } else if (y < lastY - 8) {
-                setHideTopBar(false)        // scrolling up → show immediately
-            }
-            lastY = y
             ticking = false
+            const now = performance.now()
+            const y = window.scrollY
+
+            // Near the very top: force the bar visible and reset tracking.
+            if (y <= TOP_ZONE) {
+                if (hidden) { hidden = false; setHideTopBar(false); lockedUntil = now + COOLDOWN }
+                lastY = y; anchorY = y; dir = 0
+                return
+            }
+
+            // While locked (bar is mid-transition), keep re-anchoring but never
+            // toggle — this absorbs the reflow-induced scroll events.
+            if (now < lockedUntil) {
+                lastY = y; anchorY = y; dir = 0
+                return
+            }
+
+            // Direction; reset the anchor when it changes so the threshold
+            // measures *sustained* movement, not jittery back-and-forth.
+            const newDir: -1 | 0 | 1 = y > lastY ? 1 : y < lastY ? -1 : dir
+            if (newDir !== dir && newDir !== 0) {
+                dir = newDir
+                anchorY = y
+            }
+
+            if (dir === 1 && !hidden && y - anchorY > THRESHOLD) {
+                hidden = true
+                setHideTopBar(true)
+                lockedUntil = now + COOLDOWN
+            } else if (dir === -1 && hidden && anchorY - y > THRESHOLD) {
+                hidden = false
+                setHideTopBar(false)
+                lockedUntil = now + COOLDOWN
+            }
+
+            lastY = y
         }
+
         const onScroll = () => {
             if (!ticking) {
                 window.requestAnimationFrame(update)
@@ -219,7 +265,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                                     <div className="w-10 h-10 bg-gray-50 rounded border flex-shrink-0 relative overflow-hidden">
                                                         {p.images?.[0] ? <img src={getSeoImageUrl(p.images[0])} alt="" className="object-cover w-full h-full" /> : <Search className="w-4 h-4 m-3 text-gray-300" />}
                                                     </div>
-                                                    <span className="text-sm font-bold text-gray-900 group-hover:text-primary">{p.name}</span>
+                                                    <span className="text-sm font-bold text-[#212529] group-hover:text-primary">{p.name}</span>
                                                 </Link>
                                             ))}
                                         </div>
@@ -239,7 +285,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                                     <div className="w-10 h-10 bg-gray-50 rounded border flex-shrink-0 relative overflow-hidden p-1">
                                                         {c.imageUrl ? <img src={getSeoImageUrl(c.imageUrl)} alt="" className="object-contain w-full h-full" /> : <Search className="w-4 h-4 m-3 text-gray-300" />}
                                                     </div>
-                                                    <span className="text-sm font-bold text-gray-900 group-hover:text-primary">{c.name}</span>
+                                                    <span className="text-sm font-bold text-[#212529] group-hover:text-primary">{c.name}</span>
                                                 </Link>
                                             ))}
                                         </div>
@@ -259,7 +305,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                                                     <div className="w-10 h-10 bg-gray-50 rounded border flex-shrink-0 relative overflow-hidden">
                                                         {b.mainImage ? <img src={getSeoImageUrl(b.mainImage)} alt="" className="object-cover w-full h-full" /> : <Search className="w-4 h-4 m-3 text-gray-300" />}
                                                     </div>
-                                                    <span className="text-sm font-bold text-gray-900 group-hover:text-primary line-clamp-1">{b.title}</span>
+                                                    <span className="text-sm font-bold text-[#212529] group-hover:text-primary line-clamp-1">{b.title}</span>
                                                 </Link>
                                             ))}
                                         </div>
@@ -285,14 +331,14 @@ export function Navbar({ settings, menuData }: NavbarProps) {
 
                     {/* Right Actions */}
                     <div className="hidden lg:flex items-center gap-6">
-                        <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold rounded-md h-10 px-6 whitespace-nowrap">
+                        <Button asChild className="btn-gold rounded-md h-10 px-6 whitespace-nowrap">
                             <Link href="/quote">Request a Quote</Link>
                         </Button>
                         <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
                             <Phone className="w-8 h-8 text-primary fill-primary/10" />
                             <div className="flex flex-col">
                                 <span className="text-xs text-gray-500 font-medium">Call Us 24/7</span>
-                                <span className="text-sm font-bold text-gray-900">{phone}</span>
+                                <span className="text-sm font-bold text-[#212529]">{phone}</span>
                             </div>
                         </a>
                         <button
@@ -314,7 +360,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                     <button
                         type="button"
                         aria-label={isOpen ? "Close menu" : "Open menu"}
-                        className="lg:hidden text-gray-900"
+                        className="lg:hidden text-[#212529]"
                         onClick={() => setIsOpen(!isOpen)}
                     >
                         {isOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
@@ -348,7 +394,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                         {navItems.map((item, idx) => {
                             const itemHref = item.href?.startsWith('/') || item.href?.startsWith('http') ? item.href : `/${item.href}`;
                             return (
-                                <Link key={idx} href={itemHref || "#"} className="text-sm font-bold text-gray-900 border-b pb-2" onClick={() => setIsOpen(false)}>
+                                <Link key={idx} href={itemHref || "#"} className="text-sm font-bold text-[#212529] border-b pb-2" onClick={() => setIsOpen(false)}>
                                     {item.label}
                                 </Link>
                             )
@@ -360,7 +406,7 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                             <Phone className="w-5 h-5 text-primary" />
                             <span className="text-sm font-bold">{phone}</span>
                         </a>
-                        <Button asChild className="w-full bg-primary hover:bg-primary/90">
+                        <Button asChild className="w-full btn-gold">
                             <Link href="/quote" onClick={() => setIsOpen(false)}>Request a Quote</Link>
                         </Button>
                     </div>

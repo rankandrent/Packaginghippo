@@ -90,12 +90,12 @@ export default function CheckoutPage() {
             <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-12 h-12" />
             </div>
-            <h1 className="text-4xl font-black text-gray-900">Thank You!</h1>
-            <p className="text-xl text-gray-600">Your order <span className="font-bold text-blue-600">#{orderComplete}</span> has been placed successfully.</p>
-            <p className="text-gray-500">We've sent a confirmation email to <span className="font-medium text-gray-900">{formData.email}</span> with your order details.</p>
+            <h1 className="text-4xl font-black text-[#011f7b]">Thank You!</h1>
+            <p className="text-xl text-gray-600">Your order <span className="font-bold text-[#011f7b]">#{orderComplete}</span> has been placed successfully.</p>
+            <p className="text-gray-500">We've sent a confirmation email to <span className="font-medium text-[#212529]">{formData.email}</span> with your order details.</p>
 
             <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild className="h-14 px-8 rounded-2xl font-bold bg-blue-600 hover:bg-blue-700">
+              <Button asChild className="h-14 px-8 rounded-2xl font-bold bg-[#011f7b] hover:bg-[#01154f]">
                 <Link href="/products">Continue Shopping</Link>
               </Button>
               <Button asChild variant="outline" className="h-14 px-8 rounded-2xl font-bold">
@@ -113,19 +113,19 @@ export default function CheckoutPage() {
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8 flex items-center justify-between">
-            <Link href="/products" className="flex items-center gap-2 text-gray-500 hover:text-blue-600 font-bold transition-colors">
+            <Link href="/products" className="flex items-center gap-2 text-gray-500 hover:text-[#011f7b] font-bold transition-colors">
               <ArrowLeft className="w-4 h-4" />
               Back to Store
             </Link>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Checkout</h1>
+            <h1 className="text-3xl font-black text-[#011f7b] tracking-tight">Checkout</h1>
           </div>
 
           <div className="grid lg:grid-cols-12 gap-12 items-start">
             {/* Left Column - Form */}
             <div className="lg:col-span-7 space-y-8">
               <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
-                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">1</div>
+                <h2 className="text-xl font-black text-[#011f7b] mb-6 flex items-center gap-2">
+                  <div className="w-8 h-8 bg-blue-100 text-[#011f7b] rounded-lg flex items-center justify-center text-sm">1</div>
                   Contact Information
                 </h2>
                 <div className="grid md:grid-cols-2 gap-6">
@@ -145,8 +145,8 @@ export default function CheckoutPage() {
               </section>
 
               <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
-                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">2</div>
+                <h2 className="text-xl font-black text-[#011f7b] mb-6 flex items-center gap-2">
+                  <div className="w-8 h-8 bg-blue-100 text-[#011f7b] rounded-lg flex items-center justify-center text-sm">2</div>
                   Shipping Address
                 </h2>
                 <div className="grid md:grid-cols-2 gap-6">
@@ -173,14 +173,14 @@ export default function CheckoutPage() {
                 </div>
               </section>
 
-              <div className="bg-blue-600 p-8 rounded-3xl shadow-xl shadow-blue-200">
+              <div className="bg-[#011f7b] p-8 rounded-3xl shadow-xl shadow-blue-200">
                 <div className="flex items-start gap-4 text-white">
                   <div className="bg-white/20 p-3 rounded-2xl">
                     <Package className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black">Ready to place your order?</h3>
-                    <p className="text-blue-100 text-sm mt-1">By clicking the button below, your order will be processed and our team will start preparing your custom packaging solutions.</p>
+                    <h3 className="text-xl font-black text-white">Ready to place your order?</h3>
+                    <p className="text-white/80 text-sm mt-1">By clicking the button below, your order will be processed and our team will start preparing your custom packaging solutions.</p>
                   </div>
                 </div>
               </div>
@@ -189,22 +189,22 @@ export default function CheckoutPage() {
             {/* Right Column - Summary */}
             <div className="lg:col-span-5">
               <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 sticky top-32">
-                <h2 className="text-xl font-black text-gray-900 mb-6 tracking-tight italic">Order Summary</h2>
+                <h2 className="text-xl font-black text-[#011f7b] mb-6 tracking-tight italic">Order Summary</h2>
 
                 <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 mb-6 scrollbar-hide">
                   {cart.map((item) => (
                     <div key={item.id} className="flex gap-4 items-center">
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
                         <Image src={item.image || "/placeholder.png"} alt={item.name} fill className="object-cover" />
-                        <div className="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-bl-lg">
+                        <div className="absolute top-0 right-0 bg-[#011f7b] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-bl-lg">
                           x{item.quantity}
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-bold text-gray-900 text-sm line-clamp-1">{item.name}</h4>
-                        <p className="text-blue-600 font-bold text-xs">${item.price.toFixed(2)}</p>
+                        <h4 className="font-bold text-[#011f7b] text-sm line-clamp-1">{item.name}</h4>
+                        <p className="text-[#011f7b] font-bold text-xs">${item.price.toFixed(2)}</p>
                       </div>
-                      <p className="font-black text-gray-900 text-sm italic">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-black text-[#212529] text-sm italic">${(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                   ))}
                   {cart.length === 0 && <p className="text-center text-gray-400 py-8">Your cart is empty.</p>}
@@ -219,16 +219,16 @@ export default function CheckoutPage() {
                     <span>Shipping</span>
                     <span className="text-green-600 font-bold text-[10px] tracking-widest bg-green-50 px-2 py-1 rounded">Calculated at production</span>
                   </div>
-                  <div className="flex justify-between text-2xl font-black text-gray-900 pt-3 border-t">
+                  <div className="flex justify-between text-2xl font-black text-[#212529] pt-3 border-t">
                     <span>Total</span>
-                    <span className="text-blue-600 italic font-black">${subtotal.toFixed(2)}</span>
+                    <span className="text-[#011f7b] italic font-black">${subtotal.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting || cart.length === 0}
-                  className="w-full h-16 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-lg mt-8 shadow-xl shadow-blue-200 transition-all active:scale-95 group"
+                  className="w-full h-16 rounded-2xl bg-[#011f7b] hover:bg-[#01154f] text-white font-black text-lg mt-8 shadow-xl shadow-blue-200 transition-all active:scale-95 group"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center gap-2">

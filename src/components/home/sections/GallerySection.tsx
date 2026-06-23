@@ -14,14 +14,15 @@ export function GallerySection({ data }: { data: any }) {
     if (items.length === 0) return null
 
     return (
-        <section className="py-16 bg-white">
+        <section className="section-py bg-white">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-5xl font-black text-zinc-900 mb-4">
+                    <span className="brand-eyebrow mb-3">Gallery</span>
+                    <h2 className="text-3xl md:text-5xl font-black text-[#011f7b] mb-4 mt-3">
                         {data.heading || "Our Gallery"}
                     </h2>
                     {data.subheading && (
-                        <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
+                        <p className="text-lg text-[#212529]/70 max-w-2xl mx-auto">
                             {data.subheading}
                         </p>
                     )}

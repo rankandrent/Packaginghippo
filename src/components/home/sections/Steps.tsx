@@ -12,7 +12,7 @@ export function Steps({ data }: { data: any }) {
                         <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border relative">
                             <div className="text-6xl font-black text-gray-100 absolute top-4 right-4 z-0">{i + 1}</div>
                             <div className="relative z-10">
-                                <h3 className="text-xl font-bold mb-2 text-yellow-600">{step.title}</h3>
+                                <h3 className="text-xl font-bold mb-2 text-[#c4901a]">{step.title}</h3>
                                 <p className="text-gray-600">{step.desc}</p>
                             </div>
                         </div>

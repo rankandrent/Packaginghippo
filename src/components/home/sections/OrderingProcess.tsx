@@ -22,9 +22,9 @@ export function OrderingProcess({ data }: { data: any }) {
                         return (
                             <div key={i} className="flex flex-col items-center">
                                 <div className="w-20 h-20 mb-6 relative">
-                                    <div className="absolute inset-0 bg-yellow-100 rounded-2xl transform rotate-6"></div>
+                                    <div className="absolute inset-0 bg-[#DAA520]/15 rounded-2xl transform rotate-6"></div>
                                     <div className="absolute inset-0 bg-white border-2 border-black rounded-2xl flex items-center justify-center relative z-10">
-                                        <Icon className="w-10 h-10 text-black" strokeWidth={1.5} />
+                                        <Icon className="w-10 h-10 text-[#011f7b]" strokeWidth={1.5} />
                                     </div>
                                 </div>
                                 <h3 className="text-2xl font-bold mb-3">{step.title}</h3>

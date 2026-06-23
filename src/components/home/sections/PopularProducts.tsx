@@ -18,14 +18,15 @@ export function PopularProducts({ data, categories = [] }: { data: any, categori
     if (!data) return null
 
     return (
-        <section className="py-24 bg-gray-50">
+        <section className="section-py bg-[#F8F9FA]">
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 text-left">
                     <div className="max-w-2xl">
-                        <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">{data.heading || "Most Popular Custom Box Types We Offer"}</h2>
-                        <p className="text-gray-600 text-lg">Choose from our wide range of premium packaging solutions tailored to your brand.</p>
+                        <span className="brand-eyebrow mb-3">Our Range</span>
+                        <h2 className="text-4xl md:text-5xl font-black text-[#011f7b] mb-4 mt-3">{data.heading || "Most Popular Custom Box Types We Offer"}</h2>
+                        <p className="text-[#212529]/70 text-lg">Choose from our wide range of premium packaging solutions tailored to your brand.</p>
                     </div>
-                    <Link href="/services" className="group flex items-center gap-2 text-yellow-700 font-bold text-lg hover:text-yellow-800 transition-colors">
+                    <Link href="/services" className="group flex items-center gap-2 text-[#011f7b] font-bold text-lg hover:text-[#DAA520] transition-colors">
                         View All Categories <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
@@ -34,7 +35,7 @@ export function PopularProducts({ data, categories = [] }: { data: any, categori
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                         {categories.map((item: any, i: number) => (
                             <Link href={`/${item.slug}`} key={i}>
-                                <Card className="group cursor-pointer hover:shadow-xl transition-all border-none shadow-sm h-full rounded-2xl overflow-hidden bg-white">
+                                <Card className="brand-card group cursor-pointer border border-gray-100 shadow-sm h-full rounded-2xl overflow-hidden bg-white">
                                     <CardContent className="p-8">
                                         {item.imageUrl ? (
                                             <div className="relative w-full aspect-video mb-6 rounded-xl overflow-hidden bg-gray-100">
@@ -47,11 +48,11 @@ export function PopularProducts({ data, categories = [] }: { data: any, categori
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="mb-6 bg-yellow-50 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:bg-yellow-500 group-hover:rotate-6 transition-all duration-300">
-                                                <PackageIcon className="w-7 h-7 text-yellow-600 group-hover:text-black transition-colors" />
+                                            <div className="mb-6 bg-[#DAA520]/10 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:bg-[#DAA520] group-hover:rotate-6 transition-all duration-300">
+                                                <PackageIcon className="w-7 h-7 text-[#DAA520] group-hover:text-[#011f7b] transition-colors" />
                                             </div>
                                         )}
-                                        <h3 className="font-black text-xl text-gray-900 group-hover:text-yellow-600 transition-colors tracking-tight">{item.name}</h3>
+                                        <h3 className="font-black text-xl text-[#011f7b] group-hover:text-[#DAA520] transition-colors tracking-tight">{item.name}</h3>
                                     </CardContent>
                                 </Card>
                             </Link>

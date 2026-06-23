@@ -18,12 +18,12 @@ export function TopProductsSection({ products = [] }: { products: Product[] }) {
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4 text-left border-b pb-4">
                     <div className="flex flex-col md:flex-row md:items-baseline gap-2">
-                        <h2 className="text-3xl font-bold text-gray-900">Popular Custom Boxes</h2>
-                        <span className="hidden md:inline text-gray-400">|</span>
-                        <p className="text-gray-600 text-sm md:text-base">Find The Best Custom Packaging For Every Products!</p>
+                        <h2 className="text-3xl font-bold text-[#011f7b]">Popular Custom Boxes</h2>
+                        <span className="hidden md:inline text-gray-300">|</span>
+                        <p className="text-[#212529]/70 text-sm md:text-base">Find The Best Custom Packaging For Every Products!</p>
                     </div>
 
-                    <Link href="/products" className="group flex items-center gap-1 text-green-700 font-bold text-sm hover:text-green-800 transition-colors whitespace-nowrap">
+                    <Link href="/products" className="group flex items-center gap-1 text-[#011f7b] font-bold text-sm hover:text-[#DAA520] transition-colors whitespace-nowrap">
                         View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
@@ -46,7 +46,7 @@ export function TopProductsSection({ products = [] }: { products: Product[] }) {
                                     </div>
                                 )}
                             </div>
-                            <h3 className="font-bold text-gray-900 group-hover:text-green-700 transition-colors text-sm md:text-base px-2">
+                            <h3 className="font-bold text-[#011f7b] group-hover:text-[#DAA520] transition-colors text-sm md:text-base px-2">
                                 {product.name}
                             </h3>
                         </Link>

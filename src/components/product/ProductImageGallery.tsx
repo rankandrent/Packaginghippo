@@ -40,7 +40,7 @@ export function ProductImageGallery({ images, name }: { images: string[], name: 
                             className={cn(
                                 "relative aspect-[6/5] rounded-xl overflow-hidden border-2 cursor-pointer transition-all duration-300",
                                 i === selected 
-                                    ? "border-blue-600 ring-4 ring-blue-600/10 scale-95" 
+                                    ? "border-[#011f7b] ring-4 ring-[#011f7b]/10 scale-95" 
                                     : "border-gray-100 hover:border-blue-200 grayscale-[0.5] hover:grayscale-0"
                             )}
                         >

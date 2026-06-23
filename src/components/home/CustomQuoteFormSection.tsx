@@ -117,14 +117,14 @@ Message: ${formData.message}`,
                                     </svg>
                                 </div>
                                 <div className="space-y-2">
-                                    <h2 className="text-3xl font-black text-blue-900">Thank You!</h2>
+                                    <h2 className="text-3xl font-black text-[#011f7b]">Thank You!</h2>
                                     <p className="text-gray-600 max-w-md mx-auto">
                                         Your quote request has been received. Our team will review your requirements and get back to you shortly with a competitive price.
                                     </p>
                                 </div>
                                 <button
                                     onClick={() => setIsSubmitted(false)}
-                                    className="px-8 py-3 bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-bold uppercase rounded-lg transition-all"
+                                    className="px-8 py-3 bg-[#DAA520] hover:bg-[#c4901a] text-[#011f7b] font-bold uppercase rounded-lg transition-all"
                                 >
                                     Submit Another Quote
                                 </button>
@@ -132,12 +132,12 @@ Message: ${formData.message}`,
                         ) : (
                             <>
                                 <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-3xl font-black text-blue-900">
+                                    <h2 className="text-3xl font-black text-[#011f7b]">
                                         Get Custom Quote
                                     </h2>
-                                    <div className="flex items-center gap-2 bg-yellow-50 px-3 py-1.5 rounded-lg border border-yellow-200">
-                                        <Truck className="w-4 h-4 text-blue-900" />
-                                        <span className="text-xs font-bold text-blue-900">Free Shipping</span>
+                                    <div className="flex items-center gap-2 bg-[#DAA520]/10 px-3 py-1.5 rounded-lg border border-[#DAA520]/30">
+                                        <Truck className="w-4 h-4 text-[#011f7b]" />
+                                        <span className="text-xs font-bold text-[#011f7b]">Free Shipping</span>
                                     </div>
                                 </div>
 
@@ -151,7 +151,7 @@ Message: ${formData.message}`,
                                             required
                                             value={formData.name}
                                             onChange={handleChange}
-                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm"
+                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm"
                                         />
                                         <input
                                             type="tel"
@@ -160,7 +160,7 @@ Message: ${formData.message}`,
                                             required
                                             value={formData.phone}
                                             onChange={handleChange}
-                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm"
+                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm"
                                         />
                                         <input
                                             type="email"
@@ -169,7 +169,7 @@ Message: ${formData.message}`,
                                             required
                                             value={formData.email}
                                             onChange={handleChange}
-                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm"
+                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm"
                                         />
                                     </div>
 
@@ -183,14 +183,14 @@ Message: ${formData.message}`,
                                             min="1"
                                             value={formData.quantity}
                                             onChange={handleChange}
-                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm"
+                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm"
                                         />
                                         <select
                                             name="color"
                                             required
                                             value={formData.color}
                                             onChange={handleChange}
-                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm bg-white"
+                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm bg-white"
                                         >
                                             <option value="">Select Color</option>
                                             <option value="CMYK">CMYK</option>
@@ -206,7 +206,7 @@ Message: ${formData.message}`,
                                             required
                                             value={formData.productName}
                                             onChange={handleChange}
-                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm"
+                                            className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm"
                                         />
                                     </div>
 
@@ -223,7 +223,7 @@ Message: ${formData.message}`,
                                                 step="0.1"
                                                 value={formData.length}
                                                 onChange={handleChange}
-                                                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm"
+                                                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm"
                                             />
                                             <input
                                                 type="number"
@@ -234,7 +234,7 @@ Message: ${formData.message}`,
                                                 step="0.1"
                                                 value={formData.width}
                                                 onChange={handleChange}
-                                                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm"
+                                                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm"
                                             />
                                             <input
                                                 type="number"
@@ -245,13 +245,13 @@ Message: ${formData.message}`,
                                                 step="0.1"
                                                 value={formData.depth}
                                                 onChange={handleChange}
-                                                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm"
+                                                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm"
                                             />
                                             <select
                                                 name="unit"
                                                 value={formData.unit}
                                                 onChange={handleChange}
-                                                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm bg-white"
+                                                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm bg-white"
                                             >
                                                 <option value="inch">inch</option>
                                                 <option value="cm">cm</option>
@@ -267,7 +267,7 @@ Message: ${formData.message}`,
                                         rows={4}
                                         value={formData.message}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 text-sm resize-none"
+                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#011f7b] text-sm resize-none"
                                     />
 
                                     {/* Honeypot field (hidden) */}
@@ -285,9 +285,9 @@ Message: ${formData.message}`,
                                     {/* Captcha */}
                                     <div className="flex items-center gap-3">
                                         <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg">
-                                            <span className="font-bold text-blue-900">{captchaQuestion.num1}</span>
+                                            <span className="font-bold text-[#011f7b]">{captchaQuestion.num1}</span>
                                             <span className="text-gray-600">+</span>
-                                            <span className="font-bold text-blue-900">{captchaQuestion.num2}</span>
+                                            <span className="font-bold text-[#011f7b]">{captchaQuestion.num2}</span>
                                             <span className="text-gray-600">=</span>
                                             <input
                                                 type="number"
@@ -296,7 +296,7 @@ Message: ${formData.message}`,
                                                 required
                                                 value={formData.captcha}
                                                 onChange={handleChange}
-                                                className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+                                                className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm focus:outline-none focus:ring-2 focus:ring-[#011f7b]"
                                             />
                                         </div>
                                         <span className="text-xs text-gray-500">(Are you human?)</span>
@@ -306,7 +306,7 @@ Message: ${formData.message}`,
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-black py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                                        className="w-full bg-[#DAA520] hover:bg-[#c4901a] text-[#011f7b] font-black py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                                     >
                                         {isSubmitting ? "Submitting..." : "Submit"}
                                     </button>
@@ -316,7 +316,7 @@ Message: ${formData.message}`,
                     </div>
 
                     {/* Right: Image */}
-                    <div className="lg:col-span-4 bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl shadow-xl overflow-hidden min-h-[400px] h-full relative">
+                    <div className="lg:col-span-4 bg-gradient-to-br from-[#011f7b] to-[#01154f] rounded-2xl shadow-xl overflow-hidden min-h-[400px] h-full relative">
                         {image ? (
                             <Image
                                 src={getSeoImageUrl(image)}

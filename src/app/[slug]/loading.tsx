@@ -19,7 +19,7 @@ export default function SlugLoading() {
                             <div className="h-4 w-full animate-pulse rounded bg-gray-100" />
                             <div className="h-4 w-5/6 animate-pulse rounded bg-gray-100" />
                             <div className="flex flex-wrap gap-3 pt-2">
-                                <div className="h-10 w-32 animate-pulse rounded-full bg-yellow-100" />
+                                <div className="h-10 w-32 animate-pulse rounded-full bg-[#DAA520]/15" />
                                 <div className="h-10 w-36 animate-pulse rounded-full bg-green-100" />
                                 <div className="h-10 w-28 animate-pulse rounded-full bg-green-100" />
                             </div>

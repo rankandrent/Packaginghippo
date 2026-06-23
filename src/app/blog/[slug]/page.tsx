@@ -127,13 +127,13 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                 <div className="container mx-auto px-4">
                     <div className="max-w-4xl mx-auto">
                         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                            <Link href="/" className="hover:text-blue-900">Home</Link>
+                            <Link href="/" className="hover:text-[#011f7b]">Home</Link>
                             <ChevronRight className="w-3 h-3" />
-                            <Link href="/blog" className="hover:text-blue-900">Blog</Link>
+                            <Link href="/blog" className="hover:text-[#011f7b]">Blog</Link>
                             <ChevronRight className="w-3 h-3" />
                             <span className="truncate">{post.title}</span>
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-black text-blue-900 mb-6 leading-tight">
+                        <h1 className="text-3xl md:text-5xl font-black text-[#011f7b] mb-6 leading-tight">
                             {post.title}
                         </h1>
                         <div className="flex flex-wrap items-center gap-6">
@@ -142,7 +142,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                                     {post.author?.image && <img src={post.author.image} alt={post.author.name} className="w-full h-full object-cover" />}
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-gray-900">{post.author?.name || 'Admin'}</p>
+                                    <p className="text-sm font-bold text-[#212529]">{post.author?.name || 'Admin'}</p>
                                     <p className="text-xs text-gray-500">{post.author?.role || 'Packaging Expert'}</p>
                                 </div>
                             </div>
@@ -170,7 +170,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                             </div>
 
                             <div className="pt-6 mt-2 border-t shrink-0">
-                                <h3 className="font-bold text-blue-900 uppercase tracking-wider text-xs border-b pb-2 mb-4 text-center md:text-left">Share This Post</h3>
+                                <h3 className="font-bold text-[#011f7b] uppercase tracking-wider text-xs border-b pb-2 mb-4 text-center md:text-left">Share This Post</h3>
                                 <ShareButtons title={post.title} slug={post.slug} />
                             </div>
                         </div>
@@ -195,15 +195,15 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                             </div>
                             <div className="space-y-3">
                                 <div>
-                                    <h4 className="text-xl font-bold text-blue-900">Written by {post.author?.name || 'Admin'}</h4>
+                                    <h4 className="text-xl font-bold text-[#011f7b]">Written by {post.author?.name || 'Admin'}</h4>
                                     <p className="text-sm font-semibold text-gray-500">{post.author?.role || 'Packaging Expert'}</p>
                                 </div>
                                 <p className="text-gray-600 leading-relaxed">
                                     {post.author?.bio || "Expert in custom packaging solutions, sustainability, and brand development with years of experience in the industrial packaging sector."}
                                 </p>
                                 <div className="flex justify-center md:justify-start gap-4 pt-2">
-                                    <Link href={`/blog/author/${post.author?.slug}`} className="font-bold text-sm text-blue-900 hover:underline">View Profile</Link>
-                                    <Link href={`/blog?author=${post.author?.slug}`} className="font-bold text-sm text-blue-900 hover:underline">All Posts</Link>
+                                    <Link href={`/blog/author/${post.author?.slug}`} className="font-bold text-sm text-[#011f7b] hover:underline">View Profile</Link>
+                                    <Link href={`/blog?author=${post.author?.slug}`} className="font-bold text-sm text-[#011f7b] hover:underline">All Posts</Link>
                                 </div>
                             </div>
                         </div>
@@ -220,8 +220,8 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                 {relatedPosts.length > 0 && (
                     <div className="mt-24 pt-16 border-t max-w-6xl mx-auto">
                         <div className="flex items-center justify-between mb-12">
-                            <h2 className="text-3xl font-black text-blue-900">Related Articles</h2>
-                            <Link href="/blog" className="text-sm font-bold text-blue-900 hover:underline flex items-center gap-2">View All Posts <ChevronRight className="w-4 h-4" /></Link>
+                            <h2 className="text-3xl font-black text-[#011f7b]">Related Articles</h2>
+                            <Link href="/blog" className="text-sm font-bold text-[#011f7b] hover:underline flex items-center gap-2">View All Posts <ChevronRight className="w-4 h-4" /></Link>
                         </div>
                         <div className="grid md:grid-cols-3 gap-8">
                             {relatedPosts.map((rp: any) => (
@@ -231,7 +231,7 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                                     </div>
                                     <div className="space-y-2">
-                                        <h4 className="font-bold text-gray-900 leading-snug group-hover:text-blue-900 transition-colors line-clamp-2">{rp.title}</h4>
+                                        <h4 className="font-bold text-[#011f7b] leading-snug group-hover:text-[#011f7b] transition-colors line-clamp-2">{rp.title}</h4>
                                         <p className="text-xs text-gray-500">{new Date(rp.publishedAt || rp.createdAt).toLocaleDateString()}</p>
                                     </div>
                                 </Link>
@@ -242,12 +242,12 @@ export default async function SingleBlogPage({ params }: { params: Promise<{ slu
             </div>
 
             {/* CTA Section */}
-            <div className="bg-blue-900 py-20 text-white text-center">
+            <div className="bg-[#011f7b] py-20 text-white text-center">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl md:text-4xl font-black uppercase mb-6">Need Custom Packaging Solutions?</h2>
-                    <p className="text-blue-100 mb-10 max-w-2xl mx-auto">Get a personalized quote for your business today. Our experts are ready to help.</p>
-                    <div className="flex flex-col sm:flex-row justify-center gap-4 text-gray-900">
-                        <Link href="/quote" className="px-10 py-4 bg-yellow-500 hover:bg-yellow-400 font-black uppercase rounded-lg transition-all shadow-lg shadow-yellow-500/10">Get A Quote</Link>
+                    <h2 className="text-3xl md:text-4xl font-black uppercase mb-6 text-white">Need Custom Packaging Solutions?</h2>
+                    <p className="text-white/80 mb-10 max-w-2xl mx-auto">Get a personalized quote for your business today. Our experts are ready to help.</p>
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 text-[#212529]">
+                        <Link href="/quote" className="px-10 py-4 bg-[#DAA520] hover:bg-[#DAA520] font-black uppercase rounded-lg transition-all shadow-lg shadow-[#DAA520]/10">Get A Quote</Link>
                         <Link href="/contact-us" className="px-10 py-4 bg-white hover:bg-gray-100 font-black uppercase rounded-lg transition-all">Contact Us</Link>
                     </div>
                 </div>

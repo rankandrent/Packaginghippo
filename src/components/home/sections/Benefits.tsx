@@ -6,21 +6,21 @@ export function Benefits({ data }: { data: any }) {
     if (!data) return null
 
     return (
-        <section className="py-24 bg-white">
+        <section className="section-py bg-white">
             <div className="container mx-auto px-4">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-6">
-                        <h2 className="text-4xl font-black">{data.heading}</h2>
-                        <p className="text-lg text-gray-600">{data.intro}</p>
+                        <h2 className="text-4xl font-black text-[#011f7b]">{data.heading}</h2>
+                        <p className="text-lg text-[#212529]/70">{data.intro}</p>
                         <div className="space-y-4 pt-4">
                             {data.items?.map((item: any, i: number) => (
                                 <div key={i} className="flex gap-4">
-                                    <div className="mt-1 bg-yellow-100 p-2 rounded-lg h-fit">
-                                        <CheckCircle className="w-5 h-5 text-yellow-600" />
+                                    <div className="mt-1 bg-[#DAA520]/15 p-2 rounded-lg h-fit">
+                                        <CheckCircle className="w-5 h-5 text-[#DAA520]" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg">{item.title}</h3>
-                                        <p className="text-gray-500">{item.desc}</p>
+                                        <h3 className="font-bold text-lg text-[#011f7b]">{item.title}</h3>
+                                        <p className="text-[#212529]/70">{item.desc}</p>
                                     </div>
                                 </div>
                             ))}

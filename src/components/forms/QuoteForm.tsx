@@ -100,7 +100,7 @@ export function QuoteForm({
         return (
             <div className={cn(
                 "w-full max-w-2xl mx-auto p-8 text-center space-y-4 rounded-2xl shadow-xl border animate-in fade-in zoom-in duration-300",
-                theme === "dark" ? "bg-[#1a2b4b] text-white border-white/10" : "bg-white text-gray-900 border-gray-100"
+                theme === "dark" ? "bg-[#1a2b4b] text-white border-white/10" : "bg-white text-[#212529] border-gray-100"
             )}>
                 <div className="flex justify-center">
                     <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center">
@@ -119,8 +119,8 @@ export function QuoteForm({
     }
 
     const inputClasses = cn(
-        "w-full p-3 text-sm rounded-lg border-none outline-none focus:ring-2 focus:ring-yellow-400 transition-all",
-        theme === "dark" ? "bg-white/10 text-white placeholder:text-gray-400" : "bg-gray-100 text-gray-900 placeholder:text-gray-500"
+        "w-full p-3 text-sm rounded-lg border-none outline-none focus:ring-2 focus:ring-[#DAA520] transition-all",
+        theme === "dark" ? "bg-white/10 text-white placeholder:text-gray-400" : "bg-gray-100 text-[#212529] placeholder:text-gray-500"
     )
 
     const labelClasses = cn(
@@ -131,7 +131,7 @@ export function QuoteForm({
     return (
         <div className={cn(
             "w-full max-w-4xl mx-auto rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 duration-700",
-            theme === "dark" ? "bg-[#1a2b4b] text-white" : "bg-white text-gray-900"
+            theme === "dark" ? "bg-[#1a2b4b] text-white" : "bg-white text-[#212529]"
         )}>
             {showTitle && (
                 <div className={cn("p-6 text-center border-b", theme === "dark" ? "border-white/10" : "border-gray-100")}>
@@ -145,7 +145,7 @@ export function QuoteForm({
                     <div className="grid md:grid-cols-2 gap-6">
                         {/* Contact Info */}
                         <div className="space-y-4">
-                            <h4 className={cn("text-sm font-black tracking-widest border-l-4 border-yellow-500 pl-3 mb-4", theme === "dark" ? "text-white" : "text-gray-900")}>Contact Details</h4>
+                            <h4 className={cn("text-sm font-black tracking-widest border-l-4 border-[#DAA520] pl-3 mb-4", theme === "dark" ? "text-white" : "text-[#011f7b]")}>Contact Details</h4>
                             <div className="space-y-1.5">
                                 <label className={labelClasses}>Full Name <span className="text-red-500">*</span></label>
                                 <input {...form.register("name")} className={inputClasses} placeholder="John Doe" />
@@ -170,7 +170,7 @@ export function QuoteForm({
 
                         {/* Product Info */}
                         <div className="space-y-4">
-                            <h4 className={cn("text-sm font-black tracking-widest border-l-4 border-yellow-500 pl-3 mb-4", theme === "dark" ? "text-white" : "text-gray-900")}>Specifications</h4>
+                            <h4 className={cn("text-sm font-black tracking-widest border-l-4 border-[#DAA520] pl-3 mb-4", theme === "dark" ? "text-white" : "text-[#011f7b]")}>Specifications</h4>
                             <div className="grid grid-cols-3 gap-3">
                                 <div className="space-y-1.5">
                                     <label className={labelClasses}>Width</label>
@@ -241,12 +241,12 @@ export function QuoteForm({
                             type="submit"
                             disabled={isSubmitting}
                             variant="yellow"
-                            className="w-full py-7 text-lg font-black tracking-widest shadow-2xl hover:bg-yellow-400 hover:scale-[1.01] transition-all group"
+                            className="w-full py-7 text-lg font-black tracking-widest shadow-2xl hover:bg-[#DAA520] hover:scale-[1.01] transition-all group"
                         >
                             {isSubmitting ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : null}
                             Send My Custom Quote <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </Button>
-                        <p className={cn("text-[10px] text-center mt-4 font-bold tracking-widest opacity-50", theme === "dark" ? "text-white" : "text-gray-900")}>
+                        <p className={cn("text-[10px] text-center mt-4 font-bold tracking-widest opacity-50", theme === "dark" ? "text-white" : "text-[#212529]")}>
                             Secure Submission & Instant Processing
                         </p>
                     </div>

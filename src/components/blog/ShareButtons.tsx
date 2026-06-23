@@ -29,7 +29,7 @@ export function ShareButtons({ title, slug, variant = 'sidebar' }: ShareButtonsP
                     href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 bg-gray-100 rounded-full hover:bg-blue-600 hover:text-white transition-all text-blue-600"
+                    className="p-3 bg-gray-100 rounded-full hover:bg-[#011f7b] hover:text-white transition-all text-[#011f7b]"
                 >
                     <Facebook className="w-5 h-5" />
                 </a>
@@ -45,7 +45,7 @@ export function ShareButtons({ title, slug, variant = 'sidebar' }: ShareButtonsP
                     href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 bg-gray-100 rounded-full hover:bg-blue-700 hover:text-white transition-all text-blue-700"
+                    className="p-3 bg-gray-100 rounded-full hover:bg-[#01154f] hover:text-white transition-all text-[#01154f]"
                 >
                     <Linkedin className="w-5 h-5" />
                 </a>
@@ -65,7 +65,7 @@ export function ShareButtons({ title, slug, variant = 'sidebar' }: ShareButtonsP
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all"
+                className="p-2 bg-blue-50 text-[#011f7b] rounded-full hover:bg-[#011f7b] hover:text-white transition-all"
             >
                 <Facebook className="w-4 h-4" />
             </a>
@@ -81,7 +81,7 @@ export function ShareButtons({ title, slug, variant = 'sidebar' }: ShareButtonsP
                 href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-700 hover:text-white transition-all"
+                className="p-2 bg-blue-50 text-[#01154f] rounded-full hover:bg-[#01154f] hover:text-white transition-all"
             >
                 <Linkedin className="w-4 h-4" />
             </a>
