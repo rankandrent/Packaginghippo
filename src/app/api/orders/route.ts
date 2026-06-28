@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/db'
+import { sendOrderNotificationEmail } from '@/lib/email'
 
 export async function GET() {
     try {
@@ -79,6 +80,14 @@ export async function POST(req: Request) {
                 items: true
             }
         })
+
+        // Email the store owner about the new order (non-blocking).
+        try {
+            await sendOrderNotificationEmail(order)
+        } catch (emailError) {
+            console.error('Failed to send order notification email:', emailError)
+        }
+
         return NextResponse.json(order)
     } catch (error) {
         console.error('Failed to create order:', error)
