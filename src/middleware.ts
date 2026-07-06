@@ -74,25 +74,45 @@ export async function middleware(request: NextRequest) {
             // Normalize the pathname for matching
             const normalizedPath = normalizeSourceUrl(pathname);
 
-            // In Docker/Coolify production, the public URL can't be reached internally.
-            // Always use localhost:3000 for internal API calls to avoid container networking issues.
-            const internalOrigin = process.env.INTERNAL_API_URL || 'http://localhost:3000';
-            const redirectCheckUrl = `${internalOrigin}/api/redirect-lookup?sourceUrl=${encodeURIComponent(normalizedPath)}`;
+            // Middleware (Edge runtime) can't use Prisma directly, so it calls the
+            // redirect-lookup API internally. The right origin differs per host:
+            // - Coolify/Docker: the public URL isn't reachable from inside the
+            //   container, and the app may listen on a custom PORT.
+            // - Local/dev: localhost:3000 works.
+            // Try several candidates in order until one responds.
+            const port = process.env.PORT || '3000';
+            const candidateOrigins = Array.from(new Set([
+                process.env.INTERNAL_API_URL,
+                `http://127.0.0.1:${port}`,
+                `http://localhost:${port}`,
+                request.nextUrl.origin,
+            ].filter(Boolean) as string[]));
 
-            const redirectRes = await fetch(redirectCheckUrl, { cache: 'no-store' });
-
-            if (redirectRes.ok) {
-                const redirectData = await redirectRes.json();
-                if (redirectData.found && redirectData.targetUrl) {
-                    const statusCode = redirectData.type === 302 ? 302 : 301;
-
-                    // Handle both absolute URLs (https://...) and relative paths (/page)
-                    const targetUrl = redirectData.targetUrl.startsWith('http')
-                        ? redirectData.targetUrl
-                        : new URL(redirectData.targetUrl, request.url).toString();
-
-                    return NextResponse.redirect(targetUrl, statusCode);
+            let redirectData: { found?: boolean; targetUrl?: string; type?: number } | null = null;
+            for (const origin of candidateOrigins) {
+                try {
+                    const res = await fetch(
+                        `${origin}/api/redirect-lookup?sourceUrl=${encodeURIComponent(normalizedPath)}`,
+                        { cache: 'no-store' }
+                    );
+                    if (res.ok) {
+                        redirectData = await res.json();
+                        break;
+                    }
+                } catch {
+                    // Try the next candidate origin.
                 }
+            }
+
+            if (redirectData?.found && redirectData.targetUrl) {
+                const statusCode = redirectData.type === 302 ? 302 : 301;
+
+                // Handle both absolute URLs (https://...) and relative paths (/page)
+                const targetUrl = redirectData.targetUrl.startsWith('http')
+                    ? redirectData.targetUrl
+                    : new URL(redirectData.targetUrl, request.url).toString();
+
+                return NextResponse.redirect(targetUrl, statusCode);
             }
         } catch (error) {
             // Silently fail - don't block page loading if redirect check fails
