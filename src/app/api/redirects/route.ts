@@ -1,6 +1,25 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 
+// Normalize a source URL to a bare path so it matches middleware's pathname.
+// Accepts full URLs (https://site.com/page), "/https://..." mistakes, or paths,
+// and always returns a lowercased, leading-slash, no-trailing-slash path.
+function normalizeSourceUrl(raw: string): string {
+    let s = String(raw).trim()
+    s = s.replace(/^\/+(https?:\/\/)/i, '$1')
+    if (/^https?:\/\//i.test(s)) {
+        try {
+            const u = new URL(s)
+            s = u.pathname + (u.search || '')
+        } catch {
+            // fall through with the raw string
+        }
+    }
+    if (!s.startsWith('/')) s = `/${s}`
+    if (s.length > 1 && s.endsWith('/')) s = s.slice(0, -1)
+    return s.toLowerCase()
+}
+
 export async function GET() {
     try {
         const redirects = await prisma.redirect.findMany({
@@ -22,16 +41,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Source and Target URLs are required" }, { status: 400 })
         }
 
-        // Normalize source URL: ensure it starts with / and is lowercased
-        let formattedSource = sourceUrl.trim()
-        if (!formattedSource.startsWith('/')) {
-            formattedSource = `/${formattedSource}`
-        }
-        // Remove trailing slash (except root)
-        if (formattedSource.length > 1 && formattedSource.endsWith('/')) {
-            formattedSource = formattedSource.slice(0, -1)
-        }
-        formattedSource = formattedSource.toLowerCase()
+        // Normalize source to a bare path (strips domain if a full URL was pasted)
+        const formattedSource = normalizeSourceUrl(sourceUrl)
 
         // Format target URL: keep external URLs as-is, only add / prefix for relative paths
         let formattedTarget = targetUrl.trim()
@@ -72,12 +83,7 @@ export async function PUT(req: Request) {
         const updateData: any = {}
 
         if (sourceUrl !== undefined) {
-            let formattedSource = sourceUrl.trim()
-            if (!formattedSource.startsWith('/')) formattedSource = `/${formattedSource}`
-            if (formattedSource.length > 1 && formattedSource.endsWith('/')) {
-                formattedSource = formattedSource.slice(0, -1)
-            }
-            updateData.sourceUrl = formattedSource.toLowerCase()
+            updateData.sourceUrl = normalizeSourceUrl(sourceUrl)
         }
 
         if (targetUrl !== undefined) {
