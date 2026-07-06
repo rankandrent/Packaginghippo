@@ -62,6 +62,23 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
+    // --- Protect admin/CMS API routes ---
+    // These were fully open before (anyone could edit content, settings,
+    // redirects, or upload files without logging in). Now they require a valid
+    // admin session. Public APIs stay open: /api/inquiry, /api/search,
+    // /api/chat/*, /api/auth/*, /api/redirect-lookup, and order CREATION
+    // (checkout POST /api/orders).
+    if (pathname.startsWith('/api')) {
+        const adminApiPrefixes = ['/api/cms', '/api/upload', '/api/media', '/api/redirects'];
+        const isAdminApi =
+            adminApiPrefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`)) ||
+            (pathname.startsWith('/api/orders') && request.method !== 'POST');
+
+        if (isAdminApi && !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+    }
+
     // --- Dynamic Redirect Logic (SEO) ---
     // Skip static files, _next, api routes, and dashboard
     const shouldCheckRedirect = !pathname.startsWith('/_next') &&
