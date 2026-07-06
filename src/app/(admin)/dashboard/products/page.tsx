@@ -338,7 +338,7 @@ export default function ProductsPage() {
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            onClick={() => window.open(`/products/${product.slug}`, '_blank')}
+                                            onClick={() => window.open(`/${product.slug}`, '_blank')}
                                             title="View Product"
                                         >
                                             <Eye className="h-4 w-4 text-blue-500" />
