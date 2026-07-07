@@ -165,7 +165,10 @@
   --tw-prose-headings: #011f7b;
 }
 
-/* Body content -> brand ink (beats editor inline black). */
+/* Body content -> brand ink (beats editor inline black).
+   NOTE: intentionally does NOT include `div` — CollapsibleText renders its own
+   UI (e.g. a white-on-navy "scroll" pill) inside a .rich-text wrapper, and a
+   blanket div rule would override those component styles. */
 .rich-text p,
 .rich-text li,
 .rich-text span,
@@ -174,8 +177,7 @@
 .rich-text em,
 .rich-text td,
 .rich-text th,
-.rich-text blockquote,
-.rich-text div {
+.rich-text blockquote {
   color: #212529 !important;
 }
 

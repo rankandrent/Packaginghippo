@@ -1,4 +1,4 @@
-import { sanitizeInternalLinkRel } from "@/lib/utils"
+import { CollapsibleText } from "@/components/public/CollapsibleText"
 
 export function SeoContent({ data }: { data: any }) {
     const collapsedHeight = data.collapsedHeight || 300
@@ -11,24 +11,7 @@ export function SeoContent({ data }: { data: any }) {
                 {data.heading && (
                     <h2 className="text-3xl font-bold mb-8 text-[#011f7b]">{data.heading}</h2>
                 )}
-                <div
-                    className="overflow-y-auto pr-3 custom-scrollbar"
-                    style={{ maxHeight: `${collapsedHeight}px` }}
-                >
-                    <div
-                        className="prose max-w-none text-[#212529] leading-relaxed rich-text
-                        prose-headings:font-bold prose-headings:text-[#011f7b]
-                        prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
-                        prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
-                        prose-p:mb-4 prose-p:leading-7
-                        prose-a:text-[#011f7b] prose-a:no-underline hover:prose-a:underline
-                        prose-ul:list-disc prose-ul:pl-5 prose-ul:mb-4
-                        prose-ol:list-decimal prose-ol:pl-5 prose-ol:mb-4
-                        prose-li:mb-2"
-                        dangerouslySetInnerHTML={{ __html: sanitizeInternalLinkRel(data.content) }}
-                        suppressHydrationWarning
-                    />
-                </div>
+                <CollapsibleText content={data.content} collapsedHeight={collapsedHeight} />
             </div>
         </section>
     )
