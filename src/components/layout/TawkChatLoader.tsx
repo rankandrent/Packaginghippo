@@ -12,6 +12,16 @@ declare global {
 
 const TAWK_SRC = "https://embed.tawk.to/66fc04b2e5982d6c7bb7336c/1i9474n3p"
 
+/**
+ * Loads Tawk.to right after the page finishes loading (mirrors Next.js's
+ * `Script strategy="lazyOnload"`, which is what this project used originally).
+ *
+ * A prior "performance" change gated this behind either a user interaction
+ * (scroll/click/keydown/touch) or a 20-28s fallback timer. Visitors who
+ * browsed without interacting and left within that window meant Tawk never
+ * loaded at all, so the owner never got a "visitor on site" notification and
+ * no chat could even start. Loading promptly on mount fixes that regression.
+ */
 export function TawkChatLoader() {
     useEffect(() => {
         if (typeof window === "undefined" || window.__tawkLoaded) return
@@ -30,35 +40,13 @@ export function TawkChatLoader() {
             document.body.appendChild(script)
         }
 
-        const events: Array<keyof WindowEventMap> = ["pointerdown", "keydown", "scroll", "touchstart"]
-        const fallbackTimer = window.setTimeout(loadTawk, 20000)
-        const idleId =
-            "requestIdleCallback" in window
-                ? window.requestIdleCallback(() => {
-                    window.setTimeout(loadTawk, 8000)
-                })
-                : null
-
-        const handleInteraction = () => {
+        if (document.readyState === "complete") {
             loadTawk()
-            cleanup()
+            return
         }
 
-        const cleanup = () => {
-            window.clearTimeout(fallbackTimer)
-            if (idleId && "cancelIdleCallback" in window) {
-                window.cancelIdleCallback(idleId)
-            }
-            events.forEach((eventName) => {
-                window.removeEventListener(eventName, handleInteraction)
-            })
-        }
-
-        events.forEach((eventName) => {
-            window.addEventListener(eventName, handleInteraction, { passive: true, once: true })
-        })
-
-        return cleanup
+        window.addEventListener("load", loadTawk, { once: true })
+        return () => window.removeEventListener("load", loadTawk)
     }, [])
 
     return null
