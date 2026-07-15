@@ -17,7 +17,7 @@ import { CustomQuoteFormSection } from "@/components/home/CustomQuoteFormSection
 import { ProductHeroQuoteForm } from "@/components/forms/ProductHeroQuoteForm"
 import { ProductTabs } from "@/components/product/ProductTabs"
 import { ProductImageGallery } from "@/components/product/ProductImageGallery"
-import { AddToCartButton } from "@/components/cart/AddToCartButton"
+import { ProductBuyBox } from "@/components/cart/ProductBuyBox"
 import { Button } from "@/components/ui/button"
 import { BRAND_LOGO_MENU } from "@/lib/brand"
 import { cn, constructMetadataTitle, getSiteUrl, sanitizeInternalLinkRel, stripHtml } from "@/lib/utils"
@@ -1014,21 +1014,13 @@ async function ProductView({ product, slug }: { product: any, slug: string }) {
                                 {/* Compact Form Injection or Add to Cart */}
                                 <div className="pt-2 space-y-4">
                                     {product.isEcommerce ? (
-                                        <div className="flex flex-col sm:flex-row gap-4 items-center">
-                                            <AddToCartButton 
-                                                product={{
-                                                    id: product.id,
-                                                    name: product.name,
-                                                    slug: product.slug,
-                                                    price: product.ecommercePrice || 0,
-                                                    image: product.images?.[0] || ""
-                                                }}
-                                                className="w-full h-14 text-lg font-black rounded-xl shadow-lg shadow-blue-200"
-                                            />
-                                            <Button asChild variant="outline" className="w-full h-14 text-lg font-bold rounded-xl border-gray-200">
-                                                <Link href="/quote">Bulk Quote</Link>
-                                            </Button>
-                                        </div>
+                                        <ProductBuyBox
+                                            id={product.id}
+                                            name={product.name}
+                                            slug={product.slug}
+                                            price={product.ecommercePrice || 0}
+                                            image={product.images?.[0] || ""}
+                                        />
                                     ) : (
                                         <ProductHeroQuoteForm productSlug={product.slug} />
                                     )}

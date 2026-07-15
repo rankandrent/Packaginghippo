@@ -49,6 +49,8 @@ type Product = {
     isActive: boolean
     isTopProduct: boolean
     isFeaturedInCategory: boolean
+    isEcommerce: boolean
+    ecommercePrice: number | null
     sections: any // Json
     tabs: any // Json
     layout: string[] | null
@@ -351,6 +353,36 @@ export default function ProductEditor({ params }: { params: Promise<{ id: string
                                 onChange={(e) => setProduct({ ...product, price: parseFloat(e.target.value) })}
                             />
                         </div>
+
+                        {/* E-commerce / Buy Button */}
+                        <div className="rounded-lg border border-[#DAA520]/40 bg-[#DAA520]/5 p-3 space-y-3">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="isEcommerce"
+                                    checked={product.isEcommerce || false}
+                                    onChange={(e) => setProduct({ ...product, isEcommerce: e.target.checked })}
+                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                />
+                                <Label htmlFor="isEcommerce" className="font-semibold">Enable Buy Button (sell online)</Label>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                When on, the product page shows a quantity selector, live total price, and Add to Cart / Buy Now buttons instead of the quote form.
+                            </p>
+                            {product.isEcommerce && (
+                                <div className="space-y-2">
+                                    <Label htmlFor="ecommercePrice">Selling Price ($ per unit)</Label>
+                                    <Input
+                                        type="number"
+                                        step="0.01"
+                                        id="ecommercePrice"
+                                        value={product.ecommercePrice ?? 0}
+                                        onChange={(e) => setProduct({ ...product, ecommercePrice: parseFloat(e.target.value) || 0 })}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
                         <div className="space-y-2">
                             <Label htmlFor="category">Category</Label>
                             <select
