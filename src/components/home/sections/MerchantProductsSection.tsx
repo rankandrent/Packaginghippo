@@ -2,9 +2,11 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { ShoppingCart, Check } from "lucide-react"
 import { getSeoImageUrl, getAltFromUrl } from "@/lib/image-seo"
 import { useCart } from "@/context/CartContext"
+import { slugifyName } from "@/lib/merchant"
 
 type MerchantProduct = {
     image: string
@@ -107,7 +109,7 @@ export function MerchantProductsSection({ data }: { data: any }) {
                             className="brand-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group flex flex-col"
                         >
                             {/* Product Image */}
-                            <div className="relative aspect-square bg-gray-50 overflow-hidden">
+                            <Link href={`/buy/${slugifyName(product.name)}`} className="relative aspect-square bg-gray-50 overflow-hidden block">
                                 {product.image ? (
                                     <Image
                                         src={getSeoImageUrl(product.image)}
@@ -121,13 +123,13 @@ export function MerchantProductsSection({ data }: { data: any }) {
                                         No Image
                                     </div>
                                 )}
-                            </div>
+                            </Link>
 
                             {/* Product Info */}
                             <div className="p-3 flex flex-col flex-1 gap-2">
-                                <h3 className="font-bold text-[#011f7b] text-sm leading-tight line-clamp-2">
+                                <Link href={`/buy/${slugifyName(product.name)}`} className="font-bold text-[#011f7b] text-sm leading-tight line-clamp-2 hover:text-[#DAA520] transition-colors">
                                     {product.name || "Custom Packaging"}
-                                </h3>
+                                </Link>
                                 {product.price && (
                                     <p className="text-[#DAA520] font-black text-sm">
                                         {product.price}
