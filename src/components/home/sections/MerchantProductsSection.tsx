@@ -6,7 +6,7 @@ import Link from "next/link"
 import { ShoppingCart, Check } from "lucide-react"
 import { getSeoImageUrl, getAltFromUrl } from "@/lib/image-seo"
 import { useCart } from "@/context/CartContext"
-import { slugifyName } from "@/lib/merchant"
+import { merchantHref } from "@/lib/merchant"
 
 type MerchantProduct = {
     image: string
@@ -109,7 +109,7 @@ export function MerchantProductsSection({ data }: { data: any }) {
                             className="brand-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group flex flex-col"
                         >
                             {/* Product Image */}
-                            <Link href={`/buy/${slugifyName(product.name)}`} className="relative aspect-square bg-gray-50 overflow-hidden block">
+                            <Link href={merchantHref(product)} className="relative aspect-square bg-gray-50 overflow-hidden block">
                                 {product.image ? (
                                     <Image
                                         src={getSeoImageUrl(product.image)}
@@ -127,7 +127,7 @@ export function MerchantProductsSection({ data }: { data: any }) {
 
                             {/* Product Info */}
                             <div className="p-3 flex flex-col flex-1 gap-2">
-                                <Link href={`/buy/${slugifyName(product.name)}`} className="font-bold text-[#011f7b] text-sm leading-tight line-clamp-2 hover:text-[#DAA520] transition-colors">
+                                <Link href={merchantHref(product)} className="font-bold text-[#011f7b] text-sm leading-tight line-clamp-2 hover:text-[#DAA520] transition-colors">
                                     {product.name || "Custom Packaging"}
                                 </Link>
                                 {product.price && (

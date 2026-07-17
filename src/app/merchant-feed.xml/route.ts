@@ -1,4 +1,4 @@
-import { getMerchantProducts, slugifyName, parsePrice } from '@/lib/merchant'
+import { getMerchantProducts, slugifyName, parsePrice, merchantHref } from '@/lib/merchant'
 import { getSeoImageUrl } from '@/lib/image-seo'
 
 // Google Merchant Center product feed (RSS 2.0 + g: namespace) built from the
@@ -35,12 +35,14 @@ export async function GET() {
                 const price = parsePrice(p.price)
                 if (!slug || price <= 0) return ''
                 const img = absImage(p.image)
+                const href = merchantHref(p)
+                const link = href.startsWith('http') ? href : `${SITE}${href}`
                 return `
     <item>
       <g:id>${xmlEscape(slug)}</g:id>
       <g:title>${xmlEscape(p.name)}</g:title>
       <g:description>${xmlEscape(`Custom ${p.name} by Packaging Hippo.`)}</g:description>
-      <g:link>${SITE}/buy/${xmlEscape(slug)}</g:link>
+      <g:link>${xmlEscape(link)}</g:link>
       ${img ? `<g:image_link>${xmlEscape(img)}</g:image_link>` : ''}
       <g:availability>in_stock</g:availability>
       <g:price>${price.toFixed(2)} USD</g:price>

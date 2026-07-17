@@ -21,6 +21,16 @@ export function parsePrice(price: unknown): number {
     return Number.isFinite(n) && n > 0 ? n : 0
 }
 
+// Where a Featured Product should link: the admin-set "Page Link" when it's a
+// real page (e.g. /balloon-boxes), otherwise the auto-generated buyable page.
+export function merchantHref(p: { name: string; link?: string | null }): string {
+    const link = String(p.link || "").trim()
+    if (link && link !== "/" && (link.startsWith("/") || link.startsWith("http"))) {
+        return link
+    }
+    return `/buy/${slugifyName(p.name)}`
+}
+
 export async function getMerchantProducts(): Promise<MerchantProduct[]> {
     try {
         const section = await prisma.homepageSection.findFirst({
