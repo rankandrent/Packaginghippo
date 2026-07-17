@@ -356,15 +356,30 @@ export function Navbar({ settings, menuData }: NavbarProps) {
                         </button>
                     </div>
 
-                    {/* Mobile Menu Button */}
-                    <button
-                        type="button"
-                        aria-label={isOpen ? "Close menu" : "Open menu"}
-                        className="lg:hidden text-[#212529]"
-                        onClick={() => setIsOpen(!isOpen)}
-                    >
-                        {isOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
-                    </button>
+                    {/* Mobile: Cart + Menu Buttons */}
+                    <div className="flex items-center gap-4 lg:hidden">
+                        <button
+                            type="button"
+                            aria-label="Open cart"
+                            onClick={() => setIsCartOpen(true)}
+                            className="relative hover:opacity-80 transition-opacity text-[#212529]"
+                        >
+                            <ShoppingCart className="w-7 h-7 text-primary" />
+                            {totalItems > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-in zoom-in">
+                                    {totalItems}
+                                </span>
+                            )}
+                        </button>
+                        <button
+                            type="button"
+                            aria-label={isOpen ? "Close menu" : "Open menu"}
+                            className="text-[#212529]"
+                            onClick={() => setIsOpen(!isOpen)}
+                        >
+                            {isOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
+                        </button>
+                    </div>
                 </div>
             </div>
 
