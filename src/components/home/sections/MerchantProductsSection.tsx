@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ShoppingCart, Check } from "lucide-react"
 import { getSeoImageUrl, getAltFromUrl } from "@/lib/image-seo"
 import { useCart } from "@/context/CartContext"
@@ -15,42 +16,58 @@ type MerchantProduct = {
     link: string
 }
 
-function AddToCartButton({ product, index }: { product: MerchantProduct, index: number }) {
+function buildCartItem(product: MerchantProduct, index: number) {
+    const slug = product.link?.replace(/^\//, '') || `product-${index}`
+    const parsedPrice = parseFloat(product.price?.replace(/[^0-9.]/g, '') || '0') || 0
+    return {
+        id: slug,
+        name: product.name || "Custom Packaging",
+        slug,
+        price: parsedPrice,
+        quantity: 1,
+        image: product.image || '',
+    }
+}
+
+function ProductActions({ product, index }: { product: MerchantProduct, index: number }) {
     const { addItem } = useCart()
+    const router = useRouter()
     const [added, setAdded] = useState(false)
 
     const handleAddToCart = () => {
-        const slug = product.link?.replace(/^\//, '') || `product-${index}`
-        const parsedPrice = parseFloat(product.price?.replace(/[^0-9.]/g, '') || '0') || 0
-
-        addItem({
-            id: slug,
-            name: product.name || "Custom Packaging",
-            slug,
-            price: parsedPrice,
-            quantity: 1,
-            image: product.image || '',
-        })
-
+        addItem(buildCartItem(product, index))
         setAdded(true)
         setTimeout(() => setAdded(false), 2000)
     }
 
+    const handleBuyNow = () => {
+        addItem(buildCartItem(product, index))
+        router.push('/checkout')
+    }
+
     return (
-        <button
-            onClick={handleAddToCart}
-            className={`flex items-center justify-center gap-1.5 w-full text-xs font-bold py-2 px-3 rounded-lg transition-all duration-200 ${
-                added
-                    ? 'bg-green-600 text-white'
-                    : 'bg-[#011f7b] hover:bg-[#01154f] text-white'
-            }`}
-        >
-            {added ? (
-                <><Check className="w-3.5 h-3.5" /> Added!</>
-            ) : (
-                <><ShoppingCart className="w-3.5 h-3.5" /> Add to Cart</>
-            )}
-        </button>
+        <div className="flex flex-col gap-1.5">
+            <button
+                onClick={handleBuyNow}
+                className="flex items-center justify-center gap-1.5 w-full text-xs font-bold py-2 px-3 rounded-lg btn-gold"
+            >
+                Buy Now
+            </button>
+            <button
+                onClick={handleAddToCart}
+                className={`flex items-center justify-center gap-1.5 w-full text-xs font-bold py-2 px-3 rounded-lg transition-all duration-200 ${
+                    added
+                        ? 'bg-green-600 text-white'
+                        : 'bg-[#011f7b] hover:bg-[#01154f] text-white'
+                }`}
+            >
+                {added ? (
+                    <><Check className="w-3.5 h-3.5" /> Added!</>
+                ) : (
+                    <><ShoppingCart className="w-3.5 h-3.5" /> Add to Cart</>
+                )}
+            </button>
+        </div>
     )
 }
 
@@ -136,7 +153,7 @@ export function MerchantProductsSection({ data }: { data: any }) {
                                     </p>
                                 )}
                                 <div className="mt-auto pt-1">
-                                    <AddToCartButton product={product} index={index} />
+                                    <ProductActions product={product} index={index} />
                                 </div>
                             </div>
                         </div>
