@@ -44,13 +44,17 @@ export async function POST(request: Request) {
             );
         }
 
-        // Hash password and create user
+        // Hash password and create user.
+        // Public self-signups always start as STAFF (limited access) and
+        // unapproved; an existing ADMIN must approve and can promote the
+        // role from the Users management page.
         const hashedPassword = await hashPassword(password);
         const user = await prisma.adminUser.create({
             data: {
                 email: email.toLowerCase(),
                 password: hashedPassword,
                 name: name || null,
+                role: 'STAFF',
             },
         });
 

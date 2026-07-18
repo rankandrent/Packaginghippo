@@ -51,6 +51,7 @@ export async function POST(request: Request) {
             userId: user.id,
             email: user.email,
             name: user.name || undefined,
+            role: user.role,
         });
 
         // Set cookie
@@ -62,6 +63,7 @@ export async function POST(request: Request) {
                 id: user.id,
                 email: user.email,
                 name: user.name,
+                role: user.role,
             },
         });
     } catch (error) {

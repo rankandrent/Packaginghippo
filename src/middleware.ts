@@ -62,6 +62,16 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
+    // --- Role-based access: only ADMIN can see Live Chat, Inquiries, and
+    // user management. Other logged-in roles (e.g. STAFF) are redirected
+    // away from these dashboard pages.
+    const isAdminOnlyPage = ['/dashboard/chat', '/dashboard/inquiries', '/dashboard/users'].some(
+        (p) => pathname === p || pathname.startsWith(`${p}/`)
+    );
+    if (isAdminOnlyPage && user && user.role !== 'ADMIN') {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
     // --- Protect admin/CMS API routes ---
     // These were fully open before (anyone could edit content, settings,
     // redirects, or upload files without logging in). Now they require a valid
@@ -76,6 +86,25 @@ export async function middleware(request: NextRequest) {
 
         if (isAdminApi && !user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Within the admin API surface, some data is ADMIN-only (leads and
+        // chat transcripts are sensitive) even for other logged-in roles.
+        const adminOnlyApiPrefixes = [
+            '/api/cms/inquiries',
+            '/api/cms/users',
+            '/api/chat/conversations',
+            '/api/chat/unread',
+            '/api/chat/ai-reply',
+        ];
+        const isAdminOnlyApi = adminOnlyApiPrefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+        if (isAdminOnlyApi) {
+            if (!user) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+            if (user.role !== 'ADMIN') {
+                return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+            }
         }
     }
 

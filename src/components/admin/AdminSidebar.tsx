@@ -22,8 +22,14 @@ import {
     Image,
     Link as LinkIcon,
     LayoutTemplate,
-    ShoppingBag
+    ShoppingBag,
+    Users
 } from "lucide-react"
+
+// Items only visible to the ADMIN role. Staff accounts can use everything
+// else in the dashboard but not see leads (Inquiries) or chat transcripts
+// (Live Chat), and cannot manage other users.
+const ADMIN_ONLY_TITLES = new Set(["Live Chat", "Inquiries", "Users"])
 
 const sidebarItems = [
     {
@@ -106,16 +112,24 @@ const sidebarItems = [
         href: "/dashboard/inquiries",
         icon: MessageSquare,
     },
+    {
+        title: "Users",
+        href: "/dashboard/users",
+        icon: Users,
+    },
 ]
 
 export function AdminSidebar() {
     const pathname = usePathname()
     const router = useRouter()
     const [loggingOut, setLoggingOut] = useState(false)
-    const [user, setUser] = useState<{ name?: string; email: string } | null>(null)
+    const [user, setUser] = useState<{ name?: string; email: string; role?: string } | null>(null)
     const [pendingInquiriesCount, setPendingInquiriesCount] = useState(0)
     const [seoIssuesCount, setSeoIssuesCount] = useState(0)
     const [unreadChatCount, setUnreadChatCount] = useState(0)
+
+    const isAdmin = user?.role === 'ADMIN'
+    const visibleItems = sidebarItems.filter((item) => isAdmin || !ADMIN_ONLY_TITLES.has(item.title))
 
     useEffect(() => {
         // Fetch current user session
@@ -127,29 +141,42 @@ export function AdminSidebar() {
                 }
             })
             .catch(() => { })
+    }, [])
 
-        // Fetch counts
-        const fetchCounts = () => {
-            fetch('/api/cms/inquiries/count')
-                .then(res => res.json())
-                .then(data => setPendingInquiriesCount(data.count))
-                .catch(() => { })
-
+    useEffect(() => {
+        // SEO issues are visible to everyone; Inquiries/chat counts are
+        // ADMIN-only data, so only poll them once we know the role.
+        const fetchSeoCount = () => {
             fetch('/api/cms/seo-audit/count')
                 .then(res => res.json())
                 .then(data => setSeoIssuesCount(data.count))
                 .catch(() => { })
+        }
+        fetchSeoCount()
+        const seoInterval = setInterval(fetchSeoCount, 30000)
 
-            fetch('/api/chat/unread')
-                .then(res => res.json())
-                .then(data => setUnreadChatCount(data.count))
-                .catch(() => { })
+        let adminInterval: ReturnType<typeof setInterval> | undefined
+        if (isAdmin) {
+            const fetchAdminCounts = () => {
+                fetch('/api/cms/inquiries/count')
+                    .then(res => res.json())
+                    .then(data => setPendingInquiriesCount(data.count))
+                    .catch(() => { })
+
+                fetch('/api/chat/unread')
+                    .then(res => res.json())
+                    .then(data => setUnreadChatCount(data.count))
+                    .catch(() => { })
+            }
+            fetchAdminCounts()
+            adminInterval = setInterval(fetchAdminCounts, 30000)
         }
 
-        fetchCounts()
-        const interval = setInterval(fetchCounts, 30000) // Poll every 30 seconds
-        return () => clearInterval(interval)
-    }, [])
+        return () => {
+            clearInterval(seoInterval)
+            if (adminInterval) clearInterval(adminInterval)
+        }
+    }, [isAdmin])
 
     async function handleLogout() {
         setLoggingOut(true)
@@ -172,7 +199,7 @@ export function AdminSidebar() {
             </div>
             <div className="flex-1 py-4">
                 <nav className="grid items-start px-4 text-sm font-medium">
-                    {sidebarItems.map((item) => (
+                    {visibleItems.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
